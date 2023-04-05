@@ -12,18 +12,17 @@ import {
   ChangeTheme,
   SetCurrentAccount,
   GetAuthToken,
-  ClearAuthToken,
 } from "@/storage/utils/local";
 import {
   GenerateAuth,
   GetAddress,
   MetaMaskConnect,
-  WalletListener,
 } from "@/storage/utils/web3";
 import Router from "next/router";
 import { isDocked } from "@/storage/utils/window";
 import { IStylingObject } from "@/storage/constants/interfaces";
 import { useWindowSize } from "@/storage/utils/tools";
+import { UserSettings } from "@/components/UserSettings";
 
 const Login = () => {
   const [styling, setStyling] = useState<IStylingObject>({});
@@ -35,10 +34,6 @@ const Login = () => {
     ChangeTheme();
     setStyling(STYLING[CheckTheme()]);
     setIsDark(CheckTheme() === "dark");
-  };
-
-  const HandleLogin = async () => {
-    await GenerateAuth();
   };
 
   useEffect(() => {
@@ -88,54 +83,7 @@ const Login = () => {
             Login With
           </div>
           {size.width > 800 && (
-            <div
-              style={{
-                border: `1px solid ${styling.btn_primary}`,
-                borderRadius: "999px",
-                height: "45px",
-                right: "150px",
-                width: "125px",
-                cursor: "pointer",
-                zIndex: "10",
-                display: "flex",
-                alignItems: "center",
-                justifyItems: "center",
-                position: "fixed",
-                justifyContent: "center",
-              }}
-              onClick={() => {
-                handleThemeChange();
-              }}
-            >
-              <div
-                style={{
-                  width: "50px",
-                  height: "30px",
-                  borderRadius: "900px",
-                  background: !isDark ? styling.btn_primary : "",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <SunSVG />
-              </div>
-              <div
-                style={{
-                  width: "50px",
-                  height: "30px",
-                  borderRadius: "900px",
-                  background: isDark ? styling.btn_primary : "",
-                  display: "flex",
-                  alignItems: "center",
-                  alignContent: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <MoonSVG />
-              </div>
-            </div>
+            <UserSettings HandleThemeChange={handleThemeChange} />
           )}
         </div>
       }
@@ -172,12 +120,11 @@ const Login = () => {
           }}
           onClick={async () => {
             let address: any = await GetAddress();
-            await setIsConnecting(true);
+            setIsConnecting(true);
             await MetaMaskConnect();
             const s = await GenerateAuth();
-            await SetCurrentAccount(address, s);
+            SetCurrentAccount(address, s);
             await Router.push("/toolbox");
-            await window.location.reload();
           }}
         >
           {!connecting && (

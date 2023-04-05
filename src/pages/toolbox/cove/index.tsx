@@ -72,6 +72,7 @@ const TheCove = () => {
     currentValue: 1,
     max: 1,
   });
+  const [currentType, setCurrentType] = useState<string>("All Types");
 
   const [loadPercent, setLoadPercent] = useState<number>(0);
   const [wodBalance, setWodBalance] = useState<any>("0.00");
@@ -122,9 +123,25 @@ const TheCove = () => {
       { text: "Artifact" },
     ],
   });
+  const [typeFilter, setTypeFilter] = useState<any>({
+    displayed: false,
+    options: [
+      { text: "All Types" },
+      { text: "Rod" },
+      { text: "Hook" },
+      { text: "Reel" },
+      { text: "Line" },
+      { text: "Float" },
+      { text: "Net" },
+      { text: "Boat" },
+      { text: "Bite Indicator" },
+      { text: "Fish Feeders Box" },
+    ],
+  });
   const [filters, setFilters] = useState<IFilters>({
     searchTerm: "",
     rarity: 0,
+    type: "",
   });
   const [menu, setMenu] = useState<any>({
     1: true,
@@ -215,6 +232,58 @@ const TheCove = () => {
           ></path>
         </svg>
       );
+    } else if (type === "fish-feeders-box") {
+      return (
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12H10V14H14V12H20V18H4V12Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+          <path
+            d="M11 11H13V13H11V11Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+          <path
+            d="M15 8V6H9V8H4V11H10V10H14V11H20V8H15ZM10 8V7H14V8H10Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+        </svg>
+      );
+    } else if (type === "net") {
+      return (
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 16C18 17.105 17.105 18 16 18C14.895 18 14 17.105 14 16C14 14.895 14.895 14 16 14C17.105 14 18 14.895 18 16Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+          <path
+            d="M15.7 20C14.9 20 14.1 19.8 13.4 19.3L7.2 16C6.7 15.6 6.3 15.4 5.9 15C4.7 13.8 4 12.1 4 10.4C4 8.7 4.7 7.1 5.9 5.9C7.1 4.7 8.7 4 10.4 4C12.1 4 13.7 4.7 15 5.9C15.4 6.3 15.6 6.6 16 7.1L19.5 13.5C20.5 15.2 20.2 17.3 18.8 18.7C17.9 19.6 16.9 20 15.7 20ZM10.4 5C9 5 7.6 5.6 6.6 6.6C5.6 7.6 5 9 5 10.4C5 11.9 5.6 13.2 6.6 14.2C6.9 14.5 7.2 14.7 7.7 15L14 18.4C14.6 18.8 15.2 18.9 15.8 18.9C16.7 18.9 17.5 18.6 18.1 17.9C19.2 16.8 19.4 15.2 18.6 13.9L15.1 7.5C14.8 7.1 14.6 6.8 14.3 6.5C13.2 5.6 11.9 5 10.4 5Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+          <path
+            d="M15 11V10L13.6 9.5C13.5 9.3 13.5 9.2 13.4 9L14 7.7L13.3 7L12 7.6C11.8 7.5 11.7 7.5 11.5 7.4L11 6H10L9.5 7.4C9.3 7.5 9.2 7.5 9 7.6L7.7 7L7 7.7L7.6 9C7.5 9.2 7.5 9.3 7.4 9.5L6 10V11L7.4 11.5C7.5 11.7 7.5 11.8 7.6 12L7 13.3L7.7 14L9 13.4C9.2 13.5 9.3 13.6 9.5 13.6L10 15H11L11.5 13.6C11.7 13.5 11.8 13.5 12 13.4L13.3 14L14 13.3L13.4 12C13.5 11.8 13.6 11.7 13.6 11.5L15 11ZM10.5 12C9.7 12 9 11.3 9 10.5C9 9.7 9.7 9 10.5 9C11.3 9 12 9.7 12 10.5C12 11.3 11.3 12 10.5 12Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+        </svg>
+      );
     } else if (type === "float") {
       return (
         <svg
@@ -251,6 +320,37 @@ const TheCove = () => {
           <path
             d="M12.4775 4.52252C11.4226 3.46763 9.99184 2.875 8.5 2.875C7.00816 2.875 5.57742 3.46763 4.52252 4.52252C3.46763 5.57742 2.875 7.00816 2.875 8.5C2.875 9.99184 3.46763 11.4226 4.52252 12.4775L8.5 8.5L12.4775 4.52252Z"
             fill={styling.font_primary}
+          />
+        </svg>
+      );
+    } else if (type === "bite-indicator") {
+      return (
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 9H11V14H15V13L12.07 13.07L12 9Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+          <path
+            d="M9.46002 4.87016C9.07302 4.34816 8.46002 4.01416 7.76802 4.01416C7.35802 4.01416 6.97502 4.13216 6.65102 4.33516L5.66002 5.10016C5.25002 5.48416 4.99402 6.02916 4.99402 6.63416C4.99402 7.13016 5.16602 7.58516 5.45302 7.94416L9.46002 4.87016Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+          <path
+            d="M18.3399 5.10016L17.3399 4.33016C17.0249 4.13216 16.6419 4.01416 16.2319 4.01416C15.5399 4.01416 14.9269 4.34816 14.5439 4.86416L18.5399 7.94016C18.8269 7.58416 18.9999 7.12716 18.9999 6.62816C18.9999 6.02616 18.7469 5.48316 18.3409 5.10016H18.3399Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
+          />
+          <path
+            d="M16.87 18C18.178 16.732 18.992 14.962 19 13.002C18.972 9.146 15.855 6.029 12.003 6C8.146 6.028 5.028 9.145 5 12.997C5.008 14.962 5.822 16.732 7.128 17.998L6.19 18.94C6.115 19.042 6.07 19.171 6.07 19.31C6.07 19.658 6.352 19.94 6.7 19.94C6.839 19.94 6.968 19.895 7.072 19.818L8.07 18.819C9.162 19.577 10.516 20.03 11.975 20.03C13.434 20.03 14.788 19.577 15.903 18.804L16.88 19.819C16.982 19.894 17.111 19.939 17.25 19.939C17.598 19.939 17.88 19.657 17.88 19.309C17.88 19.17 17.835 19.041 17.758 18.937L16.87 18ZM6.87 13C6.898 10.178 9.178 7.898 11.997 7.87C14.822 7.898 17.102 10.178 17.13 12.997C17.102 15.822 14.822 18.102 12.003 18.13C9.178 18.102 6.898 15.822 6.87 13.003V13Z"
+            fill={styling.font_primary}
+            fill-opacity="0.6"
           />
         </svg>
       );
@@ -469,7 +569,11 @@ const TheCove = () => {
                       .toString()
                       .toLowerCase()
                       .includes(filters.searchTerm.toLowerCase())) &&
-                  (filters.rarity === 0 || item.props.rarity === filters.rarity)
+                  (filters.rarity === 0 ||
+                    item.props.rarity === filters.rarity) &&
+                  (filters.type === "all-types" ||
+                    filters.type === "" ||
+                    item.props.type === filters.type)
                 ) {
                   return true;
                 }
@@ -484,6 +588,7 @@ const TheCove = () => {
                 }
               });
             }
+            console.log(filtered);
             const newCards = [];
             const max =
               Math.ceil(scrollY / 200) * 6 +
@@ -1082,6 +1187,10 @@ const TheCove = () => {
               ...rarityFilter,
               displayed: !rarityFilter.displayed,
             });
+            setTypeFilter({
+              ...typeFilter,
+              displayed: false,
+            });
           }}
         >
           {rarityFilter.options[filters.rarity].text}
@@ -1125,6 +1234,111 @@ const TheCove = () => {
                     rarity: rarityFilter.options.indexOf(item),
                   });
                   setRarityFilter({ ...rarityFilter, displayed: false });
+                }}
+                key={genRanHex(64)}
+                style={{
+                  cursor: "pointer",
+                  fontWeight: "500",
+                  color: "white",
+                  fontSize: "20px",
+                  marginTop: "16px",
+                }}
+              >
+                {item.text}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div
+        style={{
+          display: menu["3"] ? "hidden" : "block",
+          position: "absolute",
+          top: "300px",
+          width: "180px",
+          left: "1100px",
+        }}
+      >
+        <div
+          style={{
+            color: "#777E90",
+            marginLeft: "5px",
+            fontSize: "12px",
+            fontWeight: "600",
+          }}
+        >
+          ITEM TYPE
+        </div>
+        <div
+          style={{
+            border: "1px solid #777E90",
+            fontSize: "16px",
+            width: "180px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            marginTop: "5px",
+
+            height: "40px",
+            borderRadius: "15px",
+            color: styling.font_primary,
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            setTypeFilter({
+              ...typeFilter,
+              displayed: !typeFilter.displayed,
+            });
+            setRarityFilter({
+              ...rarityFilter,
+              displayed: false,
+            });
+          }}
+        >
+          {currentType}
+          <svg
+            width="10"
+            height="6"
+            viewBox="0 0 10 6"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M9.20704 0.793031C9.01951 0.60556 8.76521 0.500244 8.50004 0.500244C8.23488 0.500244 7.98057 0.60556 7.79304 0.793031L5.00004 3.58603L2.20704 0.793031C2.01844 0.610873 1.76584 0.510078 1.50364 0.512357C1.24144 0.514635 0.990631 0.619804 0.805223 0.805212C0.619815 0.99062 0.514645 1.24143 0.512367 1.50363C0.510088 1.76583 0.610883 2.01843 0.793041 2.20703L4.29304 5.70703C4.48057 5.8945 4.73488 5.99982 5.00004 5.99982C5.26521 5.99982 5.51951 5.8945 5.70704 5.70703L9.20704 2.20703C9.39451 2.0195 9.49983 1.76519 9.49983 1.50003C9.49983 1.23487 9.39451 0.980558 9.20704 0.793031Z"
+              fill={styling.font_primary}
+            />
+          </svg>
+        </div>
+        <div
+          style={{
+            width: "250px",
+            background: "grey",
+            height: typeFilter.displayed ? "410px" : "0px",
+            marginTop: "5px",
+            borderRadius: "3px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            position: "absolute",
+            overflow: "hidden",
+            zIndex: "999",
+            transition: "0.5s",
+          }}
+        >
+          {typeFilter.options.map((item: any) => {
+            return (
+              <div
+                onClick={() => {
+                  setFilters({
+                    ...filters,
+                    type: item.text.replace(/\s+/g, "-").toLowerCase(),
+                  });
+                  setTypeFilter({ ...typeFilter, displayed: false });
+                  setCurrentType(item.text);
                 }}
                 key={genRanHex(64)}
                 style={{

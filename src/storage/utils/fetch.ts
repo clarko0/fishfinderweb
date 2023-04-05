@@ -44,30 +44,36 @@ export const getUsersStats = async () => {
 
 export const getMarketplaceItems = async (page: number) => {
   const chainId = await getChainid();
-  return await api.post(
-    chainId === 56 ? "/marketplace/search/items" : "/marketplace/search/items",
-    {
-      filters: {
-        name: "",
-        by_owner: false,
-        wod_multiplier: { min: 0.8, max: 2 },
-        exp_multiplier: { min: 0.8, max: 4 },
-        level: { min: 1, max: 15 },
-        price: { min: 0, max: null },
-        durability: { min: 0, max: 100 },
-        rarity: [],
-        coll_num: [],
-        slot_key: ["-fish"],
-        is_new: true,
-        is_auction: false,
-        is_sale: false,
-        not_for_sale: false,
-        not_auction: false,
-      },
-      sort: { sort_by: "price", sort_dir: "ASC" },
-      page: page,
-    }
-  );
+  try {
+    return await api.post(
+      chainId === 56
+        ? "/marketplace/search/items"
+        : "/marketplace/search/items",
+      {
+        filters: {
+          name: "",
+          by_owner: false,
+          wod_multiplier: { min: 0.8, max: 2 },
+          exp_multiplier: { min: 0.8, max: 4 },
+          level: { min: 1, max: 15 },
+          price: { min: 0, max: null },
+          durability: { min: 0, max: 100 },
+          rarity: [],
+          coll_num: [],
+          slot_key: ["-fish"],
+          is_new: true,
+          is_auction: false,
+          is_sale: false,
+          not_for_sale: false,
+          not_auction: false,
+        },
+        sort: { sort_by: "price", sort_dir: "ASC" },
+        page: page,
+      }
+    );
+  } catch (e) {
+    return { data: { items: [] } };
+  }
 };
 
 export const getMarketplaceFish = async (page: number) => {

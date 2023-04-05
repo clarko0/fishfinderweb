@@ -356,7 +356,7 @@ const CoveCard = (props: any) => {
             transition: "0.5s",
             color: styling.font_primary,
             borderRadius: "3px",
-            width: toolTip ? "75px" : "0px",
+            width: toolTip ? "150px" : "0px",
             marginTop: "50px",
             overflow: "hidden",
             height: toolTip ? "30px" : "0px",
@@ -369,7 +369,10 @@ const CoveCard = (props: any) => {
           }}
         >
           {props.type !== undefined &&
-            props.type[0].toUpperCase() + props.type.slice(1)}
+            (props.type[0].toUpperCase() + props.type.slice(1)).replace(
+              "-",
+              " "
+            )}
         </div>
       </div>
     </div>

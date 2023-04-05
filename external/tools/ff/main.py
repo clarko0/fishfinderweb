@@ -330,6 +330,7 @@ def handlePendingSessions(pending, isStartup):
         print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Starting sessions for {i["address"]}' )
         startTime = time.time()
         i["items"] = sortByWodRate([x["items"] for x in items if x["session_id"] == i["session_id"]][0])
+        # if not isStartup:
         repairUsersTools(items=i["items"], data=i)
         i["sets"] = createSets(items=i["items"])
         i.pop("items")
@@ -404,4 +405,10 @@ def Main():
         
 
 if __name__ == "__main__":
-    Main()
+    while True:
+        try:
+            Main()
+        except:
+            time.sleep(30) 
+            pass
+            

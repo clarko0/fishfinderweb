@@ -28,6 +28,7 @@ export interface IUserData {
 
 export interface IFilters {
   searchTerm: string;
+  type: string;
   rarity: number;
 }
 
