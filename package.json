@@ -1,0 +1,41 @@
+{
+  "name": "fishfinder",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "start_up": "startup.bat",
+    "lint": "next lint",
+    "vercel" : "vercel"
+  },
+  "dependencies": {
+    "@next/font": "13.1.6",
+    "@types/node": "18.11.18",
+    "@types/react": "18.0.27",
+    "@types/react-dom": "18.0.10",
+    "axios": "^1.2.6",
+    "base-64": "^1.0.0",
+    "eslint": "8.32.0",
+    "eslint-config-next": "13.1.6",
+    "ethers": "^6.0.8",
+    "is-valid-domain": "^0.1.6",
+    "next": "13.1.6",
+    "nprogress": "^0.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-progressbar": "^15.4.1",
+    "to-hex": "^0.0.18",
+    "typescript": "4.9.4",
+    "vercel": "^28.18.1",
+    "web3": "^1.8.2",
+    "web3-token": "^1.0.4",
+    "mongodb" : "5.1.0"
+  },
+  "devDependencies": {
+    "@types/base-64": "^1.0.0",
+    "@types/ms": "^0.7.31",
+    "@types/nprogress": "^0.2.0"
+  }
+}
