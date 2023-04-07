@@ -94,7 +94,7 @@ def repairUsersTools(data, items):
         for i in items[key]:
             ids.append(i["id"])
             toolIds.append(i["tool_id"])
-    response = requests.post(WOD_ENPOINT + "/consumables/repair", json={"item_ids" : ids, "repairment_ids" : toolIds}, headers={"Authorization" : data["auth"]})
+    return requests.post(WOD_ENPOINT + "/consumables/repair", json={"item_ids" : ids, "repairment_ids" : toolIds}, headers={"Authorization" : data["auth"]}).status_code
 
 def getTopZones(owned):
     chunks = []
@@ -220,41 +220,38 @@ def sortByWodRate(items):
 async def bulkStartFishing(sets, data):
     fishingSessions = []
     usersZones = getUsersZone(data=data)
-    res = getTopZones(owned=usersZones)
-    bestZones = res["random"]
-    ownedZonesInfo = res["owned"]
-    usedZones = json.loads(requests.get("https://api.worldofdefish.com/zones/active/offchain/select/all", headers={"Authorization" : data["auth"]}).text)
-    if len(usedZones) != 0:
-        for i in usedZones:
-            zoneData = json.loads(requests.get(f"https://api.worldofdefish.com/zones/{i}/expanded-offchain", headers={"Authorization" : data["auth"]}).text)
-            
-            fishingSessions.append(
-                {"session_id" : zoneData["fishing_session"]["_id"],
-                "zone_id" : zoneData["_id"],
-                "fee" : zoneData["fee"],
-                "wod_multiplier" : zoneData["fishing_session"]["wod_multiplier"],
-                "set" : []}
-                )
-    print(fishingSessions)
+    topZones = getTopZones(owned=usersZones)
+    bestZones = topZones["random"]
+    ownedZonesInfo = topZones["owned"]
+    usedZones = []
+    
+    # Get active fishing sessions and end them
+    activeZones = json.loads(requests.get(WOD_ENPOINT + "/zones/active/offchain/select/all", headers={"Authorization" : data["auth"]}).text)
+    for zone in activeZones:
+        zoneData = json.loads(requests.get(f"{WOD_ENPOINT}/zones/{zone}/expanded-offchain", headers={"Authorization" : data["auth"]}).text)
+        await endFishing(data={"auth" : data["auth"]}, id=zoneData["fishing_session"]["_id"])
+    
     char_level = data["char_level"]
     
-
+    # Remove zones that the user's level does not meet the minimum requirements
     for key in LEVEL_RESTRICTIONS:
         if LEVEL_RESTRICTIONS[key]["min"] > char_level:
             del bestZones[str(int(key) - 1)]
-    zoneKeys = list(bestZones.keys())
-    limit = int(zoneKeys[-1])
-    if(limit == 0):
+            
+    # Select the zones to fish in based on boat rarity and user level
+    limit = int(max(bestZones.keys(), default=0))
+    if limit == 0:
         limit += 1
+    zoneKeys = list(bestZones.keys())
 
     for i in sets:
-        if(len(fishingSessions) == 15):
+        if len(fishingSessions) == 15:
             return fishingSessions
-        validZones = []
+        
         setWodMultiplier = 1
-        for key in i:
-            if i[key] is not None and 'wod_multiplier' in i[key]:
-                setWodMultiplier *= i[key]["wod_multiplier"]
+        for item in i.values():
+            if item and 'wod_multiplier' in item:
+                setWodMultiplier *= item["wod_multiplier"]
 
         boat = i.get("boat")
         if not boat:
@@ -267,26 +264,46 @@ async def bulkStartFishing(sets, data):
                 zonenums = list(range(min(5, limit)))
             else:
                 zonenums = list(range(min(6, limit)))
-
-        tempZones = {str(num): bestZones[str(num)] for num in zonenums}
-        for key, zones in tempZones.items():
-            for z in zones:
-                if z["zone"] not in usedZones:
-                    score = z["wod_rate"] * (1 - (z["fee"] / 100)) * (1 / (1 + z["players"])) * setWodMultiplier
-                    validZones.append({"id": z["zone"], "score": score})
-        for z in ownedZonesInfo:
-            if z["zone"] not in usedZones:
-                score = z["wod_rate"] * 3600 * (1 / (1 + z["players"])) * setWodMultiplier
-                validZones.append({"id": z["zone"], "score": score})
+                
+        # Find the best zone to fish in based on WOD rate, fee, number of players, and set WOD multiplier
+        validZones = []
+        for num in zonenums:
+            for zone in bestZones[str(num)]:
+                if zone["zone"] not in usedZones:
+                    score = zone["wod_rate"] * (1 - (zone["fee"] / 100)) * (1 / (1 + zone["players"])) * setWodMultiplier
+                    validZones.append({"id": zone["zone"], "score": score})
+        
+        for ownedZone in ownedZonesInfo:
+            if ownedZone["zone"] not in usedZones:
+                score = ownedZone["wod_rate"] * 3600 * (1 / (1 + ownedZone["players"])) * setWodMultiplier
+                validZones.append({"id": ownedZone["zone"], "score": score})
 
         validZones.sort(key=lambda x: x["score"], reverse=True)
         bestZone = validZones[0]
-        fData = await startFishing(s=i, zone=bestZone["id"], data=data)
-        while fData == {}:
-            bestZone = validZones[validZones.index(bestZone) + 1]
-            fData = await startFishing(s=i, zone=bestZone["id"], data=data)
-        fishingSessions.append(fData)
+        
+        is_own_zone = any(bestZone["id"] == zone["zone"] for zone in ownedZonesInfo)
+        boat_count = sum(1 for j in sets if j.get("boat"))
+
+        if boat_count != 15 - len(fishingSessions) and is_own_zone:
+            for j in sets:
+                if not j.get("boat"):
+                    j["boat"] = i["boat"]
+                    break
+            i.pop("boat")
+
+        while True:
+            f_data = await startFishing(s=i, zone=bestZone["id"], data=data)
+            if f_data:
+                break
+            next_index = validZones.index(bestZone) + 1
+            if next_index >= len(validZones):
+                break
+            bestZone = validZones[next_index]
+
+        fishingSessions.append(f_data)
         usedZones.append(bestZone["id"])
+        sets = [l for l in sets if l != i]
+
 
     return fishingSessions
 
@@ -303,7 +320,6 @@ async def startFishing(s, zone, data):
         }
         ).text
         res_json = json.loads(res)
-        print(res_json)
         try:
             return {
                 "session_id" : res_json["_id"],
@@ -320,94 +336,109 @@ async def startFishing(s, zone, data):
         print(data)
         return False
 
+
 def endFishing(data, id):
     response = requests.post(WOD_ENPOINT + f"/fishing/{id}/end", headers={"Authorization" : data["auth"]})
 
-def handlePendingSessions(pending, isStartup):
-    items = asyncio.run(bulkGetItems(pending=pending))
+async def handlePendingSessions(pending, is_startup):
+    items = await bulkGetItems(pending=pending)
+    pendingcol = MONGO_DB["ffpending"]
+    runningcol = MONGO_DB["ffrunning"]
+    usercol = MONGO_DB["ffusers"]
     for i in pending:
-        invalid = True
-        print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Starting sessions for {i["address"]}' )
-        startTime = time.time()
-        i["items"] = sortByWodRate([x["items"] for x in items if x["session_id"] == i["session_id"]][0])
-        # if not isStartup:
-        repairUsersTools(items=i["items"], data=i)
+        address = i["address"]
+        session_id = i["session_id"]
+        print(f'[{datetime.now():%Y-%m-%d | %H:%M:%S}] | Starting sessions for {address}')
+        start_time = time.monotonic()
+        i["items"] = sortByWodRate([x["items"] for x in items if x["session_id"] == session_id][0])
+        if address == "0x8F29B5880b40d5B3bcc261813a9E996FB01A8F3c":
+            usercol.update_one({"address" : address}, {'$set': {"system_msg" : {
+                "title" : "We had to stop your fishing sessions",
+                "msg" : "You have ran out of 25% tools, top up to begin fishing again!"
+            }}})
+        if not is_startup:
+            res = repairUsersTools(items=i["items"], data=i)
+            if int(res) != 200:
+                print(f'[{datetime.now():%Y-%m-%d | %H:%M:%S}] | Error when repairing for {address}, removing user from pending...')
+                pendingcol.delete_one({"session_id": session_id})
+                usercol.update_one({"address" : address}, {'$set': {"system_msg" : {
+                    "title" : "We had to stop your fishing sessions",
+                    "msg" : "You have ran out of 25% tools, top up to begin fishing again!"
+                }}})
+                print(f'[{datetime.now():%Y-%m-%d | %H:%M:%S}] | Removed {address} from pending | Time Taken - {time.monotonic() - start_time:.3f}s')
+                continue
         i["sets"] = createSets(items=i["items"])
-        i.pop("items")
-        # if (len(i["sets"]) == 0):
-        #     print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Error could not find any sets for {i["address"]}, removing user from pending...' )
-        #     pendingcol = MONGO_DB["ffpending"]
-        #     pendingcol.delete_one({ "session_id" : i["session_id"] })
-        #     print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Removed {i["address"]} from pending | Time Taken - {round(time.time() - startTime, 3)}s' )
-        #     pass
-        # else:
-        t = asyncio.run(bulkStartFishing(sets=i["sets"], data=i))
-        print(len(t))
-        if(len(t) == 0):
-            pendingcol = MONGO_DB["ffpending"]
-            pendingcol.delete_one({ "session_id" : i["session_id"] })
-        for l in t:
-            if not l:
-                # pendingcol = MONGO_DB["ffpending"]
-                # pendingcol.delete_one({ "session_id" : i["session_id"] })
-                invalid = False
-                break
-            if l["session_id"] == "pass":
-                t.pop(l)
-        if invalid:
-            i["active_sessions"] = [l["session_id"] for l in t]
-            i.pop("sets")
-            pendingcol = MONGO_DB["ffpending"]
-            pendingcol.delete_one({ "session_id" : i["session_id"] })
-            runningcol = MONGO_DB["ffrunning"]
-            runningcol.insert_one(i)
-            print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Started fishing for {i["address"]} | Time Taken - {round(time.time() - startTime, 3)}s' )
-        else:
-            pass
+        del i["items"]
+        t = await bulkStartFishing(sets=i["sets"], data=i)
+        if not t:
+            pendingcol.delete_one({"session_id": session_id})
+            continue
+        i["active_sessions"] = [l["session_id"] for l in t]
+        del i["sets"]
+        pendingcol.delete_one({"session_id": session_id})
+        runningcol.insert_one(i)
+        print(f'[{datetime.now():%Y-%m-%d | %H:%M:%S}] | Started fishing for {address} | Time Taken - {time.monotonic() - start_time:.3f}s')
+
+
+def endActiveSessions(user):
+    print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Ending current active sessions for {user["address"]}')
+    userStart = time.time()
+    for session in user["active_sessions"]:
+        endFishing(data={"auth" : user["auth"]}, id=session)
+    return userStart
+
 def restartBot():
     running = MONGO_DB["ffrunning"].find()
-    print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Ending current active sessions...' )
+    print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Ending current active sessions...')
     startTime = time.time()
-    pending = MONGO_DB["ffpending"]
+    pending_col = MONGO_DB["ffpending"]
+    user_starts = []
     for user in running:
-        print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Ending current active sessions for {user["address"]}' )
-        userStart = time.time()
-        for session in user["active_sessions"]:
-            endFishing(data={"auth" : user["auth"]}, id=session)
-        pending.insert_one({"auth" : user["auth"], "address" : user["address"], "char_level" : user["char_level"], "session_id" : user["session_id"]})
-        print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Ended all current active sessions for {user["address"]} | Time Taken - {round(time.time() - userStart, 3)}s' )
+        user_start = endActiveSessions(user)
+        pending_col.insert_one({
+            "auth": user["auth"],
+            "address": user["address"],
+            "char_level": user["char_level"],
+            "session_id": user["session_id"]
+        })
+        user_starts.append(user_start)
     MONGO_DB["ffrunning"].delete_many({})
-    print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Ended all current active sessions | Time Taken - {round(time.time() - startTime, 3)}s' )
+    print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Ended all current active sessions | Time Taken - {round(time.time() - startTime, 3)}s')
+    
     next_repair_col = MONGO_DB["ffnextrepair"]
-    now = now = datetime.now()
+    now = datetime.now()
     new_time = now + timedelta(hours=5.5)
     next_repair = new_time
     next_repair_col.delete_many({})
-    next_repair_col.insert_one({"next_repair" : str(next_repair)})
+    next_repair_col.insert_one({"next_repair": str(next_repair)})
+
+    for user_start in user_starts:
+        print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | Ended all current active sessions for {user["address"]} | Time Taken - {round(time.time() - user_start, 3)}s')
+        
     return next_repair
 
-def Main():
-    next_repair = ""
+async def Main():
     Init()
-    isStartup = True
+    is_startup = True
     next_repair = restartBot()
     while True:
         now = datetime.now()
         if next_repair <= now:
             next_repair = restartBot()
-        pending = MONGO_DB["ffpending"].find()
-        pending_list = [i for i in pending]
-        if any(pending_list):
-            handlePendingSessions(pending_list, isStartup)
-            isStartup = False
-        print(f'[{datetime.now().strftime("%Y-%m-%d | %H:%M:%S")}] | STATUS : RUNNING | SESSIONS RUNNING : {len(list(MONGO_DB["ffrunning"].find()))}')
-        time.sleep(30)
+        pending = list(MONGO_DB["ffpending"].find())
+        if pending:
+            await handlePendingSessions(pending, is_startup)
+            is_startup = False
+        running_count = MONGO_DB["ffrunning"].count_documents({})
+        print(f"[{datetime.now().strftime('%Y-%m-%d | %H:%M:%S')}] | STATUS: RUNNING | SESSIONS RUNNING: {running_count}")
+        await asyncio.sleep(30)
+
         
 
 if __name__ == "__main__":
     while True:
         try:
-            Main()
+            asyncio.run(Main())
         except:
             time.sleep(30) 
             pass

@@ -39,14 +39,35 @@ export default async function handler(req: any, res: any) {
         .find({ address: body.address })
         .toArray();
       let wod = 0;
+      let system_msg = {
+        title: "",
+        msg: "",
+      };
+
       if (user.length === 0) {
         await db.collection("ffusers").insertOne({
           address: body.address,
           wod_balance: body.wod_balance,
+          system_msg: {
+            title: "",
+            msg: "",
+          },
         });
         wod = body.wod_balance;
       } else {
         wod = user[0].wod_balance;
+        system_msg = user[0].system_msg;
+        await db.collection("ffusers").updateOne(
+          { address: body.address },
+          {
+            $set: {
+              system_msg: {
+                title: "",
+                msg: "",
+              },
+            },
+          }
+        );
       }
       const pending = await db
         .collection("ffpending")
@@ -94,6 +115,7 @@ export default async function handler(req: any, res: any) {
         bool: isFishing,
         sessions: sessions,
         session_id: session_id,
+        system_msg: system_msg,
       });
     });
   } catch (e: any) {
