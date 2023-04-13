@@ -404,7 +404,8 @@ const FishermanFriend = () => {
         });
 
         setWodFarmed(Number(wod.toFixed(2)));
-        setWodFarmedPrice(Number(wod.toFixed(2)) * wodPrice);
+        console.log(Number(wod.toFixed(2)) * tokenPrice);
+        setWodFarmedPrice(Number(wod.toFixed(2)) * tokenPrice);
       });
       const interval = setInterval(() => {
         pingFishing(wod_balance).then(async (res) => {
