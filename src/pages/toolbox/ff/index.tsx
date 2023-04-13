@@ -311,7 +311,7 @@ const FishermanFriend = () => {
       pingFishing(wod_balance).then(async (res) => {
         setStatus(res.data.status);
         setIsFishing(res.data.bool);
-        setSessions(res.data.sessions);
+
         setSessionId(res.data.session_id);
         setWodOnSignup(res.data.wod_signup);
         setNextRepair(res.data.next_repair);
@@ -354,52 +354,54 @@ const FishermanFriend = () => {
         setConsumableData(cData[3]);
         const currentWod: any = await getUsersStats();
         let wod: any = currentWod.data.total_wod - res.data.wod_signup;
-        if (res.data.bool) {
-          GetActiveZone().then(async (res) => {
-            let zoneIds: any = res.data;
-            let items: IItems = {
-              common: [],
-              uncommon: [],
-              rare: [],
-              epic: [],
-              legendary: [],
-              artifact: [],
-            };
-            const sessionInfo: any = await getSessionInfo(zoneIds);
 
-            for (let i = 0; i < sessionInfo.length; i++) {
-              for (
-                let z = 0;
-                z < sessionInfo[i].fishing_session.slot_items.length;
-                z++
-              ) {
-                let item = sessionInfo[i].fishing_session.slot_items[z];
-                if (item.rarity === 1) {
-                  items.common.push(item);
-                } else if (item.rarity === 2) {
-                  items.uncommon.push(item);
-                } else if (item.rarity === 3) {
-                  items.rare.push(item);
-                } else if (item.rarity === 4) {
-                  items.epic.push(item);
-                } else if (item.rarity === 5) {
-                  items.legendary.push(item);
-                } else if (item.rarity === 6) {
-                  items.artifact.push(item);
-                }
+        GetActiveZone().then(async (res) => {
+          let zoneIds: any = res.data;
+          let items: IItems = {
+            common: [],
+            uncommon: [],
+            rare: [],
+            epic: [],
+            legendary: [],
+            artifact: [],
+          };
+          const sessionInfo: any = await getSessionInfo(zoneIds);
+
+          for (let i = 0; i < sessionInfo.length; i++) {
+            for (
+              let z = 0;
+              z < sessionInfo[i].fishing_session.slot_items.length;
+              z++
+            ) {
+              let item = sessionInfo[i].fishing_session.slot_items[z];
+              if (item.rarity === 1) {
+                items.common.push(item);
+              } else if (item.rarity === 2) {
+                items.uncommon.push(item);
+              } else if (item.rarity === 3) {
+                items.rare.push(item);
+              } else if (item.rarity === 4) {
+                items.epic.push(item);
+              } else if (item.rarity === 5) {
+                items.legendary.push(item);
+              } else if (item.rarity === 6) {
+                items.artifact.push(item);
               }
-              wod += sessionInfo[i].fishing_session.last_saved_wod_earned;
             }
-            setUserData((prevUserData: IUserData) => ({
-              ...prevUserData,
-              items: items,
-            }));
-            setActiveSessionData(sessionInfo);
-            setGettingSessions(false);
-          });
-        } else {
+            wod += sessionInfo[i].fishing_session.last_saved_wod_earned;
+          }
+          setUserData((prevUserData: IUserData) => ({
+            ...prevUserData,
+            items: items,
+          }));
+          setActiveSessionData(sessionInfo);
+          setSessions(
+            sessionInfo.map((item: any) => {
+              return item.fishing_session._id;
+            })
+          );
           setGettingSessions(false);
-        }
+        });
 
         setWodFarmed(Number(wod.toFixed(2)));
         setWodFarmedPrice(Number(wod.toFixed(2)) * wodPrice);
