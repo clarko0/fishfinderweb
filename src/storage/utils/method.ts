@@ -136,26 +136,35 @@ export const isUnlimitedApproveTools = async () => {
 export const buyTools = async (
   items: any,
   numberOfRepairs: number,
-  percent: number,
-  cData: any
+  rarites: any
 ) => {
-  let address = await GetAddress();
-  let tools: any = {};
-  for (const key in items) {
-    for (let i = 0; i < items[key].length; i++) {
-      const vendor: number = cData[percent].filter((item: any) => {
-        return item.rarity === items[key][i].rarity;
-      })[0].id;
-      if (!(vendor in tools)) {
-        tools[vendor] = 0;
-      }
-      tools[vendor]++;
+  const address = await GetAddress();
+  let toolInfo: any = {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+  };
+  const nonUsedRarites: any = Object.keys(rarites).filter((item: any) => {
+    return !rarites[item];
+  });
+  console.log(nonUsedRarites);
+
+  for (const i in items) {
+    if (!nonUsedRarites.includes(items[i][0].rarity.toString())) {
+      toolInfo[Object.keys(items).indexOf(i) + 1] = items[i].length;
     }
   }
-  for (const key in tools) {
-    ToolContract.methods
-      .buyV3(key, tools[key] * numberOfRepairs)
-      .send({ from: address });
+
+  console.log(toolInfo);
+  for (const key in toolInfo) {
+    if (toolInfo[key] !== 0) {
+      ToolContract.methods
+        .buyV3((parseInt(key) - 1) * 3, toolInfo[key] * numberOfRepairs)
+        .send({ from: address });
+    }
   }
 };
 
