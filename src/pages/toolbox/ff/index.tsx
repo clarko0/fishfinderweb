@@ -327,7 +327,6 @@ const FishermanFriend = () => {
           });
         }
         const tokenPrice = await GetTokenPrice(1);
-        console.log(tokenPrice);
         setWodPrice(tokenPrice);
         setPageLoading(false);
         const consumablePrices: any = await GetAllConsumablePrices();
@@ -404,7 +403,6 @@ const FishermanFriend = () => {
         });
 
         setWodFarmed(Number(wod.toFixed(2)));
-        console.log(Number(wod.toFixed(2)) * tokenPrice);
         setWodFarmedPrice(Number(wod.toFixed(2)) * tokenPrice);
       });
       const interval = setInterval(() => {
