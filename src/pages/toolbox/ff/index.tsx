@@ -410,7 +410,6 @@ const FishermanFriend = () => {
         pingFishing(wod_balance).then(async (res) => {
           setStatus(res.data.status);
           setIsFishing(res.data.bool);
-          setSessions(res.data.sessions);
           setSessionId(res.data.session_id);
           setWodOnSignup(res.data.wod_signup);
           setNextRepair(res.data.next_repair);
@@ -426,16 +425,20 @@ const FishermanFriend = () => {
           }
           const currentWod: any = await getUsersStats();
           let wod: any = currentWod.data.total_wod - res.data.wod_signup;
-          if (res.data.bool) {
-            GetActiveZone().then(async (res) => {
-              let zoneIds: any = res.data;
-              const sessionInfo: any = await getSessionInfo(zoneIds);
-              for (let i = 0; i < sessionInfo.length; i++) {
-                wod += sessionInfo[i].fishing_session.last_saved_wod_earned;
-              }
-              setActiveSessionData(sessionInfo);
-            });
-          }
+          GetActiveZone().then(async (res) => {
+            let zoneIds: any = res.data;
+            const sessionInfo: any = await getSessionInfo(zoneIds);
+            for (let i = 0; i < sessionInfo.length; i++) {
+              wod += sessionInfo[i].fishing_session.last_saved_wod_earned;
+            }
+            setActiveSessionData(sessionInfo);
+            setSessions(
+              sessionInfo.map((item: any) => {
+                return item.fishing_session._id;
+              })
+            );
+          });
+
           setWodFarmed(Number(wod.toFixed(2)));
           setWodFarmedPrice(Number(wod.toFixed(2)) * wodPrice);
         });
