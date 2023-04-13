@@ -246,6 +246,7 @@ const BuyToolMenu = ({
                         .map((item: any) => {
                           return (
                             <div
+                              key="blah"
                               style={{
                                 fontSize: "16px",
                                 width: "10px",
