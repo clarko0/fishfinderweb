@@ -100,6 +100,7 @@ const FishermanFriend = () => {
       artifact: [],
     },
     isReady: false,
+    doublyReady: false,
   });
   const [wodOnSignup, setWodOnSignup] = useState<number>(0);
   const [timer, setTimer] = useState("00 : 00 : 00");
@@ -361,12 +362,12 @@ const FishermanFriend = () => {
         GetActiveZone().then(async (res) => {
           let zoneIds: any = res.data;
           let items: IItems = {
-            common: [],
-            uncommon: [],
-            rare: [],
-            epic: [],
-            legendary: [],
-            artifact: [],
+            common: [...userData.items.common],
+            uncommon: [...userData.items.uncommon],
+            rare: [...userData.items.rare],
+            epic: [...userData.items.epic],
+            legendary: [...userData.items.legendary],
+            artifact: [...userData.items.artifact],
           };
           const sessionInfo: any = await getSessionInfo(zoneIds);
 
@@ -393,8 +394,8 @@ const FishermanFriend = () => {
             }
             wod += sessionInfo[i].fishing_session.last_saved_wod_earned;
           }
-          setUserData((prevUserData: IUserData) => ({
-            ...prevUserData,
+          setUserData((prev: any) => ({
+            ...prev,
             items: items,
           }));
           setActiveSessionData(sessionInfo);
@@ -403,9 +404,12 @@ const FishermanFriend = () => {
               return item.fishing_session._id;
             })
           );
+          setUserData((prevData: any) => ({
+            ...prevData,
+            doublyReady: true,
+          }));
           setGettingSessions(false);
         });
-
         setWodFarmed(Number(wod.toFixed(2)));
         setWodFarmedPrice(Number(wod.toFixed(2)) * tokenPrice);
       });
@@ -561,6 +565,21 @@ const FishermanFriend = () => {
         setCanFish(validation);
         GetUserdata().then((res: any) => {
           setPlayerLevel(res.data.character.level);
+
+          let newItems = userData.items;
+          for (const i in newItems) {
+            newItems[i] = [...newItems[i], ...items[i]];
+          }
+
+          for (const i in newItems) {
+            const seen = new Set();
+            const filteredArr = newItems[i].filter((el: any) => {
+              const duplicate = seen.has(el.id);
+              seen.add(el.id);
+              return !duplicate;
+            });
+            newItems[i] = filteredArr;
+          }
           setUserData({
             username: "@" + res.data.nickname,
             avatar:
@@ -568,8 +587,9 @@ const FishermanFriend = () => {
                 ? "https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png"
                 : res.data.avatar_url,
             tools: tools,
-            items: items,
+            items: newItems,
             isReady: true,
+            doublyReady: false,
           });
         });
       });
@@ -577,7 +597,8 @@ const FishermanFriend = () => {
   }, []);
 
   useEffect(() => {
-    if (userData.isReady) {
+    if (userData.isReady && userData.doublyReady) {
+      console.log(userData.items);
       setFishingTime(
         CaclulateFishingTime(userData.items, userData.tools).string
       );

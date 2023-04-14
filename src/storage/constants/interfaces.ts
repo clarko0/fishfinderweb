@@ -24,6 +24,7 @@ export interface IUserData {
   tools: ITool[];
   items: IItems;
   isReady: boolean;
+  doublyReady: boolean;
 }
 
 export interface IFilters {
