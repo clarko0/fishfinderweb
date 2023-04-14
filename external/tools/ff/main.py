@@ -229,7 +229,7 @@ async def bulkStartFishing(sets, data):
     activeZones = json.loads(requests.get(WOD_ENPOINT + "/zones/active/offchain/select/all", headers={"Authorization" : data["auth"]}).text)
     for zone in activeZones:
         zoneData = json.loads(requests.get(f"{WOD_ENPOINT}/zones/{zone}/expanded-offchain", headers={"Authorization" : data["auth"]}).text)
-        await endFishing(data={"auth" : data["auth"]}, id=zoneData["fishing_session"]["_id"])
+        endFishing(data={"auth" : data["auth"]}, id=zoneData["fishing_session"]["_id"])
     
     char_level = data["char_level"]
     
@@ -356,17 +356,17 @@ async def handlePendingSessions(pending, is_startup):
                 "title" : "We had to stop your fishing sessions",
                 "msg" : "You have ran out of 25% tools, top up to begin fishing again!"
             }}})
-        if not is_startup:
-            res = repairUsersTools(items=i["items"], data=i)
-            if int(res) != 200:
-                print(f'[{datetime.now():%Y-%m-%d | %H:%M:%S}] | Error when repairing for {address}, removing user from pending...')
-                pendingcol.delete_one({"session_id": session_id})
-                usercol.update_one({"address" : address}, {'$set': {"system_msg" : {
-                    "title" : "We had to stop your fishing sessions",
-                    "msg" : "You have ran out of 25% tools, top up to begin fishing again!"
-                }}})
-                print(f'[{datetime.now():%Y-%m-%d | %H:%M:%S}] | Removed {address} from pending | Time Taken - {time.monotonic() - start_time:.3f}s')
-                continue
+        # if not is_startup:
+        res = repairUsersTools(items=i["items"], data=i)
+        if int(res) != 200:
+            print(f'[{datetime.now():%Y-%m-%d | %H:%M:%S}] | Error when repairing for {address}, removing user from pending...')
+            pendingcol.delete_one({"session_id": session_id})
+            usercol.update_one({"address" : address}, {'$set': {"system_msg" : {
+                "title" : "We had to stop your fishing sessions",
+                "msg" : "You have ran out of 25% tools, top up to begin fishing again!"
+            }}})
+            print(f'[{datetime.now():%Y-%m-%d | %H:%M:%S}] | Removed {address} from pending | Time Taken - {time.monotonic() - start_time:.3f}s')
+            continue
         i["sets"] = createSets(items=i["items"])
         del i["items"]
         t = await bulkStartFishing(sets=i["sets"], data=i)
@@ -436,10 +436,10 @@ async def Main():
         
 
 if __name__ == "__main__":
-    while True:
-        try:
-            asyncio.run(Main())
-        except:
-            time.sleep(30) 
-            pass
+    # while True:
+    #     try:
+    asyncio.run(Main())
+        # except:
+        #     time.sleep(30) 
+        #     pass
             

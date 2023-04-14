@@ -8,7 +8,7 @@ import SunSVG from "@/storage/svg/SunSVG";
 import MoonSVG from "@/storage/svg/MoonSVG";
 import WorldSVG from "@/storage/svg/WorldSVG";
 import Router from "next/router";
-import { useWindowSize } from "@/storage/utils/tools";
+import { isDev, useWindowSize } from "@/storage/utils/tools";
 import DiscordSVG from "@/storage/svg/DiscordSVG";
 import TelegramSVG from "@/storage/svg/TelegramSVG";
 import TwitterSVG from "@/storage/svg/TwitterSVG";
@@ -35,7 +35,7 @@ const Home = () => {
   return (
     <div
       style={{
-        background: styling.background_main,
+        background: isDev() ? "orange" : styling.background_main,
         height: "100vh",
         width: "100%",
         overflow: "hidden",

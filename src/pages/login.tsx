@@ -21,7 +21,7 @@ import {
 import Router from "next/router";
 import { isDocked } from "@/storage/utils/window";
 import { IStylingObject } from "@/storage/constants/interfaces";
-import { useWindowSize } from "@/storage/utils/tools";
+import { isDev, useWindowSize } from "@/storage/utils/tools";
 import { UserSettings } from "@/components/UserSettings";
 
 const Login = () => {
@@ -120,6 +120,9 @@ const Login = () => {
           }}
           onClick={async () => {
             let address: any = await GetAddress();
+            if (address === undefined) {
+              window.location.reload();
+            }
             setIsConnecting(true);
             await MetaMaskConnect();
             const s = await GenerateAuth();
