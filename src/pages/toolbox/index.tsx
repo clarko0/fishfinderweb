@@ -7,6 +7,7 @@ import { GetUserdata } from "@/storage/utils/fetch";
 import { CheckTheme, GetAuthToken } from "@/storage/utils/local";
 import Router from "next/router";
 import { useEffect, useState } from "react";
+import { isDev } from "@/storage/utils/tools";
 
 const Toolbox = () => {
   const [userData, setUserData] = useState<IUserData>({
@@ -57,7 +58,7 @@ const Toolbox = () => {
   return (
     <div
       style={{
-        background: styling.background_main,
+        background: isDev() ? "orange" : styling.background_main,
         width: "100%",
         height: "100vh",
         transition: "0.5s",

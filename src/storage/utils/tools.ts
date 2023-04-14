@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { IItem, IItems, ITool } from "../constants/interfaces";
+import { isDocked } from "./window";
 
 export const CaclulateFishingTime = (items: IItems, tools: ITool[]) => {
   let k = 0;
@@ -179,4 +180,16 @@ export const calculateToolCost = (
 
 export const compareArrays = (a: any, b: any) => {
   return JSON.stringify(a) === JSON.stringify(b);
+};
+
+export const getSubdomain = () => {
+  if (isDocked()) {
+    var host = window.location.host;
+    var subdomain = host.split(".")[0];
+    return subdomain;
+  }
+};
+
+export const isDev = () => {
+  return getSubdomain() === "dev";
 };

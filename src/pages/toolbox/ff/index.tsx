@@ -12,6 +12,7 @@ import { STYLING } from "@/storage/constants/styling";
 import {
   CaclulateFishingTime,
   GetTokenPrice,
+  isDev,
   useWindowSize,
 } from "@/storage/utils/tools";
 import ItemsPNG from "@/storage/png/ItemsPNG";
@@ -585,7 +586,7 @@ const FishermanFriend = () => {
       style={{
         width: "100vw",
         height: "100vh",
-        background: styling.background_main,
+        background: isDev() ? "orange" : styling.background_main,
         transition: "0.5s",
         userSelect: "none",
       }}
