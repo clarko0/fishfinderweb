@@ -900,6 +900,7 @@ const TheCove = () => {
           artifact: [],
         },
         isReady: true,
+        doublyReady: false,
       });
     });
   }, []);

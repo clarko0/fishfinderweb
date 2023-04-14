@@ -22,7 +22,8 @@ const Toolbox = () => {
       legendary: [],
       artifact: [],
     },
-    isReady: true,
+    isReady: false,
+    doublyReady: false,
   });
   const [isDark, setIsDark] = useState<boolean>(false);
   const [styling, setStyling] = useState<IStylingObject>({});
@@ -50,6 +51,7 @@ const Toolbox = () => {
             artifact: [],
           },
           isReady: true,
+          doublyReady: false,
         });
       });
       WalletListener();
