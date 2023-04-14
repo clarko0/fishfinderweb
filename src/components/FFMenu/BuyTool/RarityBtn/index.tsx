@@ -5,6 +5,8 @@ const RarityBtn = ({
   idA,
   idB,
   rarity,
+  setClicker,
+  clicker,
 }: any) => {
   return (
     <div
@@ -27,6 +29,7 @@ const RarityBtn = ({
         if (ele !== null && toolMenuData.rarities[rarity]) {
           ele.style.width = "0px";
         }
+        setClicker(!clicker);
         setToolMenuData((prevData: any) => {
           let newData: any = prevData;
           newData.rarities[rarity] = !newData.rarities[rarity];

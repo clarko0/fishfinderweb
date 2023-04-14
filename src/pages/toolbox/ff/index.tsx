@@ -67,6 +67,7 @@ const FishermanFriend = () => {
   const [wodPrice, setWodPrice] = useState<any>(0);
   const [isDark, setIsDark] = useState<boolean>(false);
   const [wodFarmed, setWodFarmed] = useState<number>(0);
+  const [clicker, setClicker] = useState<boolean>(false);
   const [activeSessionData, setActiveSessionData] = useState<any>({});
   const [playerLevel, setPlayerLevel] = useState<number>(0);
   const [status, setStatus] = useState<string>("Not Started");
@@ -130,10 +131,12 @@ const FishermanFriend = () => {
       let number = parseInt(numberOfRepairs);
       let num = toolMenuData.isDays ? number * 4 : number;
       for (let i = 0; i < Object.keys(userData.items).length; i++) {
-        c +=
-          num *
-          userData.items[Object.keys(userData.items)[i]].length *
-          consumableData[i].price;
+        if (toolMenuData.rarities[i + 1]) {
+          c +=
+            num *
+            userData.items[Object.keys(userData.items)[i]].length *
+            consumableData[i].price;
+        }
       }
     }
     setToolCost(c);
@@ -141,7 +144,7 @@ const FishermanFriend = () => {
 
   useEffect(() => {
     calculateCost();
-  }, [numberOfRepairs, toolMenuData.isDays]);
+  }, [numberOfRepairs, toolMenuData.isDay, clicker]);
 
   const determineRepair = (isDays: boolean) => {
     let newToolVals: any = {
@@ -666,6 +669,8 @@ const FishermanFriend = () => {
       <BuyToolMenu
         setIsToolsMenu={setIsToolsMenu}
         isToolsMenu={isToolsMenu}
+        clicker={clicker}
+        setClicker={setClicker}
         isToolsConfirmationMenu={isToolsConfirmationMenu}
         toolMenuData={toolMenuData}
         setToolMenuData={setToolMenuData}
