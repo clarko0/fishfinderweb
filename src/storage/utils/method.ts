@@ -150,15 +150,15 @@ export const buyTools = async (
   const nonUsedRarites: any = Object.keys(rarites).filter((item: any) => {
     return !rarites[item];
   });
-  console.log(nonUsedRarites);
 
   for (const i in items) {
-    if (!nonUsedRarites.includes(items[i][0].rarity.toString())) {
-      toolInfo[Object.keys(items).indexOf(i) + 1] = items[i].length;
-    }
+    try {
+      if (!nonUsedRarites.includes(items[i][0].rarity.toString())) {
+        toolInfo[Object.keys(items).indexOf(i) + 1] = items[i].length;
+      }
+    } catch (e) {}
   }
 
-  console.log(toolInfo);
   for (const key in toolInfo) {
     if (toolInfo[key] !== 0) {
       ToolContract.methods

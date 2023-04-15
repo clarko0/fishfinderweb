@@ -1,6 +1,7 @@
 import { pingFishing } from "@/storage/utils/api";
 import {
   GetActiveZone,
+  GetAllConsumablePrices,
   GetItems,
   GetTools,
   GetUserdata,
@@ -44,14 +45,25 @@ export const ffStore = async () => {
       }
       await Promise.all(subCalls);
     }),
-    GetTools().then((res: any) => {
+    GetTools().then(async (res: any) => {
       res = res.data;
+
       for (let i = 0; i < res.length; i++) {
         if (res[i].repair_amount === 25) {
           tools.push({
             quantity: res[i].quantity,
             rarity: res[i].rarity,
           });
+        }
+      }
+      let rawData = await GetAllConsumablePrices();
+      for (let i = 0; i < rawData.length; i++) {
+        if (rawData[i].repairNum === 25) {
+          for (let x = 0; x < tools.length; x++) {
+            if (tools[x].rarity === rawData[i].rarity) {
+              tools[x].price = rawData[i].price;
+            }
+          }
         }
       }
     }),

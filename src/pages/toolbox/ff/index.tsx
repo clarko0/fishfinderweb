@@ -122,21 +122,23 @@ const FishermanFriend = () => {
     if (!isNaN(parseInt(numberOfRepairs))) {
       let number = parseInt(numberOfRepairs);
       let num = toolMenuData.isDays ? number * 4 : number;
-      for (let i = 0; i < Object.keys(userData.items).length; i++) {
-        if (toolMenuData.rarities[i + 1]) {
-          c +=
-            num *
-            userData.items[Object.keys(userData.items)[i]].length *
-            consumableData[i].price;
+      try {
+        for (let i = 0; i < Object.keys(userData.items).length; i++) {
+          if (toolMenuData.rarities[i + 1]) {
+            c +=
+              num *
+              userData.items[Object.keys(userData.items)[i]].length *
+              consumableData[i].price;
+          }
         }
-      }
+      } catch (e) {}
     }
     setToolCost(c);
   };
 
   useEffect(() => {
     calculateCost();
-  }, [numberOfRepairs, toolMenuData.isDay, clicker]);
+  }, [numberOfRepairs, clicker]);
 
   const determineRepair = (isDays: boolean) => {
     let newToolVals: any = {
@@ -373,6 +375,7 @@ const FishermanFriend = () => {
       setSessions(res.fishingInfo);
       setActiveSessionData(res.fishingInfo);
       setStatus(res.initPing.status);
+      setConsumableData(res.tools);
       setIsFishing(res.initPing.bool);
       setWodPrice(res.tokenPrice);
       setSessionId(res.initPing.session_id);

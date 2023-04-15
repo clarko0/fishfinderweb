@@ -313,6 +313,7 @@ const BuyToolMenu = ({
                       transition: "0.5s",
                     }}
                     onClick={() => {
+                      setClicker(!clicker);
                       setToolMenuData((prevData: any) => ({
                         ...prevData,
                         isDays: false,
@@ -331,6 +332,7 @@ const BuyToolMenu = ({
                       transition: "0.5s",
                     }}
                     onClick={() => {
+                      setClicker(!clicker);
                       setToolMenuData((prevData: any) => ({
                         ...prevData,
                         isDays: true,
