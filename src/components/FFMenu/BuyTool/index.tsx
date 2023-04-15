@@ -21,6 +21,8 @@ const BuyToolMenu = ({
   isToolsMenu,
   toolCost,
   wodPrice,
+  clicker,
+  setClicker,
 }: any) => {
   useEffect(() => {
     console.log(toolCost, wodPrice);
@@ -159,6 +161,8 @@ const BuyToolMenu = ({
                       toolMenuData={toolMenuData}
                       imgSrc={Artifact.src}
                       idA="imgA"
+                      setClicker={setClicker}
+                      clicker={clicker}
                       rarity={6}
                       idB="crossA"
                     />
@@ -166,6 +170,8 @@ const BuyToolMenu = ({
                       setToolMenuData={setToolMenuData}
                       toolMenuData={toolMenuData}
                       imgSrc={Legendary.src}
+                      setClicker={setClicker}
+                      clicker={clicker}
                       rarity={5}
                       idA="imgB"
                       idB="crossB"
@@ -174,6 +180,8 @@ const BuyToolMenu = ({
                       setToolMenuData={setToolMenuData}
                       toolMenuData={toolMenuData}
                       imgSrc={Epic.src}
+                      setClicker={setClicker}
+                      clicker={clicker}
                       rarity={4}
                       idA="imgC"
                       idB="crossC"
@@ -182,6 +190,8 @@ const BuyToolMenu = ({
                       setToolMenuData={setToolMenuData}
                       toolMenuData={toolMenuData}
                       imgSrc={Rare.src}
+                      setClicker={setClicker}
+                      clicker={clicker}
                       idA="imgD"
                       rarity={3}
                       idB="crossD"
@@ -190,6 +200,8 @@ const BuyToolMenu = ({
                       setToolMenuData={setToolMenuData}
                       toolMenuData={toolMenuData}
                       imgSrc={Uncommon.src}
+                      setClicker={setClicker}
+                      clicker={clicker}
                       idA="imgE"
                       rarity={2}
                       idB="crossE"
@@ -198,6 +210,8 @@ const BuyToolMenu = ({
                       setToolMenuData={setToolMenuData}
                       toolMenuData={toolMenuData}
                       imgSrc={Common.src}
+                      setClicker={setClicker}
+                      clicker={clicker}
                       idA="imgF"
                       rarity={1}
                       idB="crossF"
@@ -299,6 +313,7 @@ const BuyToolMenu = ({
                       transition: "0.5s",
                     }}
                     onClick={() => {
+                      setClicker(!clicker);
                       setToolMenuData((prevData: any) => ({
                         ...prevData,
                         isDays: false,
@@ -317,6 +332,7 @@ const BuyToolMenu = ({
                       transition: "0.5s",
                     }}
                     onClick={() => {
+                      setClicker(!clicker);
                       setToolMenuData((prevData: any) => ({
                         ...prevData,
                         isDays: true,

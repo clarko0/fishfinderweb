@@ -54,6 +54,7 @@ const TheCove = () => {
       artifact: [],
     },
     isReady: false,
+    doublyReady: false,
   });
   const [response, setResponse] = useState<any>("");
 
@@ -899,6 +900,7 @@ const TheCove = () => {
           artifact: [],
         },
         isReady: true,
+        doublyReady: false,
       });
     });
   }, []);

@@ -34,6 +34,10 @@ export const getSessionInfo = async (zoneIds: any) => {
   return results;
 };
 
+export const getSingleSession = async (zoneId: any) => {
+  return await api.get(`/zones/${zoneId}/expanded-offchain`);
+};
+
 export const endSession = async (sessionId: string) => {
   await api.post(`/fishing/${sessionId}/end`);
 };
