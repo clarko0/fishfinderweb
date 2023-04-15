@@ -392,29 +392,67 @@ const FishermanFriend = () => {
         });
       }
       setPageLoading(false);
-      const interval = setInterval(() => {
-        pingFishing(res.totalWod).then(async (response) => {
-          setStatus(response.data.status);
-          setIsFishing(response.data.bool);
-          setSessionId(response.data.session_id);
-          setWodOnSignup(response.data.wod_signup);
-          setNextRepair(response.data.next_repair);
-          if (
-            response.data.system_msg.title !== "" &&
-            response.data.system_msg.msg !== ""
-          ) {
-            setIsSystemMessage({
-              bool: true,
-              title: response.data.system_msg.title,
-              msg: response.data.system_msg.msg,
-            });
-          }
-        });
-        timerCountRef.current += 1;
-      }, 10000);
-
-      return () => clearInterval(interval);
     });
+    const interval = setInterval(() => {
+      ffStore().then((res: any) => {
+        const items: IItems = {
+          common: [],
+          uncommon: [],
+          rare: [],
+          epic: [],
+          legendary: [],
+          artifact: [],
+        };
+        for (let i = 0; i < res.items.length; i++) {
+          const item = res.items[i];
+          if (item.rarity === 1) {
+            items.common.push(item);
+          } else if (item.rarity === 2) {
+            items.uncommon.push(item);
+          } else if (item.rarity === 3) {
+            items.rare.push(item);
+          } else if (item.rarity === 4) {
+            items.epic.push(item);
+          } else if (item.rarity === 5) {
+            items.legendary.push(item);
+          } else if (item.rarity === 6) {
+            items.artifact.push(item);
+          }
+        }
+        setPlayerLevel(res.userData.level);
+        setUserData({
+          username: res.userData.username,
+          avatar: res.userData.avatar,
+          tools: res.tools,
+          items: items,
+          isReady: true,
+          wodBalance: res.totalWod,
+        });
+        setSessions(res.fishingInfo);
+        setActiveSessionData(res.fishingInfo);
+        setStatus(res.initPing.status);
+        setConsumableData(res.tools);
+        setIsFishing(res.initPing.bool);
+        setWodPrice(res.tokenPrice);
+        setSessionId(res.initPing.session_id);
+        setWodOnSignup(res.initPing.wod_signup);
+        setNextRepair(res.initPing.next_repair);
+        if (
+          res.initPing.system_msg.title !== "" &&
+          res.initPing.system_msg.msg !== ""
+        ) {
+          setIsSystemMessage({
+            bool: true,
+            title: res.initPing.system_msg.title,
+            msg: res.initPing.system_msg.msg,
+          });
+        }
+        setPageLoading(false);
+      });
+      timerCountRef.current += 1;
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
