@@ -367,11 +367,16 @@ const FishermanFriend = () => {
       setUserData({
         username: res.userData.username,
         avatar: res.userData.avatar,
-        tools: res.tools,
+        tools: res.tools.sort((a: any, b: any) =>
+          a.rarity > b.rarity ? 1 : -1
+        ),
         items: items,
         isReady: true,
         wodBalance: res.totalWod,
       });
+      console.log(
+        res.tools.sort((a: any, b: any) => (a.rarity > b.rarity ? 1 : -1))
+      );
       setSessions(res.fishingInfo);
       setActiveSessionData(res.fishingInfo);
       setStatus(res.initPing.status);
@@ -423,7 +428,9 @@ const FishermanFriend = () => {
         setUserData({
           username: res.userData.username,
           avatar: res.userData.avatar,
-          tools: res.tools,
+          tools: res.tools.sort((a: any, b: any) =>
+            a.rarity > b.rarity ? 1 : -1
+          ),
           items: items,
           isReady: true,
           wodBalance: res.totalWod,
