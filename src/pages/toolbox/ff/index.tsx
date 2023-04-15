@@ -317,7 +317,7 @@ const FishermanFriend = () => {
   }, [status]);
 
   useEffect(() => {
-    var timeZoneOffset = new Date().getTimezoneOffset() / 60 + 1;
+    var timeZoneOffset = new Date().getTimezoneOffset() / 60;
     var targetTime = new Date(nextRepair);
     targetTime.setHours(targetTime.getHours() - timeZoneOffset);
     const targetMS = targetTime.getTime();
