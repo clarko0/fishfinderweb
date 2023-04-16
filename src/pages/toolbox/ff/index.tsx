@@ -374,9 +374,6 @@ const FishermanFriend = () => {
         isReady: true,
         wodBalance: res.totalWod,
       });
-      console.log(
-        res.tools.sort((a: any, b: any) => (a.rarity > b.rarity ? 1 : -1))
-      );
       setSessions(res.fishingInfo);
       setActiveSessionData(res.fishingInfo);
       setStatus(res.initPing.status);
@@ -513,16 +510,13 @@ const FishermanFriend = () => {
         wodFarmedPrice={wodFarmedPrice}
         wodPerHour={wodPerHour}
         wodPerHourPrice={wodPerHourPrice}
+        toolMenuData={toolMenuData}
         status={status}
         gettingSessions={gettingSessions}
-      />
-      <RepairModal
-        size={size}
+        setToolMenuData={setToolMenuData}
+        consumableData={consumableData}
         userData={userData}
         fishingTime={fishingTime}
-        gettingSessions={gettingSessions}
-        wodPerHour={wodPerHour}
-        wodPerHourPrice={wodPerHourPrice}
         setIsToolsMenu={setIsToolsMenu}
       />
       <StartStopBtn

@@ -1,4 +1,13 @@
 import Wod from "public/wod.png";
+import RaritySegment from "./RaritySegment";
+import Artifact from "public/artifact.png";
+import Legendary from "public/legendary.png";
+import Epic from "public/epic.png";
+import Rare from "public/rare.png";
+import Uncommon from "public/uncommon.png";
+import Common from "public/common.png";
+import { useEffect } from "react";
+import { CaclulateFishingTime } from "@/storage/utils/tools";
 
 const DashboardModal = ({
   size,
@@ -12,7 +21,15 @@ const DashboardModal = ({
   wodPerHourPrice,
   status,
   gettingSessions,
+  toolMenuData,
+  consumableData,
+  setToolMenuData,
+  userData,
+  setIsToolsMenu,
 }: any) => {
+  const getQuantityByRarity = (rarity: number) =>
+    consumableData.find((item: any) => item.rarity === rarity)?.quantity || 0;
+
   return (
     <div
       style={{
@@ -36,13 +53,16 @@ const DashboardModal = ({
       <div
         style={{
           color: "#fff",
-          fontSize: "30px",
+          fontSize: "24px",
           fontWeight: "600",
           width: "160px",
           height: "60px",
           marginLeft: "140px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           userSelect: "none",
-          marginTop: "40px",
+          marginTop: "15px",
         }}
       >
         Dashboard
@@ -53,10 +73,10 @@ const DashboardModal = ({
           height: "1px",
           background: "#fff",
           marginLeft: "30px",
-          marginTop: "20px",
+          marginTop: "10px",
         }}
       ></div>
-      <div style={{ display: "flex", marginLeft: "30px", marginTop: "30px" }}>
+      <div style={{ display: "flex", marginLeft: "30px", marginTop: "18px" }}>
         <div style={{ color: "#fff", fontWeight: "500", fontSize: "24px" }}>
           Next Repair
         </div>
@@ -89,10 +109,10 @@ const DashboardModal = ({
           height: "1px",
           background: "#fff",
           marginLeft: "30px",
-          marginTop: "30px",
+          marginTop: "18px",
         }}
       ></div>
-      <div style={{ color: "#fff", marginLeft: "30px", marginTop: "30px" }}>
+      <div style={{ color: "#fff", marginLeft: "30px", marginTop: "18px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
           <div style={{ fontSize: "20px", fontWeight: "500" }}>Status</div>
           <div
@@ -121,7 +141,7 @@ const DashboardModal = ({
           </div>
         </div>
       </div>
-      <div style={{ color: "#fff", marginLeft: "30px", marginTop: "30px" }}>
+      <div style={{ color: "#fff", marginLeft: "30px", marginTop: "22px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
           <div style={{ fontSize: "20px", fontWeight: "500" }}>
             Sessions Running
@@ -180,7 +200,7 @@ const DashboardModal = ({
           </div>
         </div>
       </div>
-      <div style={{ color: "#fff", marginLeft: "30px", marginTop: "40px" }}>
+      <div style={{ color: "#fff", marginLeft: "30px", marginTop: "22px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
           <div style={{ fontSize: "20px", fontWeight: "500" }}>$WoD Earned</div>
           <div
@@ -211,7 +231,7 @@ const DashboardModal = ({
                 wodFarmed
               )}
             </div>
-            <div style={{ fontSize: "10px", color: "#4F4F4F" }}>
+            <div style={{ fontSize: "10px", color: "#777E90" }}>
               {gettingSessions ? (
                 <div
                   style={{
@@ -222,13 +242,13 @@ const DashboardModal = ({
                   }}
                 ></div>
               ) : (
-                `($${wodFarmedPrice.toFixed(2)})`
+                `≈ ${wodFarmedPrice.toFixed(2)} $`
               )}
             </div>
           </div>
         </div>
       </div>
-      <div style={{ color: "#fff", marginLeft: "30px", marginTop: "40px" }}>
+      <div style={{ color: "#fff", marginLeft: "30px", marginTop: "22px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
           <div style={{ fontSize: "20px", fontWeight: "500" }}>$WoD/Hour</div>
           <div
@@ -261,7 +281,7 @@ const DashboardModal = ({
                 `${wodPerHour.toFixed(2)}`
               )}
             </div>
-            <div style={{ fontSize: "10px", color: "#4F4F4F" }}>
+            <div style={{ fontSize: "10px", color: "#777E90" }}>
               {gettingSessions ? (
                 <div
                   style={{
@@ -272,11 +292,239 @@ const DashboardModal = ({
                   }}
                 ></div>
               ) : (
-                `($${wodPerHourPrice.toFixed(2)})`
+                `≈ ${wodPerHourPrice.toFixed(2)} $`
               )}
             </div>
           </div>
         </div>
+      </div>
+      <div
+        style={{
+          width: "380px",
+          height: "1px",
+          background: "#fff",
+          marginLeft: "30px",
+          marginTop: "20px",
+        }}
+      ></div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginTop: "15px",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            width: "80px",
+            height: "13px",
+            textAlign: "right",
+            color: "#777E90",
+            fontSize: "8px",
+            gap: "2px",
+            display: "flex",
+            marginTop: "33px",
+            marginLeft: "-330px",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <span
+            style={{
+              fontSize: toolMenuData.isDays ? "8px" : "10px",
+              color: toolMenuData.isDays ? "#777E90" : "#fff",
+              cursor: toolMenuData.isDays ? "pointer" : "default",
+              transition: "0.5s",
+            }}
+            onClick={() => {
+              setToolMenuData({ ...toolMenuData, isDays: false });
+            }}
+          >
+            Repairs
+          </span>
+          /
+          <span
+            style={{
+              fontSize: !toolMenuData.isDays ? "8px" : "10px",
+              color: !toolMenuData.isDays ? "#777E90" : "#fff",
+              cursor: !toolMenuData.isDays ? "pointer" : "default",
+              transition: "0.5s",
+            }}
+            onClick={() => {
+              setToolMenuData({ ...toolMenuData, isDays: true });
+            }}
+          >
+            Days
+          </span>
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            width: "80px",
+            height: "13px",
+            textAlign: "right",
+            color: "#fff",
+            fontSize: "10px",
+            gap: "2px",
+            display: "flex",
+            marginTop: "53px",
+            marginLeft: "-300px",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Tools
+        </div>
+        <div
+          style={{
+            display: "flex",
+            width: "280px",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <RaritySegment
+            image={Artifact.src}
+            topNum={toolMenuData.toolVals[6]}
+            tools={getQuantityByRarity(6)}
+          />
+          <RaritySegment
+            image={Legendary.src}
+            topNum={toolMenuData.toolVals[5]}
+            tools={getQuantityByRarity(5)}
+          />
+          <RaritySegment
+            image={Epic.src}
+            topNum={toolMenuData.toolVals[4]}
+            tools={getQuantityByRarity(4)}
+          />
+          <RaritySegment
+            image={Rare.src}
+            topNum={toolMenuData.toolVals[3]}
+            tools={getQuantityByRarity(3)}
+          />
+          <RaritySegment
+            image={Uncommon.src}
+            topNum={toolMenuData.toolVals[2]}
+            tools={getQuantityByRarity(2)}
+          />
+          <RaritySegment
+            image={Common.src}
+            topNum={toolMenuData.toolVals[1]}
+            tools={getQuantityByRarity(1)}
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          width: "380px",
+          height: "1px",
+          background: "#fff",
+          marginLeft: "30px",
+          marginTop: "24px",
+        }}
+      ></div>
+      <div
+        style={{
+          color: "#fff",
+          display: size.width > 1150 ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "20px",
+          marginTop: "23px",
+        }}
+      >
+        Estimated Earnings
+      </div>
+      <div
+        style={{
+          display: size.width > 1150 ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          marginTop: "5px",
+        }}
+      >
+        <img src={Wod.src} />
+        <div
+          style={{
+            color: "#fff",
+            fontWeight: "600",
+            fontSize: "18px",
+            marginTop: "2px",
+          }}
+        >
+          {gettingSessions ? (
+            <div
+              style={{
+                width: "50px",
+                height: "20px",
+                background: "#fff",
+                borderRadius: "3px",
+              }}
+            ></div>
+          ) : userData.isReady ? (
+            (
+              wodPerHour *
+              (CaclulateFishingTime(userData.items, userData.tools).seconds /
+                3600)
+            ).toFixed(2)
+          ) : (
+            "0.00"
+          )}
+        </div>
+        <div style={{ color: "#777E90", fontSize: "10px" }}>
+          {gettingSessions ? (
+            <div
+              style={{
+                width: "50px",
+                height: "12px",
+                background: "rgb(79, 79, 79)",
+                borderRadius: "3px",
+              }}
+            ></div>
+          ) : userData.isReady ? (
+            `≈ ${(
+              wodPerHourPrice *
+              (CaclulateFishingTime(userData.items, userData.tools).seconds /
+                3600)
+            ).toFixed(2)} $`
+          ) : (
+            "≈ 0.00 $"
+          )}
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {!gettingSessions && (
+          <div
+            onClick={() => {
+              setIsToolsMenu(true);
+            }}
+            style={{
+              border: "1px solid #3366CC",
+              color: "#fff",
+              fontWeight: "600",
+              borderRadius: "6px",
+              width: "170px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "20px",
+              height: "60px",
+              cursor: "pointer",
+            }}
+          >
+            Buy More Tools
+          </div>
+        )}
       </div>
     </div>
   );
