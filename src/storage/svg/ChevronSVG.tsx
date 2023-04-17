@@ -18,7 +18,7 @@ const ChevronSVG = () => {
     >
       <path
         d="M3.00001 3.66666L0.333339 0.99999L1.03334 0.266656L3.00001 2.23332L4.96667 0.266656L5.66667 0.99999L3.00001 3.66666Z"
-        fill={styling.font_primary}
+        fill={styling.background_main}
       />
     </svg>
   );

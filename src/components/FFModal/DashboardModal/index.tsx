@@ -169,7 +169,7 @@ const DashboardModal = ({
             style={{
               marginLeft: "-30px",
               cursor: "pointer",
-              display: gettingSessions ? "none" : "flex",
+              display: size.width < 900 || gettingSessions ? "none" : "flex",
             }}
           >
             <svg

@@ -34,6 +34,10 @@ import { useEffect, useRef, useState } from "react";
 import Wod from "public/wod.png";
 import MaterialCard from "@/components/MaterialCard";
 import { isDocked } from "@/storage/utils/window";
+import ChevronSVG from "@/storage/svg/ChevronSVG";
+import SearchSVG from "@/storage/svg/SearchSVG";
+import ExploreSVG from "@/storage/svg/ExploreSVG";
+import CloseBtnSVG from "@/storage/svg/CloseBtnSVG";
 
 const TheCove = () => {
   const [isConfirmationMenu, setIsConfirmationMenu] = useState<boolean>(false);
@@ -68,6 +72,7 @@ const TheCove = () => {
   const sliderRef = useRef<any>(null);
   const [wodCost, setWodCost] = useState<string>("0.00");
   const labelRef = useRef<any>(null);
+  const [isMobileFilter, setIsMobileFilter] = useState<boolean>(false);
   const [isItemAdded, setIsItemAdded] = useState<boolean>(false);
   const [sliderValue, setSliderValue] = useState<any>({
     currentValue: 1,
@@ -111,6 +116,7 @@ const TheCove = () => {
   const [basket, setBasket] = useState<any[]>([]);
   const [scrollY, setScrollY] = useState<number>(0);
   const [basketCards, setBasketCards] = useState<any[]>([]);
+  const [isMobileMenu, setIsMobileMenu] = useState<boolean>(false);
   const [isBasket, setIsBasket] = useState<boolean>(false);
   const [rarityFilter, setRarityFilter] = useState<any>({
     displayed: false,
@@ -953,6 +959,35 @@ const TheCove = () => {
       </div>
       <div
         style={{
+          width: "50px",
+          height: "100px",
+          background: styling.font_primary,
+          position: "absolute",
+          left: isMobileMenu ? "250px" : "-10px",
+          zIndex: "99999",
+          borderRadius: "9px",
+          top: "50%",
+          display: size.width < 850 ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          transition: "0.5s",
+        }}
+        onClick={() => {
+          setIsMobileMenu(!isMobileMenu);
+        }}
+      >
+        <div
+          style={{
+            transform: isMobileMenu ? "rotate(90deg)" : "rotate(270deg)",
+          }}
+          id="mkr"
+        >
+          <ChevronSVG />
+        </div>
+      </div>
+      <div
+        style={{
           display: "flex",
           flexDirection: "column",
           color: styling.font_primary,
@@ -962,8 +997,16 @@ const TheCove = () => {
           position: "absolute",
           top: "50%",
           marginTop: "-100px",
-          marginLeft: "75px",
-          left: size.width > 850 ? "0" : "-100%",
+          paddingTop: size.width < 850 ? "20px" : "0px",
+          paddingLeft: "75px",
+          width: "200px",
+          height: "700px",
+          borderRadius: "10px",
+          border: size.width < 850 ? "1px solid" : "0px",
+          zIndex: "999",
+          background: styling.background_main,
+          left: size.width > 850 || isMobileMenu ? "0" : "-100%",
+          transition: "0.5s",
         }}
       >
         <div
@@ -975,6 +1018,7 @@ const TheCove = () => {
           id="1"
           onClick={() => {
             updateMenu("1");
+            setIsMobileMenu(false);
           }}
         >
           ITEMS
@@ -988,6 +1032,7 @@ const TheCove = () => {
           id="2"
           onClick={() => {
             updateMenu("2");
+            setIsMobileMenu(false);
           }}
         >
           FISH
@@ -1001,6 +1046,7 @@ const TheCove = () => {
           id="3"
           onClick={() => {
             updateMenu("3");
+            setIsMobileMenu(false);
           }}
         >
           MATERIALS
@@ -1014,6 +1060,7 @@ const TheCove = () => {
           id="4"
           onClick={() => {
             updateMenu("4");
+            setIsMobileMenu(false);
           }}
         >
           ZONES
@@ -1027,13 +1074,14 @@ const TheCove = () => {
           id="5"
           onClick={() => {
             updateMenu("5");
+            setIsMobileMenu(false);
           }}
         >
           CONSUMABLES
         </div>
         <div
           style={{
-            width: "1px",
+            width: size.width < 850 ? "0px" : "1px",
             height: "600px",
             background: styling.font_primary,
             position: "absolute",
@@ -1046,9 +1094,9 @@ const TheCove = () => {
         style={{
           display: "flex",
           position: "absolute",
-          top: "35%",
-          left: size.width > 830 ? "400px" : "50%",
-          marginLeft: size.width > 830 ? "0px" : "-200px",
+          top: "330px",
+          left: size.width > 850 ? "400px" : "50%",
+          marginLeft: size.width > 850 ? "0px" : "-200px",
           alignItems: "center",
           borderBottom: "1px solid grey",
           paddingBottom: "5px",
@@ -1397,7 +1445,6 @@ const TheCove = () => {
         </svg>
         Item Added!
       </div>
-
       <div
         style={{
           display: "flex",
@@ -1408,7 +1455,7 @@ const TheCove = () => {
           left: size.width > 850 ? "400px" : "50%",
           rowGap: "20px",
           maxWidth: "1445px",
-          marginLeft: size.width > 850 ? "0px" : "-722.5px",
+          marginLeft: size.width > 850 ? "0px" : "-210px",
           height: "560px",
           columnGap: "25px",
           overflow: "scroll",
@@ -2310,6 +2357,304 @@ const TheCove = () => {
                   Awaiting Transaction
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          width: "100px",
+          height: "100px",
+          borderRadius: "999px",
+          background: "#fff",
+          position: "absolute",
+          bottom: "20px",
+          right: "20px",
+          zIndex: "9998",
+          display: size.width < 850 ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          setIsMobileFilter(true);
+        }}
+      >
+        <ExploreSVG />
+      </div>
+      <div
+        style={{
+          width: isMobileFilter ? "100vw" : "0px",
+          overflow: "hidden",
+          transition: "0.5s",
+          height: "100vh",
+          backdropFilter: "blur(9px)",
+          position: "absolute",
+          zIndex: "99999",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            width: "350px",
+            height: "500px",
+            background: "grey",
+            borderRadius: "10px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              color: "#fff",
+              fontSize: "24px",
+              fontWeight: "600",
+              marginTop: "32px",
+            }}
+          >
+            Filters
+          </div>
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              left: "70px",
+              top: "110px",
+            }}
+            onClick={() => {
+              setIsMobileFilter(false);
+            }}
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M13.2928 13.3053C13.4803 13.1178 13.7346 13.0125 13.9998 13.0125C14.265 13.0125 14.5193 13.1178 14.7068 13.3053L19.9998 18.5983L25.2928 13.3053C25.385 13.2098 25.4954 13.1336 25.6174 13.0812C25.7394 13.0288 25.8706 13.0012 26.0034 13C26.1362 12.9989 26.2678 13.0242 26.3907 13.0745C26.5136 13.1247 26.6253 13.199 26.7192 13.2929C26.8131 13.3868 26.8873 13.4984 26.9376 13.6213C26.9879 13.7442 27.0132 13.8759 27.012 14.0087C27.0109 14.1415 26.9833 14.2727 26.9309 14.3947C26.8785 14.5167 26.8023 14.627 26.7068 14.7193L21.4138 20.0123L26.7068 25.3053C26.8889 25.4939 26.9897 25.7465 26.9875 26.0087C26.9852 26.2709 26.88 26.5217 26.6946 26.7071C26.5092 26.8925 26.2584 26.9977 25.9962 27C25.734 27.0022 25.4814 26.9014 25.2928 26.7193L19.9998 21.4263L14.7068 26.7193C14.5182 26.9014 14.2656 27.0022 14.0034 27C13.7412 26.9977 13.4904 26.8925 13.305 26.7071C13.1196 26.5217 13.0144 26.2709 13.0121 26.0087C13.0098 25.7465 13.1106 25.4939 13.2928 25.3053L18.5858 20.0123L13.2928 14.7193C13.1053 14.5318 13 14.2775 13 14.0123C13 13.7471 13.1053 13.4928 13.2928 13.3053Z"
+              fill="white"
+            />
+            <rect
+              x="1"
+              y="1"
+              width="38"
+              height="38"
+              rx="19"
+              stroke="#CCCCCC"
+              strokeWidth="2"
+            />
+          </svg>
+          <div
+            style={{
+              display: menu["3"] ? "hidden" : "block",
+              width: "180px",
+              marginTop: "20px",
+            }}
+          >
+            <div
+              style={{
+                color: "#fff",
+                marginLeft: "5px",
+                fontSize: "12px",
+                fontWeight: "600",
+              }}
+            >
+              ITEM TYPE
+            </div>
+            <div
+              style={{
+                border: "1px solid white",
+                fontSize: "16px",
+                width: "180px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                marginTop: "5px",
+
+                height: "40px",
+                borderRadius: "15px",
+                color: styling.font_primary,
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setTypeFilter({
+                  ...typeFilter,
+                  displayed: !typeFilter.displayed,
+                });
+                setRarityFilter({
+                  ...rarityFilter,
+                  displayed: false,
+                });
+              }}
+            >
+              {currentType}
+              <svg
+                width="10"
+                height="6"
+                viewBox="0 0 10 6"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M9.20704 0.793031C9.01951 0.60556 8.76521 0.500244 8.50004 0.500244C8.23488 0.500244 7.98057 0.60556 7.79304 0.793031L5.00004 3.58603L2.20704 0.793031C2.01844 0.610873 1.76584 0.510078 1.50364 0.512357C1.24144 0.514635 0.990631 0.619804 0.805223 0.805212C0.619815 0.99062 0.514645 1.24143 0.512367 1.50363C0.510088 1.76583 0.610883 2.01843 0.793041 2.20703L4.29304 5.70703C4.48057 5.8945 4.73488 5.99982 5.00004 5.99982C5.26521 5.99982 5.51951 5.8945 5.70704 5.70703L9.20704 2.20703C9.39451 2.0195 9.49983 1.76519 9.49983 1.50003C9.49983 1.23487 9.39451 0.980558 9.20704 0.793031Z"
+                  fill={styling.font_primary}
+                />
+              </svg>
+            </div>
+            <div
+              style={{
+                width: "250px",
+                background: styling.background_main,
+                border: typeFilter.displayed ? "1px solid #fff" : "",
+                height: typeFilter.displayed ? "410px" : "0px",
+                marginTop: "5px",
+                borderRadius: "3px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                position: "absolute",
+                overflow: "hidden",
+                zIndex: "999",
+                transition: "0.5s",
+              }}
+            >
+              {typeFilter.options.map((item: any) => {
+                return (
+                  <div
+                    onClick={() => {
+                      setFilters({
+                        ...filters,
+                        type: item.text.replace(/\s+/g, "-").toLowerCase(),
+                      });
+                      setTypeFilter({ ...typeFilter, displayed: false });
+                      setCurrentType(item.text);
+                    }}
+                    key={genRanHex(64)}
+                    style={{
+                      cursor: "pointer",
+                      fontWeight: "500",
+                      color: "white",
+                      fontSize: "20px",
+                      marginTop: "16px",
+                    }}
+                  >
+                    {item.text}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div
+            style={{
+              display: menu["3"] ? "hidden" : "block",
+              marginTop: "20px",
+              width: "180px",
+              left: "900px",
+            }}
+          >
+            <div
+              style={{
+                color: "#fff",
+                marginLeft: "5px",
+                fontSize: "12px",
+                fontWeight: "600",
+              }}
+            >
+              RARITY
+            </div>
+            <div
+              style={{
+                border: "1px solid #fff",
+                fontSize: "16px",
+                width: "180px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                marginTop: "5px",
+
+                height: "40px",
+                borderRadius: "15px",
+                color: styling.font_primary,
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setRarityFilter({
+                  ...rarityFilter,
+                  displayed: !rarityFilter.displayed,
+                });
+                setTypeFilter({
+                  ...typeFilter,
+                  displayed: false,
+                });
+              }}
+            >
+              {rarityFilter.options[filters.rarity].text}
+              <svg
+                width="10"
+                height="6"
+                viewBox="0 0 10 6"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M9.20704 0.793031C9.01951 0.60556 8.76521 0.500244 8.50004 0.500244C8.23488 0.500244 7.98057 0.60556 7.79304 0.793031L5.00004 3.58603L2.20704 0.793031C2.01844 0.610873 1.76584 0.510078 1.50364 0.512357C1.24144 0.514635 0.990631 0.619804 0.805223 0.805212C0.619815 0.99062 0.514645 1.24143 0.512367 1.50363C0.510088 1.76583 0.610883 2.01843 0.793041 2.20703L4.29304 5.70703C4.48057 5.8945 4.73488 5.99982 5.00004 5.99982C5.26521 5.99982 5.51951 5.8945 5.70704 5.70703L9.20704 2.20703C9.39451 2.0195 9.49983 1.76519 9.49983 1.50003C9.49983 1.23487 9.39451 0.980558 9.20704 0.793031Z"
+                  fill={styling.font_primary}
+                />
+              </svg>
+            </div>
+            <div
+              style={{
+                width: "250px",
+                border: rarityFilter.displayed ? "1px solid #fff" : "",
+                background: styling.background_main,
+                height: rarityFilter.displayed ? "300px" : "0px",
+                marginTop: "5px",
+                borderRadius: "3px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                position: "absolute",
+                overflow: "hidden",
+                zIndex: "999",
+                transition: "0.5s",
+              }}
+            >
+              {rarityFilter.options.map((item: any) => {
+                return (
+                  <div
+                    onClick={() => {
+                      setFilters({
+                        ...filters,
+                        rarity: rarityFilter.options.indexOf(item),
+                      });
+                      setRarityFilter({ ...rarityFilter, displayed: false });
+                    }}
+                    key={genRanHex(64)}
+                    style={{
+                      cursor: "pointer",
+                      fontWeight: "500",
+                      color: "white",
+                      fontSize: "20px",
+                      marginTop: "16px",
+                    }}
+                  >
+                    {item.text}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
