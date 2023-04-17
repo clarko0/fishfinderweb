@@ -1452,6 +1452,7 @@ const TheCove = () => {
           position: "absolute",
           flexFlow: "row wrap",
           top: "380px",
+          transform: size.width > 850 ? "scale(1)" : "scale(0.8)",
           left: size.width > 850 ? "400px" : "50%",
           rowGap: "20px",
           maxWidth: "1445px",
