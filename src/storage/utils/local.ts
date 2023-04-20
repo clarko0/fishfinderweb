@@ -1,5 +1,5 @@
 import { isDocked } from "./window";
-
+//update-text
 export const CheckTheme = () => {
   if (isDocked()) {
     const userTheme: any = window.localStorage.getItem("user_theme");

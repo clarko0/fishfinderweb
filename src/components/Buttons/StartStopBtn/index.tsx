@@ -17,11 +17,11 @@ const StartStopBtn = ({
         userSelect: "none",
         position: "fixed",
         zIndex: "10",
-        left: size.width > 1650 ? "50%" : size.width > 1150 ? "345px" : "50%",
+        left: size.width > 1650 ? "50%" : size.width > 1150 ? "845px" : "50%",
         marginLeft: "-200px",
         top: "70%",
         marginTop:
-          size.width > 1650 ? "0px" : size.width > 600 ? "50px" : "50px",
+          size.width > 1650 ? "0px" : size.width > 600 ? "120px" : "50px",
         fontWeight: "600",
         display: "flex",
         alignItems: "center",

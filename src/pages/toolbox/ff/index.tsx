@@ -367,7 +367,9 @@ const FishermanFriend = () => {
       setUserData({
         username: res.userData.username,
         avatar: res.userData.avatar,
-        tools: res.tools,
+        tools: res.tools.sort((a: any, b: any) =>
+          a.rarity > b.rarity ? 1 : -1
+        ),
         items: items,
         isReady: true,
         wodBalance: res.totalWod,
@@ -423,7 +425,9 @@ const FishermanFriend = () => {
         setUserData({
           username: res.userData.username,
           avatar: res.userData.avatar,
-          tools: res.tools,
+          tools: res.tools.sort((a: any, b: any) =>
+            a.rarity > b.rarity ? 1 : -1
+          ),
           items: items,
           isReady: true,
           wodBalance: res.totalWod,
@@ -506,16 +510,13 @@ const FishermanFriend = () => {
         wodFarmedPrice={wodFarmedPrice}
         wodPerHour={wodPerHour}
         wodPerHourPrice={wodPerHourPrice}
+        toolMenuData={toolMenuData}
         status={status}
         gettingSessions={gettingSessions}
-      />
-      <RepairModal
-        size={size}
+        setToolMenuData={setToolMenuData}
+        consumableData={consumableData}
         userData={userData}
         fishingTime={fishingTime}
-        gettingSessions={gettingSessions}
-        wodPerHour={wodPerHour}
-        wodPerHourPrice={wodPerHourPrice}
         setIsToolsMenu={setIsToolsMenu}
       />
       <StartStopBtn
