@@ -170,5 +170,8 @@ export const buyTools = async (
 
 export const getWodBalance = async () => {
   let address = await GetAddress();
+  console.log(
+    await WODContract.methods.balanceOf(address).call({ from: address })
+  );
   return await WODContract.methods.balanceOf(address).call({ from: address });
 };

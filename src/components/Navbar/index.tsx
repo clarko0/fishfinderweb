@@ -1,20 +1,26 @@
 import { IStylingObject } from "@/storage/constants/interfaces";
 import BurgerMenuSVG from "@/storage/svg/BurgerMenuSVG";
 import ChevronSVG from "@/storage/svg/ChevronSVG";
-import { useWindowSize } from "@/storage/utils/tools";
+import { intToString, useWindowSize } from "@/storage/utils/tools";
 import { isDocked } from "@/storage/utils/window";
 import Router from "next/router";
+import Wod from "public/wod.png";
 import Logo from "public/logo.png";
 import { useEffect, useState } from "react";
+import { getWodBalance } from "@/storage/utils/method";
 
 const Navbar = (props: any) => {
   const [styling, setStyling] = useState<IStylingObject>(props.styling);
   const [isToolboxMenu, setIsToolboxMenu] = useState<boolean>(false);
   const [isBurgerMenu, setIsBurgerMenu] = useState<boolean>(false);
   const [isSocialsMenu, setIsSocialsMenu] = useState<boolean>(false);
+  const [wodBalance, setWodBalance] = useState<any>(0);
   const size = useWindowSize();
   useEffect(() => {
     setStyling(props.styling);
+    getWodBalance().then((res: any) => {
+      setWodBalance(res / 10 ** 18);
+    });
   }, [props]);
   return (
     <div
@@ -270,6 +276,31 @@ const Navbar = (props: any) => {
             position: "fixed",
           }}
         />
+      </div>
+      <div
+        style={{
+          height: "40px",
+          paddingRight: "16px",
+          border: `1px solid ${styling.font_primary}`,
+          display: "flex",
+          borderRadius: "3px",
+          position: "fixed",
+          marginLeft: "-40px",
+          left: size.width > 1650 ? "75%" : "82%",
+          top: size.width > 1650 ? "87px" : "150px",
+          color: styling.font_primary,
+          fontWeight: "600",
+          alignItems: "center",
+          gap: "5px",
+        }}
+      >
+        <img
+          src={Wod.src}
+          alt="wod"
+          width={24}
+          style={{ marginLeft: "10px" }}
+        />
+        {intToString(wodBalance)}
       </div>
       <div
         style={{
