@@ -73,6 +73,7 @@ export default async function handler(req: any, res: any) {
         .collection("ffpending")
         .find({ address: body.address })
         .toArray();
+      const running = await db.collection("ffrunning").find().toArray();
       const active = await db
         .collection("ffrunning")
         .find({ address: body.address })
@@ -116,6 +117,7 @@ export default async function handler(req: any, res: any) {
         sessions: sessions,
         session_id: session_id,
         system_msg: system_msg,
+        fisherman_count: running.length,
       });
     });
   } catch (e: any) {
