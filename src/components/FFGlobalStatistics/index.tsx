@@ -43,7 +43,7 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
       >
         <GlobalItem
           content={"$WoD Farmed"}
-          value={intToString(statisticsData.wod_farmed)}
+          value={statisticsData.wod_farmed}
           image={<img width={30} src={Wod.src} />}
         />
         <GlobalItem
