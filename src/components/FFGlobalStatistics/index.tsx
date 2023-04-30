@@ -9,6 +9,12 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
     fisher_count: false,
   });
 
+  const [wodFarmed, setWodFarmed] = useState<any>(0);
+
+  useEffect(() => {
+    setWodFarmed(intToString(statisticsData));
+  }, []);
+
   return (
     <div
       style={{
@@ -43,7 +49,7 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
       >
         <GlobalItem
           content={"$WoD Farmed"}
-          value={statisticsData.wod_farmed}
+          value={wodFarmed}
           image={<img width={30} src={Wod.src} />}
         />
         <GlobalItem

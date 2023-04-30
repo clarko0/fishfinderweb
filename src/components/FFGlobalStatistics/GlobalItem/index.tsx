@@ -1,3 +1,4 @@
+import { intToString } from "@/storage/utils/tools";
 import { Tooltip } from "@nextui-org/react";
 
 const GlobalItem = ({ content, value, image }: any) => {
