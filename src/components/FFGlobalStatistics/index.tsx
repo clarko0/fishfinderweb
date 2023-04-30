@@ -12,8 +12,10 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
   const [wodFarmed, setWodFarmed] = useState<any>(0);
 
   useEffect(() => {
-    setWodFarmed(intToString(statisticsData.wod_farmed));
-  }, []);
+    if (statisticsData.wod_farmed !== undefined) {
+      setWodFarmed(intToString(statisticsData.wod_farmed));
+    }
+  }, [statisticsData]);
 
   return (
     <div
