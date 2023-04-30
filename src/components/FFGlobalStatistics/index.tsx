@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Tooltip } from "@nextui-org/react";
+import GlobalItem from "./GlobalItem";
+import { intToString } from "@/storage/utils/tools";
+import Wod from "public/Wod40x40.png";
 
-const FFGlobalStatistics = ({ fisherCount, styling, size }: any) => {
+const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
   const [toolTip, setToolTip] = useState<any>({
     fisher_count: false,
   });
+
   return (
     <div
       style={{
@@ -32,39 +37,37 @@ const FFGlobalStatistics = ({ fisherCount, styling, size }: any) => {
           marginTop: "15px",
           display: "flex",
           alignItems: "center",
+          gap: "75px",
           justifyContent: "center",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            color: "#fff",
-            fontWeight: "600",
-            fontSize: "20px",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "5px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              color: "#fff",
-              fontWeight: "600",
-              fontSize: "20px",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "5px",
-            }}
-            onMouseEnter={() => {
-              setToolTip({ ...toolTip, fisher_count: true });
-            }}
-            onMouseLeave={() => {
-              setToolTip({ ...toolTip, fisher_count: false });
-            }}
-          >
+        <GlobalItem
+          content={"$WoD Farmed"}
+          value={intToString(statisticsData.wod_farmed)}
+          image={<img width={30} src={Wod.src} />}
+        />
+        <GlobalItem
+          content={"NFTs Farmed"}
+          value={statisticsData.nft_count}
+          image={
+            <svg
+              width="30"
+              height="35"
+              viewBox="0 0 30 35"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0.791026 5.52602H3.15932C3.39378 5.52602 3.61561 5.63022 3.76639 5.80942L6.31704 8.87162V2.36829C6.31704 1.06257 7.37962 0 8.68534 0H14.2114V4.73659C14.2169 5.77469 15.7863 5.76442 15.7902 4.73659V0H22.1057V10.2626C22.1057 10.6992 22.4594 11.052 22.8951 11.052C23.3309 11.052 23.6846 10.6992 23.6846 10.2626V0H27.6317C28.9374 0 30 1.06257 30 2.36829V32.3667C30 33.6724 28.9374 34.735 27.6317 34.735H22.8951V26.8407C22.8864 25.801 21.3218 25.8128 21.3163 26.8407V34.735H13.422V23.6829C13.418 22.6464 11.8462 22.6543 11.8431 23.6829V34.735H8.68534C7.37962 34.735 6.31704 33.6724 6.31704 32.3667V19.1326L0.0844855 6.66832C-0.183132 6.1694 0.221057 5.50786 0.791026 5.52602Z"
+                fill="white"
+              />
+            </svg>
+          }
+        />
+        <GlobalItem
+          content={"People Fishing"}
+          value={statisticsData.fisherman_count}
+          image={
             <svg
               width="40"
               height="28"
@@ -81,45 +84,8 @@ const FFGlobalStatistics = ({ fisherCount, styling, size }: any) => {
                 fill="white"
               />
             </svg>
-            <div>{fisherCount}</div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignContent: "center",
-              justifyContent: "center",
-              position: "absolute",
-              background: "#000",
-              fontWeight: "400",
-              fontSize: "12px",
-              marginTop: !toolTip.fisher_count ? "100px" : "140px",
-              opacity: !toolTip.fisher_count ? "0" : "1",
-              lineHeight: "16px",
-              padding: "12px",
-              borderRadius: "8px",
-              flex: "none",
-              order: "1",
-              flexGrow: "0",
-              transition: "opacity 0.2s, margin-top 0.25s",
-            }}
-          >
-            <div
-              style={{
-                width: "16px",
-                height: "16px",
-                position: "absolute",
-                background: "#000",
-                marginTop: "-16px",
-                borderRadius: "3px",
-                transform: "rotate(45deg)",
-                flex: "none",
-                order: "0",
-                flexGrow: "0",
-              }}
-            ></div>
-            People Fishing
-          </div>
-        </div>
+          }
+        />
       </div>
     </div>
   );

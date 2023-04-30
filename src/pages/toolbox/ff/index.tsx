@@ -109,7 +109,7 @@ const FishermanFriend = () => {
   const [isToolsMenu, setIsToolsMenu] = useState<boolean>(false);
   const timerCountRef = useRef(0);
   const [toolCost, setToolCost] = useState<number>(0);
-  const [fisherCount, setFisherCount] = useState<number>(0);
+  const [statisticsData, setStatisticsData] = useState<any>({});
   const [isToolsConfirmationMenu, setIsToolsConfirmationMenu] =
     useState<boolean>(false);
   const [canFish, setCanFish] = useState<ICanFish>({
@@ -379,7 +379,7 @@ const FishermanFriend = () => {
       setSessions(res.fishingInfo);
       setActiveSessionData(res.fishingInfo);
       setStatus(res.initPing.status);
-      setFisherCount(res.initPing.fisherman_count);
+      setStatisticsData(res.initPing.global_statistics);
       setConsumableData(res.tools);
       setIsFishing(res.initPing.bool);
       setWodPrice(res.tokenPrice);
@@ -440,7 +440,7 @@ const FishermanFriend = () => {
         setStatus(res.initPing.status);
         setConsumableData(res.tools);
         setIsFishing(res.initPing.bool);
-        setFisherCount(res.initPing.fisherman_count);
+        setStatisticsData(res.initPing.global_statistics);
         setWodPrice(res.tokenPrice);
         setSessionId(res.initPing.session_id);
         setWodOnSignup(res.initPing.wod_signup);
@@ -526,7 +526,7 @@ const FishermanFriend = () => {
       <FFGlobalStatistics
         size={size}
         styling={styling}
-        fisherCount={fisherCount}
+        statisticsData={statisticsData}
       />
       <StartStopBtn
         size={size}

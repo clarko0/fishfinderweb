@@ -78,6 +78,15 @@ export default async function handler(req: any, res: any) {
         .collection("ffrunning")
         .find({ address: body.address })
         .toArray();
+
+      const global_statistics = await db
+        .collection("ffglobal_statistics")
+        .find({})
+        .toArray();
+
+      const users_statistics = global_statistics.filter((item: any) => {
+        return item["wallet"] === body.address;
+      })[0];
       const data = await db
         .collection("ffnextrepair")
         .find()
@@ -115,9 +124,25 @@ export default async function handler(req: any, res: any) {
         status: status,
         bool: isFishing,
         sessions: sessions,
+        wod_farmed: users_statistics.wod_farmed,
+        nft_count: users_statistics.nft_count,
+        global_statistics: {
+          wod_farmed: global_statistics.reduce(
+            (accumulator: any, object: any) => {
+              return accumulator + object.wod_farmed;
+            },
+            0
+          ),
+          nft_count: global_statistics.reduce(
+            (accumulator: any, object: any) => {
+              return accumulator + object.nft_count;
+            },
+            0
+          ),
+          fisherman_count: running.length,
+        },
         session_id: session_id,
         system_msg: system_msg,
-        fisherman_count: running.length,
       });
     });
   } catch (e: any) {

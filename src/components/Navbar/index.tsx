@@ -18,10 +18,13 @@ const Navbar = (props: any) => {
   const size = useWindowSize();
   useEffect(() => {
     setStyling(props.styling);
+  }, [props]);
+
+  useEffect(() => {
     getWodBalance().then((res: any) => {
       setWodBalance(res / 10 ** 18);
     });
-  }, [props]);
+  }, []);
   return (
     <div
       style={{
