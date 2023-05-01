@@ -33,6 +33,7 @@ import RepairModal from "@/components/FFModal/RepairModal";
 import DashboardModal from "@/components/FFModal/DashboardModal";
 import { ffStore } from "@/store/ff.store";
 import FFGlobalStatistics from "@/components/FFGlobalStatistics";
+import { genRanHex } from "@/storage/constants/misc";
 
 const FishermanFriend = () => {
   const [toolMenuData, setToolMenuData] = useState<any>({
@@ -41,8 +42,8 @@ const FishermanFriend = () => {
       2: true,
       3: true,
       4: true,
-      5: true,
-      6: true,
+      5: false,
+      6: false,
     },
     toolVals: {
       1: 0,
@@ -198,7 +199,7 @@ const FishermanFriend = () => {
         );
       }
       cards.push(
-        <div style={{ display: "flex", gap: "30px" }}>
+        <div key={genRanHex(64)} style={{ display: "flex", gap: "30px" }}>
           <div style={{ display: "flex", alignItems: "center" }}>{items}</div>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "10px" }}
@@ -299,13 +300,6 @@ const FishermanFriend = () => {
     }
     setWodPerHour(Number(total.toFixed(2)));
     setWodPerHourPrice(Number(total.toFixed(2)) * wodPrice);
-    setWodFarmed(
-      Number((sessionWod + userData.wodBalance - wodOnSignup).toFixed(2))
-    );
-    setWodFarmedPrice(
-      Number((sessionWod + userData.wodBalance - wodOnSignup).toFixed(2)) *
-        wodPrice
-    );
   }, [activeSessionData]);
 
   useEffect(() => {
@@ -349,6 +343,7 @@ const FishermanFriend = () => {
         legendary: [],
         artifact: [],
       };
+
       for (let i = 0; i < res.items.length; i++) {
         const item = res.items[i];
         if (item.rarity === 1) {
@@ -384,7 +379,8 @@ const FishermanFriend = () => {
       setIsFishing(res.initPing.bool);
       setWodPrice(res.tokenPrice);
       setSessionId(res.initPing.session_id);
-      setWodOnSignup(res.initPing.wod_signup);
+      setWodFarmed(res.initPing.wod_farmed);
+      setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
       setNextRepair(res.initPing.next_repair);
       if (
         res.initPing.system_msg.title !== "" &&

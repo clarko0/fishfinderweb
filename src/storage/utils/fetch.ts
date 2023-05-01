@@ -1,49 +1,78 @@
 import axios from "axios";
-import { GetAuthToken } from "./local";
+import { GetAuthToken, GetCurrentAddress } from "./local";
 import { GetAddress, getChainid } from "./web3";
 
 const api = axios.create({
   baseURL: "https://api.worldofdefish.com",
-  headers: {
-    Authorization: GetAuthToken(),
-  },
 });
 
 export const GetUserdata = async () => {
-  return await api.get(`/auth/me`);
+  return await api.get(`/auth/me`, {
+    headers: {
+      Authorization: GetAuthToken(),
+    },
+  });
 };
 
 export const GetTools = async () => {
-  return await api.get(`/consumables/repairments/user/${await GetAddress()}`);
+  return await api.get(`/consumables/repairments/user/${GetCurrentAddress()}`, {
+    headers: {
+      Authorization: GetAuthToken(),
+    },
+  });
 };
 
 export const GetItems = async () => {
-  return await api.get(`/users/my-items`);
+  return await api.get(`/users/my-items`, {
+    headers: {
+      Authorization: GetAuthToken(),
+    },
+  });
 };
 
 export const GetActiveZone = async () => {
-  return await api.get(`/zones/active/offchain/select/all`);
+  return await api.get(`/zones/active/offchain/select/all`, {
+    headers: {
+      Authorization: GetAuthToken(),
+    },
+  });
 };
 
 export const getSessionInfo = async (zoneIds: any) => {
   const results: any[] = [];
   for (let i = 0; i < zoneIds.length; i++) {
-    const res = await api.get(`/zones/${zoneIds[i]}/expanded-offchain`);
+    const res = await api.get(`/zones/${zoneIds[i]}/expanded-offchain`, {
+      headers: {
+        Authorization: GetAuthToken(),
+      },
+    });
     results.push(res.data);
   }
   return results;
 };
 
 export const getSingleSession = async (zoneId: any) => {
-  return await api.get(`/zones/${zoneId}/expanded-offchain`);
+  return await api.get(`/zones/${zoneId}/expanded-offchain`, {
+    headers: {
+      Authorization: GetAuthToken(),
+    },
+  });
 };
 
 export const endSession = async (sessionId: string) => {
-  await api.post(`/fishing/${sessionId}/end`);
+  await api.post(`/fishing/${sessionId}/end`, {
+    headers: {
+      Authorization: GetAuthToken(),
+    },
+  });
 };
 
 export const getUsersStats = async () => {
-  return await api.get("/users/total-rewards");
+  return await api.get("/users/total-rewards", {
+    headers: {
+      Authorization: GetAuthToken(),
+    },
+  });
 };
 
 export const getMarketplaceItems = async (page: number) => {
@@ -73,6 +102,11 @@ export const getMarketplaceItems = async (page: number) => {
         },
         sort: { sort_by: "price", sort_dir: "ASC" },
         page: page,
+      },
+      {
+        headers: {
+          Authorization: GetAuthToken(),
+        },
       }
     );
   } catch (e) {
@@ -103,6 +137,11 @@ export const getMarketplaceFish = async (page: number) => {
       },
       sort: { sort_by: "price", sort_dir: "ASC" },
       page: page,
+    },
+    {
+      headers: {
+        Authorization: GetAuthToken(),
+      },
     }
   );
 };
@@ -128,6 +167,11 @@ export const getMarketplaceMaterials = async (term: string) => {
       },
       sort: { sort_by: "price", sort_dir: "ASC" },
       page: 1,
+    },
+    {
+      headers: {
+        Authorization: GetAuthToken(),
+      },
     }
   );
 };
@@ -150,6 +194,11 @@ export const getMarketplaceZones = async (page: number) => {
       },
       sort: { sort_by: "price", sort_dir: "ASC" },
       page: page,
+    },
+    {
+      headers: {
+        Authorization: GetAuthToken(),
+      },
     }
   );
 };
@@ -215,6 +264,11 @@ export const getMarketplaceMaterialsIndex = async (
       },
       sort: { sort_by: "price", sort_dir: "ASC" },
       page: index,
+    },
+    {
+      headers: {
+        Authorization: GetAuthToken(),
+      },
     }
   );
 };
@@ -266,6 +320,11 @@ export const GetConsumablePrice = async (pageIndex: number) => {
       },
       sort: { sort_by: "price", sort_dir: "ASC" },
       page: pageIndex,
+    },
+    {
+      headers: {
+        Authorization: GetAuthToken(),
+      },
     }
   );
 };

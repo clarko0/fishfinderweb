@@ -9,6 +9,7 @@ import Common from "public/common.png";
 import RarityBtn from "./RarityBtn";
 import Wod from "public/wod.png";
 import { useEffect, useState } from "react";
+import { genRanHex } from "@/storage/constants/misc";
 
 const BuyToolMenu = ({
   setIsToolsMenu,
@@ -260,11 +261,12 @@ const BuyToolMenu = ({
                         .map((item: any) => {
                           return (
                             <div
-                              key="blah"
+                              key={genRanHex(64)}
                               style={{
                                 fontSize: "16px",
                                 width: "10px",
                                 height: "12px",
+                                marginLeft: "-2px",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",

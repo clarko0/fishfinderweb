@@ -5,7 +5,8 @@ import { useEffect } from "react";
 import Router from "next/router";
 import { NextUIProvider } from "@nextui-org/react";
 import "@/styles/globals.css";
-import { ClearAuthToken } from "@/storage/utils/local";
+import { ClearAuthToken, GetCurrentAddress } from "@/storage/utils/local";
+import { CreateRerouteUrl } from "@/storage/utils/url";
 const inter = Inter({ subsets: ["latin"] });
 declare var window: any;
 
@@ -14,7 +15,7 @@ export default function MyApp({ Component, pageProps }: any) {
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", async () => {
         ClearAuthToken();
-        Router.push("/login");
+        Router.push(CreateRerouteUrl(window.location.origin + "/login"));
       });
     }
   }, []);

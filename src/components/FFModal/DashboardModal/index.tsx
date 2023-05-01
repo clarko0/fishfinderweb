@@ -8,6 +8,8 @@ import Uncommon from "public/uncommon.png";
 import Common from "public/common.png";
 import { useEffect } from "react";
 import { CaclulateFishingTime } from "@/storage/utils/tools";
+import { genRanHex } from "@/storage/constants/misc";
+import { Tooltip } from "@nextui-org/react";
 
 const DashboardModal = ({
   size,
@@ -228,7 +230,7 @@ const DashboardModal = ({
                   }}
                 ></div>
               ) : (
-                wodFarmed
+                wodFarmed.toFixed(2)
               )}
             </div>
             <div style={{ fontSize: "10px", color: "#777E90" }}>
@@ -386,31 +388,37 @@ const DashboardModal = ({
           }}
         >
           <RaritySegment
+            key={genRanHex(64)}
             image={Artifact.src}
             topNum={toolMenuData.toolVals[6]}
             tools={getQuantityByRarity(6)}
           />
           <RaritySegment
+            key={genRanHex(64)}
             image={Legendary.src}
             topNum={toolMenuData.toolVals[5]}
             tools={getQuantityByRarity(5)}
           />
           <RaritySegment
+            key={genRanHex(64)}
             image={Epic.src}
             topNum={toolMenuData.toolVals[4]}
             tools={getQuantityByRarity(4)}
           />
           <RaritySegment
+            key={genRanHex(64)}
             image={Rare.src}
             topNum={toolMenuData.toolVals[3]}
             tools={getQuantityByRarity(3)}
           />
           <RaritySegment
+            key={genRanHex(64)}
             image={Uncommon.src}
             topNum={toolMenuData.toolVals[2]}
             tools={getQuantityByRarity(2)}
           />
           <RaritySegment
+            key={genRanHex(64)}
             image={Common.src}
             topNum={toolMenuData.toolVals[1]}
             tools={getQuantityByRarity(1)}
@@ -433,7 +441,7 @@ const DashboardModal = ({
           alignItems: "center",
           justifyContent: "center",
           fontSize: "20px",
-          marginTop: "23px",
+          marginTop: "10px",
         }}
       >
         Estimated Earnings
@@ -517,7 +525,7 @@ const DashboardModal = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              marginTop: "20px",
+              marginTop: "10px",
               height: "60px",
               cursor: "pointer",
             }}

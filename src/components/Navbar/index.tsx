@@ -8,6 +8,7 @@ import Wod from "public/wod.png";
 import Logo from "public/logo.png";
 import { useEffect, useState } from "react";
 import { getWodBalance } from "@/storage/utils/method";
+import { Tooltip } from "@nextui-org/react";
 
 const Navbar = (props: any) => {
   const [styling, setStyling] = useState<IStylingObject>(props.styling);
@@ -280,6 +281,7 @@ const Navbar = (props: any) => {
           }}
         />
       </div>
+
       <div
         style={{
           height: "40px",

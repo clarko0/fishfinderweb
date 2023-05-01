@@ -23,6 +23,7 @@ import { isDocked } from "@/storage/utils/window";
 import { IStylingObject } from "@/storage/constants/interfaces";
 import { isDev, useWindowSize } from "@/storage/utils/tools";
 import { UserSettings } from "@/components/UserSettings";
+import { RerouteHandler } from "@/storage/utils/url";
 
 const Login = () => {
   const [styling, setStyling] = useState<IStylingObject>({});
@@ -38,12 +39,6 @@ const Login = () => {
 
   useEffect(() => {
     setStyling(STYLING[CheckTheme()]);
-    if (isDocked()) {
-      if (GetAuthToken() !== "") {
-        Router.push("/toolbox");
-        window.location.reload();
-      }
-    }
   }, []);
 
   return (
@@ -119,15 +114,19 @@ const Login = () => {
             justifyContent: "center",
           }}
           onClick={async () => {
-            let address: any = await GetAddress();
-            if (address === undefined) {
-              window.location.reload();
+            try {
+              setIsConnecting(true);
+              await MetaMaskConnect();
+              let address: any = await GetAddress();
+              if (address === undefined) {
+                window.location.reload();
+              }
+              const s = await GenerateAuth();
+              SetCurrentAccount(address, s);
+              RerouteHandler();
+            } catch (e) {
+              setIsConnecting(false);
             }
-            setIsConnecting(true);
-            await MetaMaskConnect();
-            const s = await GenerateAuth();
-            SetCurrentAccount(address, s);
-            await Router.push("/toolbox");
           }}
         >
           {!connecting && (
