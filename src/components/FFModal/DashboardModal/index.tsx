@@ -9,7 +9,7 @@ import Common from "public/common.png";
 import { useEffect } from "react";
 import { CaclulateFishingTime } from "@/storage/utils/tools";
 import { genRanHex } from "@/storage/constants/misc";
-import { Tooltip } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 
 const DashboardModal = ({
   size,
@@ -512,26 +512,16 @@ const DashboardModal = ({
         }}
       >
         {!gettingSessions && (
-          <div
+          <Button
+            color={"gradient"}
+            auto
+            style={{ width: "170px", height: "50px", marginTop: "10px" }}
             onClick={() => {
               setIsToolsMenu(true);
             }}
-            style={{
-              border: "1px solid #3366CC",
-              color: "#fff",
-              fontWeight: "600",
-              borderRadius: "6px",
-              width: "170px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: "10px",
-              height: "60px",
-              cursor: "pointer",
-            }}
           >
             Buy More Tools
-          </div>
+          </Button>
         )}
       </div>
     </div>
