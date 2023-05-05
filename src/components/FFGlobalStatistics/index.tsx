@@ -49,7 +49,7 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
           justifyContent: "center",
         }}
       >
-        {/* <GlobalItem
+        <GlobalItem
           content={"$WoD Farmed"}
           value={wodFarmed}
           image={<img width={30} src={Wod.src} />}
@@ -71,7 +71,7 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
               />
             </svg>
           }
-        /> */}
+        />
         <GlobalItem
           content={"People Fishing"}
           value={statisticsData.fisherman_count}
