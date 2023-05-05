@@ -135,7 +135,7 @@ export default async function handler(req: any, res: any) {
           ),
           nft_count: global_statistics.reduce(
             (accumulator: any, object: any) => {
-              return accumulator + object.nft_count;
+              return accumulator + object.nft_farmed;
             },
             0
           ),

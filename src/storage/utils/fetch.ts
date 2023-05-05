@@ -355,3 +355,47 @@ export const GetAllConsumablePrices = async () => {
   });
   return marketItems;
 };
+
+export const BuyTools = async (amount: number, rarities: any, items: any) => {
+  const calls = [];
+  let toolInfo: any = {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+  };
+  const nonUsedRarites: any = Object.keys(rarities).filter((item: any) => {
+    return !rarities[item];
+  });
+
+  for (const i in items) {
+    try {
+      if (!nonUsedRarites.includes(items[i][0].rarity.toString())) {
+        toolInfo[Object.keys(items).indexOf(i) + 1] = items[i].length;
+      }
+    } catch (e) {}
+  }
+
+  for (const key in toolInfo) {
+    if (toolInfo[key] !== 0) {
+      calls.push(
+        axios.post(
+          "https://api.defish.games/graphql",
+          {
+            query: `mutation {repairmentCollectionUpdate(input: {consumable_vendor_id: ${
+              (parseInt(key) - 1) * 3
+            }, amount_to_add: ${toolInfo[key] * amount},},) {id}}`,
+          },
+          {
+            headers: {
+              Authorization: GetAuthToken(),
+            },
+          }
+        )
+      );
+    }
+  }
+  await Promise.all(calls);
+};

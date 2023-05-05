@@ -482,6 +482,7 @@ const FishermanFriend = () => {
         username={userData.username}
         styling={styling}
       />
+
       <div
         style={{
           fontWeight: "700",

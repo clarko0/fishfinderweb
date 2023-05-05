@@ -15,8 +15,10 @@ const ReqBtn = (props: any) => {
         borderRadius: "6px",
         cursor: props.condition ? "pointer" : "not-allowed",
       }}
-      onClick={async () => {
-        props.func();
+      onClick={() => {
+        if (props.condition) {
+          props.func();
+        }
       }}
     >
       {props.text}

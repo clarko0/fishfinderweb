@@ -31,7 +31,37 @@ export default function MyApp({ Component, pageProps }: any) {
     }
   }, []);
 
-  const [isLogin, setIsLogin] = useState(false);
+  const [loginData, setLoginData] = useState<any>({
+    is_login: false,
+    data: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const [signupData, setSignupData] = useState<any>({
+    is_signup: false,
+    data: {
+      email: "",
+      password: "",
+      confirm_password: "",
+    },
+  });
+
+  const [oltData, setOltData] = useState<any>({
+    is_signup: false,
+    data: {
+      img: "",
+      username: "",
+      discord: "",
+      account: "",
+    },
+  });
+  const [loginClicker, setLoginClicker] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log(loginData);
+  }, [loginClicker]);
 
   const theme = createTheme({
     type: "dark",
@@ -49,7 +79,7 @@ export default function MyApp({ Component, pageProps }: any) {
           <Modal
             width="900px"
             blur
-            open={isLogin}
+            open={false}
             preventClose
             css={{
               background: "#0A0808",
@@ -126,6 +156,14 @@ export default function MyApp({ Component, pageProps }: any) {
                 color="primary"
                 size="xl"
                 placeholder="Email"
+                onChange={(e: any) => {
+                  setLoginClicker(!loginClicker);
+                  setLoginData((prev: any) => {
+                    const newData = prev;
+                    newData.data.email = e.target.value;
+                    return newData;
+                  });
+                }}
                 contentLeft={
                   <svg
                     width="22"
@@ -158,6 +196,14 @@ export default function MyApp({ Component, pageProps }: any) {
                 size="xl"
                 css={{ marginTop: "10px" }}
                 placeholder="Password"
+                onChange={(e: any) => {
+                  setLoginClicker(!loginClicker);
+                  setLoginData((prev: any) => {
+                    const newData = prev;
+                    newData.data.password = e.target.value;
+                    return newData;
+                  });
+                }}
                 contentLeft={
                   <svg
                     width="20"

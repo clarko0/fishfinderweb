@@ -10,6 +10,8 @@ import RarityBtn from "./RarityBtn";
 import Wod from "public/wod.png";
 import { useEffect, useState } from "react";
 import { genRanHex } from "@/storage/constants/misc";
+import { BuyTools } from "@/storage/utils/fetch";
+import { sleep } from "@/storage/utils/tools";
 
 const BuyToolMenu = ({
   setIsToolsMenu,
@@ -25,6 +27,8 @@ const BuyToolMenu = ({
   clicker,
   setClicker,
 }: any) => {
+  const [isOffchain, setIsOffchain] = useState<boolean>(false);
+  const [toolsBought, setToolsBought] = useState<boolean>(false);
   useEffect(() => {
     console.log(toolCost, wodPrice);
   }, []);
@@ -482,6 +486,22 @@ const BuyToolMenu = ({
               (${(wodPrice * toolCost).toFixed(2)})
             </div>
           </div>
+          <div
+            style={{
+              position: "absolute",
+              fontWeight: "500",
+              marginTop: "417px",
+            }}
+          >
+            Use Offchain $WoD?
+            <input
+              style={{ marginLeft: "7px" }}
+              type="checkbox"
+              onClick={() => {
+                setIsOffchain(!isOffchain);
+              }}
+            />
+          </div>
           <div style={{ display: "flex" }}></div>
           <ReqBtn
             width={"250px"}
@@ -494,16 +514,71 @@ const BuyToolMenu = ({
             }
             text="Buy"
             func={() => {
-              fullBuyTools(
-                toolMenuData.isDays
-                  ? parseInt(numberOfRepairs.toString()) * 4
-                  : parseInt(numberOfRepairs.toString()),
-                userData.items,
-                toolMenuData.rarities
-              );
+              isOffchain
+                ? BuyTools(
+                    toolMenuData.isDays
+                      ? parseInt(numberOfRepairs.toString()) * 4
+                      : parseInt(numberOfRepairs.toString()),
+                    toolMenuData.rarities,
+                    userData.items
+                  ).then(() => {
+                    setToolsBought(true);
+                    sleep(5000).then(() => {
+                      setToolsBought(false);
+                    });
+                  })
+                : fullBuyTools(
+                    toolMenuData.isDays
+                      ? parseInt(numberOfRepairs.toString()) * 4
+                      : parseInt(numberOfRepairs.toString()),
+                    userData.items,
+                    toolMenuData.rarities
+                  );
             }}
           />
         </div>
+      </div>
+      <div
+        style={{
+          width: "300px",
+          transition: "0.5s margin-left, 0.3s opacity",
+          opacity: toolsBought ? "1" : "0",
+          marginTop: "750px",
+          marginLeft: toolsBought ? "" : "-500px",
+          height: "75px",
+          borderRadius: "10px",
+          display: "flex",
+          alignItems: "center",
+          fontWeight: "600",
+          background: "#000",
+          padding: "20px",
+          gap: "10px",
+          zIndex: "9999",
+        }}
+      >
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="16"
+            cy="16"
+            r="12"
+            stroke="#30C04F"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <path
+            d="M11.3334 16.6667L13.5347 19.4184C13.783 19.7287 14.2458 19.7543 14.5267 19.4733L20.6667 13.3333"
+            stroke="#30C04F"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Tools successfully bought
       </div>
     </div>
   );
