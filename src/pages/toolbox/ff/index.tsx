@@ -300,6 +300,13 @@ const FishermanFriend = () => {
     }
     setWodPerHour(Number(total.toFixed(2)));
     setWodPerHourPrice(Number(total.toFixed(2)) * wodPrice);
+    setWodFarmed(
+      Number((sessionWod + userData.wodBalance - wodOnSignup).toFixed(2))
+    );
+    setWodFarmedPrice(
+      Number((sessionWod + userData.wodBalance - wodOnSignup).toFixed(2)) *
+        wodPrice
+    );
   }, [activeSessionData]);
 
   useEffect(() => {
@@ -379,8 +386,8 @@ const FishermanFriend = () => {
       setIsFishing(res.initPing.bool);
       setWodPrice(res.tokenPrice);
       setSessionId(res.initPing.session_id);
-      setWodFarmed(res.initPing.wod_farmed);
-      setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
+      // setWodFarmed(res.initPing.wod_farmed);
+      // setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
       setNextRepair(res.initPing.next_repair);
       if (
         res.initPing.system_msg.title !== "" &&
