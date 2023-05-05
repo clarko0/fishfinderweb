@@ -11,6 +11,7 @@ import {
 } from "../abi/abi";
 import { GetAddress } from "./web3";
 import { ethers, getAddress } from "ethers";
+import { GetCurrentAddress } from "./local";
 
 declare var window: any;
 let web3: any;
@@ -46,7 +47,7 @@ if (isDocked()) {
 }
 
 export const approveAll = async () => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
 
   await ItemContract.methods
     .setApprovalForAll(MarketPlaceContractAddress, true)
@@ -54,14 +55,14 @@ export const approveAll = async () => {
 };
 
 export const isApproveAll = async () => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
   return await ItemContract.methods
     .isApprovedForAll(address, MarketPlaceContractAddress)
     .call({ from: address });
 };
 
 export const createOrder = async (id: number, price: string) => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
   return await MarketPlaceContract.methods
     .createOrder(id, price, "0x69746d")
     .send({ from: address });
@@ -69,7 +70,7 @@ export const createOrder = async (id: number, price: string) => {
 
 export const buyOrder = async (id: number) => {
   let txhash: string = "";
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
   await FishFinderContract.methods
     .buyOrder(id)
     .send({ from: address })
@@ -81,7 +82,7 @@ export const buyOrder = async (id: number) => {
 };
 
 export const approveTokens = async () => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
   let approve_amount =
     "1157920892373161954235709850086879078532699846656405640394575840079131296399";
   return await WODContract.methods
@@ -92,7 +93,7 @@ export const approveTokens = async () => {
 };
 
 export const isUnlimitedApprove = async () => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
   const allowance = await WODContract.methods
     .allowance(address, FishFinderContractAddress)
     .call({ from: address });
@@ -100,7 +101,7 @@ export const isUnlimitedApprove = async () => {
 };
 
 export const bulkBuyOrder = async (ids: number[]) => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
   let txhash: string = "";
   if (ids.length !== 0) {
     await FishFinderContract.methods
@@ -115,7 +116,7 @@ export const bulkBuyOrder = async (ids: number[]) => {
 };
 
 export const ApprovalForAllWodTools = async () => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
   let approve_amount =
     "115792089237316195423570985008687907853269984665640564039457584007913129639935";
   return await MainnetWODContract.methods
@@ -126,7 +127,7 @@ export const ApprovalForAllWodTools = async () => {
 };
 
 export const isUnlimitedApproveTools = async () => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
   const allowance = await WODContract.methods
     .allowance(address, ToolContractAddress)
     .call({ from: address });
@@ -169,6 +170,9 @@ export const buyTools = async (
 };
 
 export const getWodBalance = async () => {
-  let address = await GetAddress();
+  let address = GetCurrentAddress();
+  if (address === "") {
+    return 0;
+  }
   return await WODContract.methods.balanceOf(address).call({ from: address });
 };

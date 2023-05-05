@@ -1,3 +1,4 @@
+import Router from "next/router";
 import { isDocked } from "./window";
 //update-text
 export const CheckTheme = () => {
@@ -28,16 +29,26 @@ export const SetCurrentAccount = (address: string, token: string) => {
   }
 };
 
+export const GetCurrentAddress = (): any => {
+  if (isDocked()) {
+    const address = window.localStorage.getItem("address");
+    if (address === null || "") {
+      Router.push("/login");
+    } else {
+      return address;
+    }
+  }
+};
+
 export const GetAuthToken = () => {
   if (isDocked()) {
     const authtoken = window.localStorage.getItem("auth_token");
-    if (authtoken === null) {
-      return "";
+    if (authtoken === null || "") {
+      Router.push("/login");
     } else {
       return authtoken;
     }
   }
-  return "";
 };
 
 export const ClearAuthToken = () => {

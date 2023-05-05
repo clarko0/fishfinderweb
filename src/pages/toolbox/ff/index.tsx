@@ -32,6 +32,8 @@ import StartStopBtn from "@/components/Buttons/StartStopBtn";
 import RepairModal from "@/components/FFModal/RepairModal";
 import DashboardModal from "@/components/FFModal/DashboardModal";
 import { ffStore } from "@/store/ff.store";
+import FFGlobalStatistics from "@/components/FFGlobalStatistics";
+import { genRanHex } from "@/storage/constants/misc";
 
 const FishermanFriend = () => {
   const [toolMenuData, setToolMenuData] = useState<any>({
@@ -40,8 +42,8 @@ const FishermanFriend = () => {
       2: true,
       3: true,
       4: true,
-      5: true,
-      6: true,
+      5: false,
+      6: false,
     },
     toolVals: {
       1: 0,
@@ -108,6 +110,7 @@ const FishermanFriend = () => {
   const [isToolsMenu, setIsToolsMenu] = useState<boolean>(false);
   const timerCountRef = useRef(0);
   const [toolCost, setToolCost] = useState<number>(0);
+  const [statisticsData, setStatisticsData] = useState<any>({});
   const [isToolsConfirmationMenu, setIsToolsConfirmationMenu] =
     useState<boolean>(false);
   const [canFish, setCanFish] = useState<ICanFish>({
@@ -196,7 +199,7 @@ const FishermanFriend = () => {
         );
       }
       cards.push(
-        <div style={{ display: "flex", gap: "30px" }}>
+        <div key={genRanHex(64)} style={{ display: "flex", gap: "30px" }}>
           <div style={{ display: "flex", alignItems: "center" }}>{items}</div>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "10px" }}
@@ -297,13 +300,6 @@ const FishermanFriend = () => {
     }
     setWodPerHour(Number(total.toFixed(2)));
     setWodPerHourPrice(Number(total.toFixed(2)) * wodPrice);
-    setWodFarmed(
-      Number((sessionWod + userData.wodBalance - wodOnSignup).toFixed(2))
-    );
-    setWodFarmedPrice(
-      Number((sessionWod + userData.wodBalance - wodOnSignup).toFixed(2)) *
-        wodPrice
-    );
   }, [activeSessionData]);
 
   useEffect(() => {
@@ -347,6 +343,7 @@ const FishermanFriend = () => {
         legendary: [],
         artifact: [],
       };
+
       for (let i = 0; i < res.items.length; i++) {
         const item = res.items[i];
         if (item.rarity === 1) {
@@ -377,11 +374,13 @@ const FishermanFriend = () => {
       setSessions(res.fishingInfo);
       setActiveSessionData(res.fishingInfo);
       setStatus(res.initPing.status);
+      setStatisticsData(res.initPing.global_statistics);
       setConsumableData(res.tools);
       setIsFishing(res.initPing.bool);
       setWodPrice(res.tokenPrice);
       setSessionId(res.initPing.session_id);
-      setWodOnSignup(res.initPing.wod_signup);
+      setWodFarmed(res.initPing.wod_farmed);
+      setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
       setNextRepair(res.initPing.next_repair);
       if (
         res.initPing.system_msg.title !== "" &&
@@ -437,6 +436,7 @@ const FishermanFriend = () => {
         setStatus(res.initPing.status);
         setConsumableData(res.tools);
         setIsFishing(res.initPing.bool);
+        setStatisticsData(res.initPing.global_statistics);
         setWodPrice(res.tokenPrice);
         setSessionId(res.initPing.session_id);
         setWodOnSignup(res.initPing.wod_signup);
@@ -482,6 +482,7 @@ const FishermanFriend = () => {
         username={userData.username}
         styling={styling}
       />
+
       <div
         style={{
           fontWeight: "700",
@@ -518,6 +519,11 @@ const FishermanFriend = () => {
         userData={userData}
         fishingTime={fishingTime}
         setIsToolsMenu={setIsToolsMenu}
+      />
+      <FFGlobalStatistics
+        size={size}
+        styling={styling}
+        statisticsData={statisticsData}
       />
       <StartStopBtn
         size={size}
