@@ -16,6 +16,7 @@
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
+    "@web3modal/react": "^2.3.7",
     "axios": "^1.2.6",
     "base-64": "^1.0.0",
     "eslint": "8.32.0",
@@ -33,7 +34,8 @@
     "typescript": "4.9.4",
     "vercel": "^28.18.1",
     "web3": "^1.8.2",
-    "web3-token": "^1.0.4"
+    "web3-token": "^1.0.4",
+    "web3modal": "^1.9.12"
   },
   "devDependencies": {
     "@types/base-64": "^1.0.0",
