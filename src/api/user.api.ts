@@ -3,7 +3,7 @@ import { ApiLocalStorage } from "@/local/api.local";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://api.dev.fishfinder.games/api" + "/users",
+  baseURL: process.env.API_BASE_URL + "/users",
 });
 
 export const UserApi = {

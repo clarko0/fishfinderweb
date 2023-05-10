@@ -85,6 +85,7 @@ export default function MyApp({ Component, pageProps }: any) {
   const [email, setEmail] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [otpWrong, setOTPWrong] = useState<boolean>(false);
 
   const handleUserData = async () => {
     try {
@@ -135,6 +136,7 @@ export default function MyApp({ Component, pageProps }: any) {
     if (newOTP.toString().replaceAll(",", "").length === 6) {
       try {
         setIsLoading(true);
+        setOTPWrong(false);
         const res = await AuthApi.completeSignup({
           email: email,
           email_confirmation: newOTP.toString().replaceAll(",", ""),
@@ -142,6 +144,7 @@ export default function MyApp({ Component, pageProps }: any) {
         let data = res.data;
         setIsEmailConfirm(false);
       } catch (e) {
+        setOTPWrong(true);
         setOtp(new Array(6).fill(""));
         currentOTPIndex = 0;
         setActiveOTPIndex(0);
@@ -272,6 +275,7 @@ export default function MyApp({ Component, pageProps }: any) {
             handleKeyDown={handleKeyDown}
             handlePaste={handlePaste}
             handleBackButton={handleBackButton}
+            otpWrong={otpWrong}
           />
           <LoginModal
             is_open={isLogin}

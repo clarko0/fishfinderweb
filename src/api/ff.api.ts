@@ -3,7 +3,7 @@ import { ApiLocalStorage } from "@/local/api.local";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.API_BASE_URL + "/ff",
+  baseURL: process.env.API_BASE_URL + "/users",
 });
 
 export const FFApi = {

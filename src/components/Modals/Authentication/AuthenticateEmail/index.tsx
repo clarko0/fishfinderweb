@@ -12,6 +12,7 @@ const AuthenticateEmailModal = ({
   isloading,
   handleBackButton,
   handlePaste,
+  otpWrong,
 }: any) => {
   const [pasting, setPasting] = useState<boolean>(false);
   return (
@@ -85,8 +86,21 @@ const AuthenticateEmailModal = ({
           color: "#949494",
         }}
       >
-        We've sent a code to
+        We&apos;ve sent a code to
         <span style={{ marginLeft: "3px", fontWeight: "600" }}>{email}</span>
+      </div>
+      <div
+        style={{
+          display: otpWrong ? "flex" : "none",
+          color: "red",
+          width: "100%",
+          fontSize: "12px",
+          justifyContent: "center",
+          top: "130px",
+          position: "absolute",
+        }}
+      >
+        Invalid Code
       </div>
       {!isloading && (
         <>
@@ -155,7 +169,7 @@ const AuthenticateEmailModal = ({
               fontSize: "12px",
             }}
           >
-            Didn't get a code?{" "}
+            Didn&apos;t get a code?{" "}
             <span
               style={{
                 fontWeight: "600",
