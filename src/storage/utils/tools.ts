@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { IItem, IItems, ITool } from "../constants/interfaces";
 import { isDocked } from "./window";
+import { type } from "os";
+import { ApiLocalStorage } from "@/local/api.local";
 
 export const CaclulateFishingTime = (items: IItems, tools: ITool[]) => {
   let k = 0;
@@ -195,26 +197,75 @@ export const isDev = () => {
 };
 
 export const intToString = (num: any) => {
-  num = num.toString().replace(/[^0-9.]/g, "");
-  if (num < 1000) {
-    return num;
-  }
-  let si = [
-    { v: 1e3, s: "K" },
-    { v: 1e6, s: "M" },
-    { v: 1e9, s: "B" },
-    { v: 1e12, s: "T" },
-    { v: 1e15, s: "P" },
-    { v: 1e18, s: "E" },
-  ];
-  let index;
-  for (index = si.length - 1; index > 0; index--) {
-    if (num >= si[index].v) {
-      break;
+  try {
+    num = num.toString().replace(/[^0-9.]/g, "");
+    if (num < 1000) {
+      return num.toFixed(2);
     }
+    let si = [
+      { v: 1e3, s: "K" },
+      { v: 1e6, s: "M" },
+      { v: 1e9, s: "B" },
+      { v: 1e12, s: "T" },
+      { v: 1e15, s: "P" },
+      { v: 1e18, s: "E" },
+    ];
+    let index;
+    for (index = si.length - 1; index > 0; index--) {
+      if (num >= si[index].v) {
+        break;
+      }
+    }
+    return (
+      (num / si[index].v).toFixed(2).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, "$1") +
+      si[index].s
+    );
+  } catch (e) {
+    return 0;
   }
-  return (
-    (num / si[index].v).toFixed(2).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, "$1") +
-    si[index].s
-  );
 };
+
+export const getBase64 = (event: any) => {
+  let me = this;
+  let file = event.target.files[0];
+  let reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = function () {
+    //me.modelvalue = reader.result;
+    return reader.result;
+  };
+  reader.onerror = function (error) {
+    console.log("Error: ", error);
+  };
+};
+
+export function onFileSelected(event: any) {
+  var selectedFile = event.target.files[0];
+  var reader = new FileReader();
+
+  var imgtag: any = document.getElementById("pfpImage");
+  imgtag.title = selectedFile.name;
+
+  reader.onload = function (event) {
+    if (event.target) imgtag.src = event.target.result;
+  };
+
+  reader.readAsDataURL(selectedFile);
+}
+
+export function getEmailFromToken() {
+  let token = ApiLocalStorage.ReadAuthToken().replace("Bearer ", "");
+  var base64Url = token.split(".")[1];
+  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  var jsonPayload = decodeURIComponent(
+    window
+      .atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+
+  return JSON.parse(jsonPayload).email;
+}
