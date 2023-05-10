@@ -12,6 +12,7 @@ const SignupModal = ({
   signupHelperEmail,
   signupSamePassword,
   signupSecurePassword,
+  signupEmailInUse,
   setIsSignup,
 }: any) => {
   return (
@@ -136,11 +137,13 @@ const SignupModal = ({
             color: "red",
             width: "400px",
             height: "0px",
-            display: signupHelperEmail ? "flex" : "none",
+            display: signupHelperEmail || signupEmailInUse ? "flex" : "none",
             alignItems: "center",
           }}
         >
-          {"Email is not valid"}
+          {signupEmailInUse
+            ? "Email is already in use, please sign in or try another email"
+            : "Email is not valid"}
         </div>
         <Input.Password
           bordered
@@ -188,7 +191,7 @@ const SignupModal = ({
           }}
         >
           {
-            "Mininum password requirements: Be 8 characters long, Have one uppercase letter, Have one lowercase letter, Have one number and Have one special character"
+            "Mininum password requirements: Be 12 characters long, Have one uppercase letter, Have one lowercase letter, Have one number and Have one special character"
           }
         </div>
         <Input.Password

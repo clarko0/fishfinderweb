@@ -1,4 +1,5 @@
 import {
+  ICompleteSignUpData,
   INewEmailData,
   INewPasswordData,
   ISignupLoginData,
@@ -14,6 +15,9 @@ const api = axios.create({
 export const AuthApi = {
   async signup(data: ISignupLoginData) {
     return await api.post("/signup", data);
+  },
+  async completeSignup(data: ICompleteSignUpData) {
+    return await api.post("/signup/complete", data);
   },
   async login(data: ISignupLoginData) {
     return await api.post("/login", data);

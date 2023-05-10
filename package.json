@@ -28,6 +28,7 @@
     "next-themes": "^0.2.1",
     "nprogress": "^0.2.0",
     "react": "18.2.0",
+    "react-auth-code-input": "^3.2.1",
     "react-dom": "18.2.0",
     "react-progressbar": "^15.4.1",
     "to-hex": "^0.0.18",

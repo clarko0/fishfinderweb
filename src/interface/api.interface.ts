@@ -30,3 +30,8 @@ export interface INewEmailData {
   new_email: string;
   confirm_key: number;
 }
+
+export interface ICompleteSignUpData {
+  email: string;
+  email_confirmation: string;
+}
