@@ -9,7 +9,7 @@ import axios from "axios";
 import { env } from "process";
 
 const api = axios.create({
-  baseURL: "https://api.dev.fishfinder.games/api" + "/auth",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL + "/auth",
 });
 
 export const AuthApi = {
