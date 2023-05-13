@@ -25,6 +25,7 @@ import OneLastThingModal from "@/components/Modals/Authentication/OneLastThing";
 import { UserApi } from "@/api/user.api";
 
 import AuthenticateEmailModal from "@/components/Modals/Authentication/AuthenticateEmail";
+import { CryptoUtils } from "@/utils/crypto.utils";
 const inter = Inter({ subsets: ["latin"] });
 declare var window: any;
 
@@ -278,7 +279,7 @@ export default function MyApp({ Component, pageProps }: any) {
             otpWrong={otpWrong}
           />
           <LoginModal
-            is_open={isLogin}
+            is_open={!isLogin}
             loginClicker={loginClicker}
             setSignupData={setSignupData}
             setLoginClicker={setLoginClicker}
