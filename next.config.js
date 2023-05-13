@@ -1,3 +1,5 @@
+const { config } = require("process");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -32,5 +34,9 @@ module.exports = {
         pathname: "/item-collections",
       },
     ],
+  },
+  env: {
+    API_BASE_URL: process.env.API_BASE_URL,
+    DEV_WEB3_SECRET: process.env.DEV_WEB3_SECRET,
   },
 };

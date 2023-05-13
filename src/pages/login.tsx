@@ -24,6 +24,7 @@ import { IStylingObject } from "@/storage/constants/interfaces";
 import { isDev, useWindowSize } from "@/storage/utils/tools";
 import { UserSettings } from "@/components/UserSettings";
 import { RerouteHandler } from "@/storage/utils/url";
+import { Web3Modal } from "@web3modal/react";
 
 const Login = () => {
   const [styling, setStyling] = useState<IStylingObject>({});
@@ -40,6 +41,12 @@ const Login = () => {
   useEffect(() => {
     setStyling(STYLING[CheckTheme()]);
   }, []);
+
+  const modalConfig = {
+    theme: "dark",
+    accentColor: "default",
+    projectId: "11bb87fcd1dcf830dbdac3541f4d9152",
+  };
 
   return (
     <div
