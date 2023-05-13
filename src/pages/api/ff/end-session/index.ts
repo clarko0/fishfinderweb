@@ -7,7 +7,7 @@
 import { getSessionInfo } from "@/storage/utils/fetch";
 import { endSession } from "@/storage/utils/fetch";
 import { GetActiveZone } from "@/storage/utils/fetch";
-import { compareArrays } from "@/storage/utils/tools";
+import { compareArrays, sleep } from "@/storage/utils/tools";
 import { connectToDatabase } from "@/util/mongodb";
 import axios from "axios";
 
@@ -76,21 +76,26 @@ export default async function handler(req: any, res: any) {
         ),
         session_id: item.fishing_session._id,
       }));
-      await fishing_history_coll.insertMany(data);
+
+      data.length > 0 && (await fishing_history_coll.insertMany(data));
       await db
         .collection("ffpending")
         .deleteOne({ session_id: body.session_id });
       await db
         .collection("ffrunning")
         .deleteOne({ session_id: body.session_id });
+      for (let i = 0; i < data.length; i++) {
+        const res = await api.post(
+          `/fishing/${data[i].session_id}/end`,
+          {},
+          {
+            headers: {
+              Authorization: authToken,
+            },
+          }
+        );
+      }
 
-      data.map(async (item: any) => {
-        await api.post(`/fishing/${item.session_id}/end`, {
-          headers: {
-            Authorization: authToken,
-          },
-        });
-      });
       await client.close();
       res.status(200).send({});
     });

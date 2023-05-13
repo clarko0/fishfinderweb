@@ -116,6 +116,7 @@ const EndFishingMenu = ({
                 setEndingFishing(true);
                 await endAutoFishing(sessionId);
                 setEndingFishing(false);
+                setIsEndFishingMenu(false);
               }}
             >
               Confirm
