@@ -4,8 +4,16 @@
  * @param {import("next").NextApiResponse} res
  */
 
+import { getSessionInfo } from "@/storage/utils/fetch";
+import { endSession } from "@/storage/utils/fetch";
+import { GetActiveZone } from "@/storage/utils/fetch";
 import { compareArrays } from "@/storage/utils/tools";
 import { connectToDatabase } from "@/util/mongodb";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "https://api.worldofdefish.com",
+});
 
 export default async function handler(req: any, res: any) {
   try {
@@ -25,27 +33,69 @@ export default async function handler(req: any, res: any) {
       if (body.session_id.length !== 32) {
         throw new Error("Invalid session_id");
       }
-      const pending = await db
-        .collection("ffpending")
-        .find({ session_id: body.session_id })
-        .toArray();
-      const active = await db
-        .collection("ffrunning")
-        .find({ session_id: body.session_id })
-        .toArray();
-      if (pending.length === 0 && active.length === 0) {
+      const pending = await db.collection("ffpending");
+      const active = await db.collection("ffrunning");
+      const fishing_history_coll = await db.collection("fffishing_history");
+      if (
+        (await pending.find({ session_id: body.session_id }).toArray()
+          .length) === 0 &&
+        (await active.find({ session_id: body.session_id }).toArray()
+          .length) === 0
+      ) {
         res.status(200).send({});
       }
+      let authToken = await active
+        .find({ session_id: body.session_id })
+        .toArray();
+      if (authToken.length > 0) {
+        authToken = authToken[0].auth;
+      }
+      const session_ids = await (
+        await api.get(`/zones/active/offchain/select/all`, {
+          headers: {
+            Authorization: authToken,
+          },
+        })
+      ).data;
+      const results = [];
+      for (let i = 0; i < session_ids.length; i++) {
+        const response = await api.get(
+          `/zones/${session_ids[i]}/expanded-offchain`,
+          {
+            headers: {
+              Authorization: authToken,
+            },
+          }
+        );
+        results.push(response.data);
+      }
+      const data = results.map((item: any) => ({
+        wodFarmed: item.fishing_session.last_saved_wod_earned,
+        nftFarmed: item.fishing_session.pending_drops.concat(
+          item.fishing_session.claimed_materials
+        ),
+        session_id: item.fishing_session._id,
+      }));
+      await fishing_history_coll.insertMany(data);
       await db
         .collection("ffpending")
         .deleteOne({ session_id: body.session_id });
       await db
         .collection("ffrunning")
         .deleteOne({ session_id: body.session_id });
+
+      data.map(async (item: any) => {
+        await api.post(`/fishing/${item.session_id}/end`, {
+          headers: {
+            Authorization: authToken,
+          },
+        });
+      });
       await client.close();
       res.status(200).send({});
     });
   } catch (e) {
+    console.log(e);
     res.status(500).send({ message: "Server Error" });
   }
 }

@@ -115,13 +115,7 @@ const EndFishingMenu = ({
               onClick={async () => {
                 setEndingFishing(true);
                 await endAutoFishing(sessionId);
-                const active = await GetActiveZone();
-                const activeSessions = await getSessionInfo(active.data);
-                for (let i = 0; i < activeSessions.length; i++) {
-                  await endSession(activeSessions[i].fishing_session.id);
-                }
                 setEndingFishing(false);
-                window.location.reload();
               }}
             >
               Confirm
