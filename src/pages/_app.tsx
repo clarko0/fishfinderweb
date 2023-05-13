@@ -279,7 +279,7 @@ export default function MyApp({ Component, pageProps }: any) {
             otpWrong={otpWrong}
           />
           <LoginModal
-            is_open={!isLogin}
+            is_open={isLogin}
             loginClicker={loginClicker}
             setSignupData={setSignupData}
             setLoginClicker={setLoginClicker}

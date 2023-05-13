@@ -39,7 +39,8 @@ export const ffStore = async () => {
         subCalls.push(
           getSingleSession(res.data[i]).then((response: any) => {
             response = response.data;
-            items = items.concat(response.fishing_session.slot_items);
+            response.fishing_session !== null &&
+              (items = items.concat(response.fishing_session.slot_items));
             fishingInfo.push(response);
           })
         );
