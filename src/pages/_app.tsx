@@ -251,7 +251,7 @@ export default function MyApp({ Component, pageProps }: any) {
         </Head>
         <div style={{ fontFamily: "inter" }} id="app">
           <Component {...pageProps} />
-          <SignupModal
+          {/* <SignupModal
             signupHelperEmail={signupHelperEmail}
             signupSamePassword={signupSamePassword}
             signupSecurePassword={signupSecurePassword}
@@ -296,7 +296,7 @@ export default function MyApp({ Component, pageProps }: any) {
             setOltImage={setOltImage}
             oltImage={oltImage}
             setOltData={setOltData}
-          />
+          /> */}
         </div>
       </NextUIProvider>
     </>
