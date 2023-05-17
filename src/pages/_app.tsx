@@ -101,14 +101,6 @@ export default function MyApp({ Component, pageProps }: any) {
     }
   };
 
-  useEffect(() => {
-    setIsLogin(ApiLocalStorage.ReadAuthToken() === "");
-    handleUserData();
-    try {
-      setEmail(getEmailFromToken());
-    } catch (e) {}
-  }, []);
-
   const theme = createTheme({
     type: "dark",
   });
@@ -308,67 +300,13 @@ export default function MyApp({ Component, pageProps }: any) {
 
   return (
     <>
-      <GoogleOAuthProvider clientId="799925864767-vrnv378u0htn0tcijch7h48900f9bh1k.apps.googleusercontent.com">
-        <NextUIProvider theme={theme}>
-          <Head>
-            <link rel="shortcut icon" href="/favicon.png" />
-            <title>Fish Finder - #1 QOL tool for WoD</title>
-          </Head>
-          <div style={{ fontFamily: "inter" }} id="app">
-            <Component {...pageProps} />
-            <SignupModal
-              signupHelperEmail={signupHelperEmail}
-              signupSamePassword={signupSamePassword}
-              signupSecurePassword={signupSecurePassword}
-              signup={signup}
-              is_open={isSignup}
-              signupClicker={signupClicker}
-              setSignupClicker={setSignupClicker}
-              setIsLogin={setIsLogin}
-              setIsSignup={setIsSignup}
-              setSignupData={setSignupData}
-              setLoginData={setLoginData}
-              signupEmailInUse={signupEmailInUse}
-            />
-            <AuthenticateEmailModal
-              is_open={isEmailConfirm}
-              email={email}
-              handleEmailPasscode={handleEmailPasscode}
-              otp={otp}
-              inputRef={inputRef}
-              isLoading={isLoading}
-              activeOTPIndex={activeOTPIndex}
-              handleKeyDown={handleKeyDown}
-              handlePaste={handlePaste}
-              handleBackButton={handleBackButton}
-              otpWrong={otpWrong}
-              otpKeyTimeout={otpKeyTimeout}
-              setOTPKeyTimeout={setOTPKeyTimeout}
-              countDown={countDown}
-              handleResendVerification={handleResendVerification}
-            />
-            <LoginModal
-              is_open={isLogin}
-              loginClicker={loginClicker}
-              setSignupData={setSignupData}
-              setLoginClicker={setLoginClicker}
-              setIsLogin={setIsLogin}
-              login={login}
-              badLogin={badLogin}
-              setBadLogin={setBadLogin}
-              setIsSignup={setIsSignup}
-              setLoginData={setLoginData}
-            />
-            <OneLastThingModal
-              is_open={false}
-              oltData={oltData}
-              setOltImage={setOltImage}
-              oltImage={oltImage}
-              setOltData={setOltData}
-            />
-          </div>
-        </NextUIProvider>
-      </GoogleOAuthProvider>
+      <Head>
+        <link rel="shortcut icon" href="/favicon.png" />
+        <title>Fish Finder - #1 QOL tool for WoD</title>
+      </Head>
+      <div style={{ fontFamily: "inter" }} id="app">
+        <Component {...pageProps} />
+      </div>
     </>
   );
 }
