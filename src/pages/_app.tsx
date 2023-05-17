@@ -13,7 +13,7 @@ import {
 } from "@nextui-org/react";
 import "@/styles/globals.css";
 import { ClearAuthToken } from "@/storage/utils/local";
-
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { CreateRerouteUrl } from "@/storage/utils/url";
 import { getEmailFromToken, sleep } from "@/storage/utils/tools";
 import LoginModal from "@/components/Modals/Authentication/Login";
@@ -47,7 +47,7 @@ export default function MyApp({ Component, pageProps }: any) {
       password: "",
     },
   });
-
+  const [otpKeyTimeout, setOTPKeyTimeout] = useState<boolean>(false);
   const [signupData, setSignupData] = useState<any>({
     is_signup: false,
     data: {
@@ -87,6 +87,7 @@ export default function MyApp({ Component, pageProps }: any) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [otpWrong, setOTPWrong] = useState<boolean>(false);
+  const [countDown, setCountDown] = useState<number>(0);
 
   const handleUserData = async () => {
     try {
@@ -99,14 +100,6 @@ export default function MyApp({ Component, pageProps }: any) {
       setIsLogin(true);
     }
   };
-
-  useEffect(() => {
-    setIsLogin(ApiLocalStorage.ReadAuthToken() === "");
-    handleUserData();
-    try {
-      setEmail(getEmailFromToken());
-    } catch (e) {}
-  }, []);
 
   const theme = createTheme({
     type: "dark",
@@ -144,7 +137,10 @@ export default function MyApp({ Component, pageProps }: any) {
         });
         let data = res.data;
         setIsEmailConfirm(false);
-      } catch (e) {
+      } catch (e: any) {
+        if (e.response.data.message === "Email verification code expired") {
+          setOTPKeyTimeout(true);
+        }
         setOTPWrong(true);
         setOtp(new Array(6).fill(""));
         currentOTPIndex = 0;
@@ -177,15 +173,74 @@ export default function MyApp({ Component, pageProps }: any) {
   }, [activeOTPIndex]);
 
   const isStrongPassword = (password: string): boolean => {
-    let expression: RegExp =
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{12,}$/;
-    return expression.test(password);
+    return password.length >= 12;
   };
 
   const isEmail = (email: string): boolean => {
     const expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     return expression.test(email);
   };
+
+  const handleResendVerification = () => {
+    setOTPKeyTimeout(false);
+    setOTPWrong(false);
+    let intervalId: NodeJS.Timeout | null = null;
+    if (isEmailConfirm) {
+      AuthApi.resendVerification(email).then(() => {
+        setCountDown(60);
+        intervalId = setInterval(() => {
+          setCountDown((prev: number) => {
+            if (prev > 0) {
+              return prev - 1;
+            } else {
+              clearInterval(intervalId!);
+              return 0;
+            }
+          });
+        }, 1000);
+      });
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  };
+
+  useEffect(() => {
+    console.log(isEmailConfirm);
+    let intervalId: NodeJS.Timeout | null = null;
+    if (isEmailConfirm) {
+      AuthApi.resendVerification(email).then(() => {
+        setCountDown(60);
+        intervalId = setInterval(() => {
+          setCountDown((prev: number) => {
+            if (prev > 0) {
+              return prev - 1;
+            } else {
+              clearInterval(intervalId!);
+              return 0;
+            }
+          });
+        }, 1000);
+      });
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isEmailConfirm]);
+
+  useEffect(() => {
+    if (countDown === 0) {
+      setOTPKeyTimeout(true);
+    } else {
+      setOTPKeyTimeout(false);
+    }
+  }, [countDown]);
 
   const signup = async () => {
     setSignupEmailInUse(false);
@@ -203,12 +258,13 @@ export default function MyApp({ Component, pageProps }: any) {
             let res = await AuthApi.signup(signupD);
             res = res.data;
             ApiLocalStorage.WriteAuthToken(res.data.access_token);
-            setEmail(getEmailFromToken());
             setIsSignup(false);
             setIsEmailConfirm(true);
             setIsLogin(false);
             setSignupEmailInUse(false);
+            setEmail(signupData.data.email);
           } catch (error) {
+            console.log(error);
             setSignupEmailInUse(true);
           }
         } else {
@@ -235,7 +291,7 @@ export default function MyApp({ Component, pageProps }: any) {
       setIsLogin(false);
       handleUserData();
       try {
-        setEmail(getEmailFromToken());
+        setEmail(loginData.data.email);
       } catch (e) {}
     } catch (e) {
       setBadLogin(true);
@@ -244,61 +300,13 @@ export default function MyApp({ Component, pageProps }: any) {
 
   return (
     <>
-      <NextUIProvider theme={theme}>
-        <Head>
-          <link rel="shortcut icon" href="/favicon.png" />
-          <title>Fish Finder - #1 QOL tool for WoD</title>
-        </Head>
-        <div style={{ fontFamily: "inter" }} id="app">
-          <Component {...pageProps} />
-          {/* <SignupModal
-            signupHelperEmail={signupHelperEmail}
-            signupSamePassword={signupSamePassword}
-            signupSecurePassword={signupSecurePassword}
-            signup={signup}
-            is_open={isSignup}
-            signupClicker={signupClicker}
-            setSignupClicker={setSignupClicker}
-            setIsLogin={setIsLogin}
-            setIsSignup={setIsSignup}
-            setSignupData={setSignupData}
-            setLoginData={setLoginData}
-            signupEmailInUse={signupEmailInUse}
-          />
-          <AuthenticateEmailModal
-            is_open={isEmailConfirm}
-            email={email}
-            handleEmailPasscode={handleEmailPasscode}
-            otp={otp}
-            inputRef={inputRef}
-            isLoading={isLoading}
-            activeOTPIndex={activeOTPIndex}
-            handleKeyDown={handleKeyDown}
-            handlePaste={handlePaste}
-            handleBackButton={handleBackButton}
-            otpWrong={otpWrong}
-          />
-          <LoginModal
-            is_open={isLogin}
-            loginClicker={loginClicker}
-            setSignupData={setSignupData}
-            setLoginClicker={setLoginClicker}
-            setIsLogin={setIsLogin}
-            login={login}
-            badLogin={badLogin}
-            setBadLogin={setBadLogin}
-            setIsSignup={setIsSignup}
-            setLoginData={setLoginData}
-          />
-          <OneLastThingModal
-            is_open={false}
-            oltData={oltData}
-            setOltImage={setOltImage}
-            oltImage={oltImage}
-            setOltData={setOltData}
-          /> */}
-        </div>
-      </NextUIProvider>
+      <Head>
+        <link rel="shortcut icon" href="/favicon.png" />
+        <title>Fish Finder - #1 QOL tool for WoD</title>
+      </Head>
+      <div style={{ fontFamily: "inter" }} id="app">
+        <Component {...pageProps} />
+      </div>
     </>
   );
 }
