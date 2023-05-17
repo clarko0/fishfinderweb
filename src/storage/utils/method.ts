@@ -50,7 +50,7 @@ export const approveAll = async () => {
   let address = GetCurrentAddress();
 
   await ItemContract.methods
-    .setApprovalForAll(MarketPlaceContractAddress, true)
+    .setApprovalForAll("0xfCD46702d80141e6380a5E149132cc3a617d42F9", true)
     .send({ from: address });
 };
 

@@ -1,3 +1,4 @@
+import { AuthApi } from "@/api/auth.api";
 import { Loading, Modal } from "@nextui-org/react";
 import React, { useState } from "react";
 
@@ -13,6 +14,9 @@ const AuthenticateEmailModal = ({
   handleBackButton,
   handlePaste,
   otpWrong,
+  countDown,
+  handleResendVerification,
+  otpKeyTimeout,
 }: any) => {
   const [pasting, setPasting] = useState<boolean>(false);
   return (
@@ -40,6 +44,7 @@ const AuthenticateEmailModal = ({
           position: "absolute",
           cursor: "pointer",
           right: "30px",
+          zIndex: "999",
           top: "30px",
         }}
         xmlns="http://www.w3.org/2000/svg"
@@ -69,6 +74,7 @@ const AuthenticateEmailModal = ({
         style={{
           position: "absolute",
           left: "35px",
+          display: otpKeyTimeout ? "none" : "flex",
           fontWeight: "600",
           fontSize: "18px",
           top: "75px",
@@ -84,14 +90,14 @@ const AuthenticateEmailModal = ({
           fontSize: "12px",
           top: "102px",
           color: "#949494",
+          display: otpKeyTimeout ? "none" : "flex",
         }}
       >
-        We&apos;ve sent a code to
-        <span style={{ marginLeft: "3px", fontWeight: "600" }}>{email}</span>
+        We&apos;ve sent you a 6 digit code
       </div>
       <div
         style={{
-          display: otpWrong ? "flex" : "none",
+          display: otpWrong && !otpKeyTimeout ? "flex" : "none",
           color: "red",
           width: "100%",
           fontSize: "12px",
@@ -102,11 +108,54 @@ const AuthenticateEmailModal = ({
       >
         Invalid Code
       </div>
+      <div
+        style={{
+          display: otpKeyTimeout ? "flex" : "none",
+          position: "absolute",
+          alignItems: "center",
+          width: "100%",
+          justifyContent: "center",
+          flexDirection: "column",
+          fontWeight: "600",
+          height: "100%",
+        }}
+      >
+        Email verification code expired
+        <div
+          style={{
+            fontWeight: "500",
+            fontSize: "12px",
+            color: "#949494",
+            cursor: "pointer",
+            textDecoration: "underline",
+          }}
+          onClick={() => {
+            handleResendVerification();
+          }}
+        >
+          Click to send a new one
+        </div>
+      </div>
+      <div
+        style={{
+          fontSize: "14px",
+          fontWeight: "500",
+          top: "220px",
+          position: "absolute",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          display: otpKeyTimeout ? "none" : "flex",
+          gap: "3px",
+        }}
+      >
+        Code expires in <span>00:{countDown.toString().padStart(2, "0")}</span>
+      </div>
       {!isloading && (
         <>
           <div
             style={{
-              display: "flex",
+              display: otpKeyTimeout ? "none" : "flex",
               gap: "7px",
               width: "100%",
               alignItems: "center",
@@ -154,31 +203,6 @@ const AuthenticateEmailModal = ({
                 </React.Fragment>
               );
             })}
-          </div>
-          <div
-            style={{
-              color: "#949494",
-              top: "210px",
-              gap: "3px",
-              position: "absolute",
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "500",
-              fontSize: "12px",
-            }}
-          >
-            Didn&apos;t get a code?{" "}
-            <span
-              style={{
-                fontWeight: "600",
-                textDecoration: "underline",
-                cursor: "pointer",
-              }}
-            >
-              Click to resend
-            </span>
           </div>
         </>
       )}

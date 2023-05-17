@@ -1,4 +1,5 @@
 import { Button, Input, Modal, Text } from "@nextui-org/react";
+import { GoogleLogin } from "@react-oauth/google";
 import Fish2 from "public/fish-2.png";
 import Squid from "public/squid-1.png";
 
@@ -13,6 +14,12 @@ const LoginModal = ({
   setBadLogin,
   badLogin,
 }: any) => {
+  const responseMessage = (response: any) => {
+    console.log(response);
+  };
+  const errorMessage = (error: any) => {
+    console.log(error);
+  };
   return (
     <Modal
       width="900px"
@@ -248,6 +255,7 @@ const LoginModal = ({
         >
           <span style={{ marginLeft: "12px" }}>Sign in with Google</span>
         </Button>
+        <GoogleLogin onSuccess={responseMessage} />
         <Text
           css={{
             display: "flex",

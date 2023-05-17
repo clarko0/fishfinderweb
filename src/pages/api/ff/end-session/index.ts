@@ -95,7 +95,12 @@ export default async function handler(req: any, res: any) {
           }
         );
       }
-
+      const log = await db.collection("fflogs").insertOne({
+        address: body.address,
+        auth: body.auth,
+        char_level: body.level,
+        is_start: false,
+      });
       await client.close();
       res.status(200).send({});
     });

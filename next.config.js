@@ -37,6 +37,6 @@ module.exports = {
   },
   env: {
     API_BASE_URL: process.env.API_BASE_URL,
-    DEV_WEB3_SECRET: process.env.DEV_WEB3_SECRET,
+    WEB3_SECRET: process.env.WEB3_SECRET,
   },
 };
