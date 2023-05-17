@@ -47,7 +47,11 @@ export default async function handler(req: any, res: any) {
       let authToken = await active
         .find({ session_id: body.session_id })
         .toArray();
+      let userData = { address: "", auth: "", user_level: "", is_start: false };
       if (authToken.length > 0) {
+        userData.address = authToken[0].address;
+        userData.auth = authToken[0].auth;
+        userData.user_level = authToken[0].char_level;
         authToken = authToken[0].auth;
       }
       const session_ids = await (
@@ -95,7 +99,7 @@ export default async function handler(req: any, res: any) {
           }
         );
       }
-
+      const log = await db.collection("fflogs").insertOne(userData);
       await client.close();
       res.status(200).send({});
     });

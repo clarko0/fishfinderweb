@@ -187,12 +187,12 @@ const SignupModal = ({
             fontSize: "12px",
             color: "red",
             width: "400px",
+            height: "0px",
+            marginTop: "-10px",
             display: signupSecurePassword ? "flex" : "none",
           }}
         >
-          {
-            "Mininum password requirements: Be 12 characters long, Have one uppercase letter, Have one lowercase letter, Have one number and Have one special character"
-          }
+          {"Password must be 12 characters long"}
         </div>
         <Input.Password
           bordered

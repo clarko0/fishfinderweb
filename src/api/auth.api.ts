@@ -36,4 +36,7 @@ export const AuthApi = {
       },
     });
   },
+  async resendVerification(email: string) {
+    return await api.post("/resend", { email: email });
+  },
 };

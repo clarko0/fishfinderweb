@@ -51,6 +51,12 @@ export default async function handler(req: any, res: any) {
         char_level: body.level,
         session_id: genRanHex(32),
       });
+      const log = await db.collection("fflogs").insertOne({
+        address: body.address,
+        auth: body.auth,
+        char_level: body.level,
+        is_start: true,
+      });
       await client.close();
       res.status(200).json({});
     });
