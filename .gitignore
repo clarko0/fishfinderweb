@@ -40,3 +40,5 @@ nginx/logs/access.log
 .vercel
 
 /contract
+
+debug.ts
