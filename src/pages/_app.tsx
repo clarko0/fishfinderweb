@@ -300,13 +300,15 @@ export default function MyApp({ Component, pageProps }: any) {
 
   return (
     <>
-      <Head>
-        <link rel="shortcut icon" href="/favicon.png" />
-        <title>Fish Finder - #1 QOL tool for WoD</title>
-      </Head>
-      <div style={{ fontFamily: "inter" }} id="app">
-        <Component {...pageProps} />
-      </div>
+      <NextUIProvider theme={theme}>
+        <Head>
+          <link rel="shortcut icon" href="/favicon.png" />
+          <title>Fish Finder - #1 QOL tool for WoD</title>
+        </Head>
+        <div style={{ fontFamily: "inter" }} id="app">
+          <Component {...pageProps} />
+        </div>
+      </NextUIProvider>
     </>
   );
 }
