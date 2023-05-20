@@ -9,6 +9,11 @@ import { compareArrays } from "@/storage/utils/tools";
 import { VerifyAuth } from "@/storage/utils/web3";
 import { connectToDatabase } from "@/util/mongodb";
 import Web3 from "web3";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "https://api.worldofdefish.com",
+});
 
 export default async function handler(req: any, res: any) {
   try {
@@ -51,10 +56,35 @@ export default async function handler(req: any, res: any) {
         char_level: body.level,
         session_id: genRanHex(32),
       });
+      const session_ids = await (
+        await api.get(`/zones/active/offchain/select/all`, {
+          headers: {
+            Authorization: body.auth,
+          },
+        })
+      ).data;
+      const results = [];
+      for (let i = 0; i < session_ids.length; i++) {
+        const response = await api.get(
+          `/zones/${session_ids[i]}/expanded-offchain`,
+          {
+            headers: {
+              Authorization: body.auth,
+            },
+          }
+        );
+        results.push(response.data);
+      }
       const log = await db.collection("fflogs").insertOne({
         address: body.address,
         auth: body.auth,
         char_level: body.level,
+        current_sessions: results.map((item: any) => ({
+          zone_id: item.id,
+          items: item.fishing_session.slot_items.map((_: any) => {
+            return _.id;
+          }),
+        })),
         is_start: true,
       });
       await client.close();

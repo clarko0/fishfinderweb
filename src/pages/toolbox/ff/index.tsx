@@ -178,126 +178,128 @@ const FishermanFriend = () => {
     const cards: any[] = [];
     let total: number = 0;
     let sessionWod: number = 0;
-
-    for (let i = 0; i < activeSessionData.length; i++) {
-      const items: any[] = [];
-      total +=
-        activeSessionData[i].fishing_session?.wod_multiplier *
-        parseFloat(activeSessionData[i].wod_rate) *
-        60 *
-        60 *
-        (1 - activeSessionData[i].fee / 100);
-      sessionWod += activeSessionData[i].fishing_session.last_saved_wod_earned;
-      for (
-        let x = 0;
-        x < activeSessionData[i].fishing_session.slot_items.length;
-        x++
-      ) {
-        const item = activeSessionData[i].fishing_session.slot_items[x];
-        items.push(
-          <img style={{ width: "80px", height: "120px" }} src={item.image} />
-        );
-      }
-      cards.push(
-        <div key={genRanHex(64)} style={{ display: "flex", gap: "30px" }}>
-          <div style={{ display: "flex", alignItems: "center" }}>{items}</div>
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-          >
+    try {
+      for (let i = 0; i < activeSessionData.length; i++) {
+        const items: any[] = [];
+        total +=
+          activeSessionData[i].fishing_session?.wod_multiplier *
+          parseFloat(activeSessionData[i].wod_rate) *
+          60 *
+          60 *
+          (1 - activeSessionData[i].fee / 100);
+        sessionWod +=
+          activeSessionData[i].fishing_session.last_saved_wod_earned;
+        for (
+          let x = 0;
+          x < activeSessionData[i].fishing_session.slot_items.length;
+          x++
+        ) {
+          const item = activeSessionData[i].fishing_session.slot_items[x];
+          items.push(
+            <img style={{ width: "80px", height: "120px" }} src={item.image} />
+          );
+        }
+        cards.push(
+          <div key={genRanHex(64)} style={{ display: "flex", gap: "30px" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>{items}</div>
             <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
-              <div style={{ fontSize: "20px", fontWeight: "500" }}>ZONE</div>
-              <div
-                style={{ textDecoration: "underline", cursor: "pointer" }}
-                onClick={() => {
-                  if (isDocked()) {
-                    window.open(
-                      `https://game.worldofdefish.com/zone/${activeSessionData[i].id}/fishing`
-                    );
-                  }
-                }}
-              >
-                {activeSessionData[i].id}
-              </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div style={{ fontSize: "20px", fontWeight: "500" }}>
-                $WoD/HOUR
-              </div>
               <div
                 style={{
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <img
-                  width="20px"
-                  src={Wod.src}
-                  style={{
-                    filter: "drop-shadow(0px 0px 10px #808000)",
+                <div style={{ fontSize: "20px", fontWeight: "500" }}>ZONE</div>
+                <div
+                  style={{ textDecoration: "underline", cursor: "pointer" }}
+                  onClick={() => {
+                    if (isDocked()) {
+                      window.open(
+                        `https://game.worldofdefish.com/zone/${activeSessionData[i].id}/fishing`
+                      );
+                    }
                   }}
-                />
-                {(
-                  activeSessionData[i].fishing_session?.wod_multiplier *
-                  parseFloat(activeSessionData[i].wod_rate) *
-                  60 *
-                  60 *
-                  (1 - activeSessionData[i].fee / 100)
-                ).toFixed(2)}
+                >
+                  {activeSessionData[i].id}
+                </div>
               </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div style={{ fontSize: "20px", fontWeight: "500" }}>
-                $WoD EARNED
-              </div>
-
               <div
                 style={{
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <img
-                  src={Wod.src}
-                  width="20px"
+                <div style={{ fontSize: "20px", fontWeight: "500" }}>
+                  $WoD/HOUR
+                </div>
+                <div
                   style={{
-                    filter: "drop-shadow(0px 0px 10px #808000)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                />
-                <div>
-                  {activeSessionData[
-                    i
-                  ].fishing_session.last_saved_wod_earned.toFixed(2)}
+                >
+                  <img
+                    width="20px"
+                    src={Wod.src}
+                    style={{
+                      filter: "drop-shadow(0px 0px 10px #808000)",
+                    }}
+                  />
+                  {(
+                    activeSessionData[i].fishing_session?.wod_multiplier *
+                    parseFloat(activeSessionData[i].wod_rate) *
+                    60 *
+                    60 *
+                    (1 - activeSessionData[i].fee / 100)
+                  ).toFixed(2)}
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div style={{ fontSize: "20px", fontWeight: "500" }}>
+                  $WoD EARNED
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src={Wod.src}
+                    width="20px"
+                    style={{
+                      filter: "drop-shadow(0px 0px 10px #808000)",
+                    }}
+                  />
+                  <div>
+                    {activeSessionData[
+                      i
+                    ].fishing_session.last_saved_wod_earned.toFixed(2)}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      );
-      setCards(cards);
-    }
+        );
+        setCards(cards);
+      }
+    } catch (e) {}
     setWodPerHour(Number(total.toFixed(2)));
     setWodPerHourPrice(Number(total.toFixed(2)) * wodPrice);
   }, [activeSessionData]);
