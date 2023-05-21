@@ -1,5 +1,6 @@
 import {
   ICompleteSignUpData,
+  IGoogleCallback,
   INewEmailData,
   INewPasswordData,
   ISignupLoginData,
@@ -12,7 +13,7 @@ const api = axios.create({
   baseURL: process.env.API_BASE_URL + "/auth",
 });
 
-export const AuthApi = {
+export const Auth = {
   async signup(data: ISignupLoginData) {
     return await api.post("/signup", data);
   },
@@ -38,5 +39,8 @@ export const AuthApi = {
   },
   async resendVerification(email: string) {
     return await api.post("/resend", { email: email });
+  },
+  async googleCallback(data: IGoogleCallback) {
+    return await api.post("/google/callback", data);
   },
 };

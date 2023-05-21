@@ -34,6 +34,7 @@ import DashboardModal from "@/components/FFModal/DashboardModal";
 import { ffStore } from "@/store/ff.store";
 import FFGlobalStatistics from "@/components/FFGlobalStatistics";
 import { genRanHex } from "@/storage/constants/misc";
+import { API } from "@/api/api";
 
 const FishermanFriend = () => {
   const [toolMenuData, setToolMenuData] = useState<any>({
@@ -139,6 +140,8 @@ const FishermanFriend = () => {
     setToolCost(c);
   };
 
+  useEffect(() => {}, []);
+
   useEffect(() => {
     calculateCost();
   }, [numberOfRepairs, clicker]);
@@ -179,24 +182,25 @@ const FishermanFriend = () => {
     let total: number = 0;
     let sessionWod: number = 0;
     try {
+      console.log(activeSessionData);
+
       for (let i = 0; i < activeSessionData.length; i++) {
+        const zone = activeSessionData[i].zone;
         const items: any[] = [];
         total +=
-          activeSessionData[i].fishing_session?.wod_multiplier *
-          parseFloat(activeSessionData[i].wod_rate) *
+          zone.fishing_pool?.wod_multiplier *
+          parseFloat(activeSessionData[i].zone.random_wod_rate) *
           60 *
           60 *
-          (1 - activeSessionData[i].fee / 100);
-        sessionWod +=
-          activeSessionData[i].fishing_session.last_saved_wod_earned;
-        for (
-          let x = 0;
-          x < activeSessionData[i].fishing_session.slot_items.length;
-          x++
-        ) {
-          const item = activeSessionData[i].fishing_session.slot_items[x];
+          (1 - activeSessionData[i].zone.fee / 100);
+        sessionWod += activeSessionData[i].last_saved_wod_earned;
+        for (let x = 0; x < activeSessionData[i].slot_items.length; x++) {
+          const item = activeSessionData[i].slot_items[x];
           items.push(
-            <img style={{ width: "80px", height: "120px" }} src={item.image} />
+            <img
+              style={{ width: "80px", height: "120px" }}
+              src={item.rendered_image_url}
+            />
           );
         }
         cards.push(
@@ -219,12 +223,12 @@ const FishermanFriend = () => {
                   onClick={() => {
                     if (isDocked()) {
                       window.open(
-                        `https://game.worldofdefish.com/zone/${activeSessionData[i].id}/fishing`
+                        `https://game.worldofdefish.com/zone/${activeSessionData[i].zone.id}/fishing`
                       );
                     }
                   }}
                 >
-                  {activeSessionData[i].id}
+                  {activeSessionData[i].zone.id}
                 </div>
               </div>
               <div
@@ -253,11 +257,11 @@ const FishermanFriend = () => {
                     }}
                   />
                   {(
-                    activeSessionData[i].fishing_session?.wod_multiplier *
-                    parseFloat(activeSessionData[i].wod_rate) *
+                    activeSessionData[i].zone.fishing_pool?.wod_multiplier *
+                    parseFloat(activeSessionData[i].zone.random_wod_rate) *
                     60 *
                     60 *
-                    (1 - activeSessionData[i].fee / 100)
+                    (1 - activeSessionData[i].zone.fee / 100)
                   ).toFixed(2)}
                 </div>
               </div>
@@ -288,9 +292,7 @@ const FishermanFriend = () => {
                     }}
                   />
                   <div>
-                    {activeSessionData[
-                      i
-                    ].fishing_session.last_saved_wod_earned.toFixed(2)}
+                    {activeSessionData[i].last_saved_wod_earned.toFixed(2)}
                   </div>
                 </div>
               </div>

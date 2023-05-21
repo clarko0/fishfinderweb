@@ -1,4 +1,4 @@
-import { AuthApi } from "@/api/auth.api";
+import { AuthApi } from "@/api/src/internal/src/auth.api";
 import { Loading, Modal } from "@nextui-org/react";
 import React, { useState } from "react";
 
