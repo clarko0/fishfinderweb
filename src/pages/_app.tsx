@@ -23,7 +23,6 @@ import { ISignupLoginData } from "@/interface/api.interface";
 import OneLastThingModal from "@/components/Modals/Authentication/OneLastThing";
 import { API } from "@/api/api";
 import AuthenticateEmailModal from "@/components/Modals/Authentication/AuthenticateEmail";
-import { CryptoUtils } from "@/utils/crypto.utils";
 const inter = Inter({ subsets: ["latin"] });
 declare var window: any;
 

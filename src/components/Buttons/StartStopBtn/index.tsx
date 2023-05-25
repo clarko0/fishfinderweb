@@ -6,6 +6,8 @@ const StartStopBtn = ({
   setIsEndFishingMenu,
   startAutoFishing,
   playerLevel,
+  setIsFishingSettings,
+  RefreshPing,
 }: any) => {
   return (
     <div
@@ -36,8 +38,7 @@ const StartStopBtn = ({
         if (isFishing || status === "Pending") {
           setIsEndFishingMenu(true);
         } else {
-          await startAutoFishing(playerLevel);
-          window.location.reload();
+          setIsFishingSettings(true);
         }
       }}
     >

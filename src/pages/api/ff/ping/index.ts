@@ -6,13 +6,13 @@
 
 import { compareArrays } from "@/storage/utils/tools";
 import { VerifyAuth } from "@/storage/utils/web3";
-import { connectToDatabase } from "@/util/mongodb";
+import { UTILS } from "@/utils/utils";
 import Web3 from "web3";
 
 export default async function handler(req: any, res: any) {
   try {
     const web3 = new Web3();
-    connectToDatabase().then(async (result: any) => {
+    UTILS.MongoDb.connectToDatabase().then(async (result: any) => {
       const { client, db } = result;
 
       if (req.method !== "POST") {

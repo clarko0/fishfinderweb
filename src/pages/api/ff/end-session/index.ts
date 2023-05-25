@@ -8,7 +8,7 @@ import { getSessionInfo } from "@/storage/utils/fetch";
 import { endSession } from "@/storage/utils/fetch";
 import { GetActiveZone } from "@/storage/utils/fetch";
 import { compareArrays, sleep } from "@/storage/utils/tools";
-import { connectToDatabase } from "@/util/mongodb";
+import { UTILS } from "@/utils/utils";
 import axios from "axios";
 
 const api = axios.create({
@@ -17,7 +17,7 @@ const api = axios.create({
 
 export default async function handler(req: any, res: any) {
   try {
-    connectToDatabase().then(async (result: any) => {
+    UTILS.MongoDb.connectToDatabase().then(async (result: any) => {
       const { client, db } = result;
 
       if (req.method !== "POST") {

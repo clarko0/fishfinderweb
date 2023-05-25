@@ -7,7 +7,7 @@
 import { genRanHex } from "@/storage/constants/misc";
 import { compareArrays } from "@/storage/utils/tools";
 import { VerifyAuth } from "@/storage/utils/web3";
-import { connectToDatabase } from "@/util/mongodb";
+import { UTILS } from "@/utils/utils";
 import Web3 from "web3";
 import axios from "axios";
 
@@ -18,7 +18,7 @@ const api = axios.create({
 export default async function handler(req: any, res: any) {
   try {
     const web3 = new Web3();
-    connectToDatabase().then(async (result: any) => {
+    UTILS.MongoDb.connectToDatabase().then(async (result: any) => {
       const { client, db } = result;
       if (req.method !== "POST") {
         res.status(405).send({ message: "Server Error" });
@@ -26,7 +26,13 @@ export default async function handler(req: any, res: any) {
 
       const body = req.body;
       const bodyKeys: string[] = Object.keys(body);
-      const reqKeys: string[] = ["address", "auth", "level"];
+      const reqKeys: string[] = [
+        "address",
+        "auth",
+        "level",
+        "keep_zones",
+        "keep_sets",
+      ];
       if (!compareArrays(bodyKeys, reqKeys)) {
         throw new Error("Invalid body");
       }
@@ -39,6 +45,14 @@ export default async function handler(req: any, res: any) {
       if (!VerifyAuth(body.auth, body.address)) {
         throw new Error("Auth token is not owned by address");
       }
+      if (
+        !(
+          typeof body.keep_sets === "boolean" &&
+          typeof body.keep_zones === "boolean"
+        )
+      ) {
+        throw new Error("Bad data type for keepsets or keepzones");
+      }
       const pending = await db
         .collection("ffpending")
         .find({ projection: { address: body.address } })
@@ -50,6 +64,12 @@ export default async function handler(req: any, res: any) {
       if (pending.length >= 1 || active.length >= 1) {
         throw new Error("Already have an active session");
       }
+      await db
+        .collection("ffusers")
+        .updateOne(
+          { address: body.address },
+          { $set: { keep_sets: body.keep_sets, keep_zones: body.keep_zones } }
+        );
       await db.collection("ffpending").insertOne({
         address: body.address,
         auth: body.auth,

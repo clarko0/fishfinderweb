@@ -27,7 +27,6 @@ import WelcomeMenu from "@/components/FFMenu/Welcome";
 import PageLoading from "@/components/PageLoading";
 import ActiveSessionMenu from "@/components/FFMenu/ActiveSessions";
 import EndFishingMenu from "@/components/FFMenu/EndFishing";
-import StartFishing from "@/components/FFMenu/StartFishing";
 import StartStopBtn from "@/components/Buttons/StartStopBtn";
 import RepairModal from "@/components/FFModal/RepairModal";
 import DashboardModal from "@/components/FFModal/DashboardModal";
@@ -35,6 +34,7 @@ import { ffStore } from "@/store/ff.store";
 import FFGlobalStatistics from "@/components/FFGlobalStatistics";
 import { genRanHex } from "@/storage/constants/misc";
 import { API } from "@/api/api";
+import FishingSettingsModal from "@/components/Modals/FishermanFriend/FishingSettings";
 
 const FishermanFriend = () => {
   const [toolMenuData, setToolMenuData] = useState<any>({
@@ -121,6 +121,10 @@ const FishermanFriend = () => {
   const [consumableData, setConsumableData] = useState<any>([]);
   const [gettingSessions, setGettingSessions] = useState<boolean>(false);
 
+  const [isCurrentZones, setIsCurrentZones] = useState<boolean>(false);
+  const [isCurrentSets, setIsCurrentSets] = useState<boolean>(false);
+  const [isFishingSettings, setIsFishingSettings] = useState<boolean>(false);
+
   const calculateCost = () => {
     let c = 0;
     if (!isNaN(parseInt(numberOfRepairs))) {
@@ -138,6 +142,68 @@ const FishermanFriend = () => {
       } catch (e) {}
     }
     setToolCost(c);
+  };
+
+  const RefreshPing = () => {
+    ffStore().then((res: any) => {
+      const items: IItems = {
+        common: [],
+        uncommon: [],
+        rare: [],
+        epic: [],
+        legendary: [],
+        artifact: [],
+      };
+
+      for (let i = 0; i < res.items.length; i++) {
+        const item = res.items[i];
+        if (item.rarity === 1) {
+          items.common.push(item);
+        } else if (item.rarity === 2) {
+          items.uncommon.push(item);
+        } else if (item.rarity === 3) {
+          items.rare.push(item);
+        } else if (item.rarity === 4) {
+          items.epic.push(item);
+        } else if (item.rarity === 5) {
+          items.legendary.push(item);
+        } else if (item.rarity === 6) {
+          items.artifact.push(item);
+        }
+      }
+      setPlayerLevel(res.userData.level);
+      setUserData({
+        username: res.userData.username,
+        avatar: res.userData.avatar,
+        tools: res.tools.sort((a: any, b: any) =>
+          a.rarity > b.rarity ? 1 : -1
+        ),
+        items: items,
+        isReady: true,
+        wodBalance: res.totalWod,
+      });
+      setSessions(res.fishingInfo);
+      setActiveSessionData(res.fishingInfo);
+      setStatus(res.initPing.status);
+      setStatisticsData(res.initPing.global_statistics);
+      setConsumableData(res.tools);
+      setIsFishing(res.initPing.bool);
+      setWodPrice(res.tokenPrice);
+      setSessionId(res.initPing.session_id);
+      setWodFarmed(res.initPing.wod_farmed);
+      setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
+      setNextRepair(res.initPing.next_repair);
+      if (
+        res.initPing.system_msg.title !== "" &&
+        res.initPing.system_msg.msg !== ""
+      ) {
+        setIsSystemMessage({
+          bool: true,
+          title: res.initPing.system_msg.title,
+          msg: res.initPing.system_msg.msg,
+        });
+      }
+    });
   };
 
   useEffect(() => {}, []);
@@ -531,22 +597,17 @@ const FishermanFriend = () => {
       />
       <StartStopBtn
         size={size}
+        RefreshPing={RefreshPing}
         styling={styling}
         isFishing={isFishing}
+        setIsFishingSettings={setIsFishingSettings}
         status={status}
         setIsEndFishingMenu={setIsEndFishingMenu}
-        startAutoFishing={startAutoFishing}
-        playerLevel={playerLevel}
-      />
-      <StartFishing
-        isFishingMenu={isFishingMenu}
-        setIsFishingMenu={setIsFishingMenu}
-        canFish={canFish}
-        playerLevel={playerLevel}
       />
       <EndFishingMenu
         setIsEndFishingMenu={setIsEndFishingMenu}
         endingFishing={endingFishing}
+        RefreshPing={RefreshPing}
         setEndingFishing={setEndingFishing}
         sessionId={sessionId}
         isEndFishingMenu={isEndFishingMenu}
@@ -587,6 +648,17 @@ const FishermanFriend = () => {
         pageLoading={pageLoading}
         size={size}
         setIsSystemMessage={setIsSystemMessage}
+      />
+      <FishingSettingsModal
+        is_open={isFishingSettings}
+        RefreshPing={RefreshPing}
+        setIsFishingSettings={setIsFishingSettings}
+        isCurrentZones={isCurrentZones}
+        setIsCurrentZones={setIsCurrentZones}
+        isCurrentSets={isCurrentSets}
+        playerLevel={playerLevel}
+        setIsCurrentSets={setIsCurrentSets}
+        startAutoFishing={startAutoFishing}
       />
     </div>
   );

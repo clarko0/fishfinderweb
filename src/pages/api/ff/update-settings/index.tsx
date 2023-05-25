@@ -1,5 +1,5 @@
 import { compareArrays } from "@/storage/utils/tools";
-import { connectToDatabase } from "@/util/mongodb";
+import { UTILS } from "@/utils/utils";
 import Web3Token from "web3-token";
 
 /**
@@ -9,7 +9,7 @@ import Web3Token from "web3-token";
  */
 export default async function handler(req: any, res: any) {
   try {
-    connectToDatabase().then(async (result: any) => {
+    UTILS.MongoDb.connectToDatabase().then(async (result: any) => {
       const { client, db } = result;
 
       if (req.method !== "POST") {

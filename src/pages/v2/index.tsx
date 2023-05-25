@@ -1,10 +1,11 @@
+import SignIn from "@/components/Auth/SignIn";
 import GlowingFish from "@/components/GlowingFish";
 import LoadingBar from "@/components/LoadingBar";
 import LoadingMainLogo from "@/components/Logo/LoadingMain";
 import { sleep } from "@/storage/utils/tools";
-import { hexlify } from "ethers";
 import Router from "next/router";
 import { useEffect, useState } from "react";
+import blur from "public/blur.svg";
 
 export const Home = () => {
   const [glowingFishSize, setGlowingFishSize] = useState<any>({
@@ -18,7 +19,7 @@ export const Home = () => {
     left: "0",
     bottom: "0",
   });
-  const [barSize, setBarSize] = useState<number>(15);
+  const [barSize, setBarSize] = useState<number>(0);
   const [barIndex, setBarIndex] = useState<number>(0);
   const [isBar, setIsBar] = useState<boolean>(false);
   const [barText, setBarText] = useState<string[]>([
@@ -39,6 +40,7 @@ export const Home = () => {
     left: "",
     bottom: "",
   });
+  const [isBigGlow, setIsBigGlow] = useState<boolean>(false);
   const [isLoadingLogo, setIsLoadingLogo] = useState<boolean>(false);
   const handleLoad = async () => {
     await sleep(500);
@@ -62,12 +64,6 @@ export const Home = () => {
       } else {
         setCurrentBarText(barText[Math.floor(Math.random() * barText.length)]);
       }
-      // setGlowingFishSize((prev: any) => {
-      //   const newSize = prev;
-      //   newSize.width = newSize.width === "500px" ? "400px" : "500px";
-      //   newSize.height = newSize.width === "500px" ? "400px" : "500px";
-      //   return newSize;
-      // });
       setBarIndex(i);
       await sleep(500);
     }
@@ -83,6 +79,7 @@ export const Home = () => {
       bottom: "-110px",
     });
     setIsLoadingLogo(false);
+    setIsBigGlow(true);
     await sleep(500);
     setLogoPosition({ top: "45px", right: "", left: "45px", bottom: "" });
     setIsLoadingLogo(true);
@@ -117,6 +114,24 @@ export const Home = () => {
         size={barSize}
         index={barIndex}
       />
+      <SignIn />
+      <div
+        style={{
+          background: "#00FF80",
+          zIndex: "0",
+          opacity: isBigGlow ? "1" : "0",
+          WebkitBoxShadow:
+            "0px 0px 50px 100px rgba(0,255,128,0.5), 500px 500px 4000px 2000px rgba(0,255,128,0.5), 0px 0px 1000px 500px rgba(0,255,128,0.3)), 0px 0px 5000px 2500px rgba(0,255,128,0.5), 0px 0px 1000px 500px rgba(0,255,128,0.3))",
+          MozBoxShadow: "0px 0px 1500px 750px rgba(0,255,128,0.2)",
+          boxShadow: "0px 0px 1500px 750px rgba(0,255,128,0.2)",
+          position: "absolute",
+          left: "600px",
+          width: "100%",
+          transform: "rotate(45deg)",
+          bottom: "0",
+          transition: "0.3s",
+        }}
+      ></div>
     </div>
   );
 };

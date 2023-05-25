@@ -27,7 +27,7 @@ function createCipher(secret: string) {
 const secret = process.env.WEB3_SECRET || "";
 const { encrypt, decrypt } = createCipher(secret);
 
-export const CryptoUtils = {
+export const Crypto = {
   encrypt,
   decrypt,
 };
