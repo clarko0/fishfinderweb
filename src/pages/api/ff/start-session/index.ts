@@ -64,19 +64,17 @@ export default async function handler(req: any, res: any) {
       if (pending.length >= 1 || active.length >= 1) {
         throw new Error("Already have an active session");
       }
-      await db
-        .collection("ffusers")
-        .updateOne(
-          { address: body.address },
-          {
-            $set: {
-              settings: {
-                keep_sets: body.keep_sets,
-                keep_zones: body.keep_zones,
-              },
+      await db.collection("ffusers").updateOne(
+        { address: body.address },
+        {
+          $set: {
+            setting: {
+              keep_sets: body.keep_sets,
+              keep_zones: body.keep_zones,
             },
-          }
-        );
+          },
+        }
+      );
       await db.collection("ffpending").insertOne({
         address: body.address,
         auth: body.auth,
@@ -106,6 +104,7 @@ export default async function handler(req: any, res: any) {
         address: body.address,
         auth: body.auth,
         char_level: body.level,
+        time_stamp: Math.round(new Date().getTime() / 1000),
         current_sessions: results.map((item: any) => ({
           zone_id: item.id,
           items: item.fishing_session.slot_items.map((_: any) => {

@@ -48,6 +48,7 @@ export default async function handler(req: any, res: any) {
         .find({ session_id: body.session_id })
         .toArray();
       let userData = {
+        time_stamp: Math.round(new Date().getTime() / 1000),
         address: "",
         auth: "",
         user_level: "",
