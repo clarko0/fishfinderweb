@@ -68,7 +68,14 @@ export default async function handler(req: any, res: any) {
         .collection("ffusers")
         .updateOne(
           { address: body.address },
-          { $set: { keep_sets: body.keep_sets, keep_zones: body.keep_zones } }
+          {
+            $set: {
+              settings: {
+                keep_sets: body.keep_sets,
+                keep_zones: body.keep_zones,
+              },
+            },
+          }
         );
       await db.collection("ffpending").insertOne({
         address: body.address,
