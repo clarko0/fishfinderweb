@@ -20,6 +20,7 @@ const FishingSettingsModal = ({
     <Modal
       width="800px"
       blur
+      preventClose
       open={is_open}
       style={{ background: "#000", fontFamily: "inter" }}
     >
