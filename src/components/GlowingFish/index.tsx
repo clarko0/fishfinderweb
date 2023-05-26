@@ -1,12 +1,11 @@
 import LargeFish from "public/largefish.png";
 
+let opacity = "1";
 const GlowingFish = ({ size, seen, position }: any) => {
   return (
     <div
       style={{
         transition: "0.3s",
-        width: size.width,
-        height: size.height,
         display: "flex",
         alignItems: "center",
         opacity: seen ? "1" : "0",
@@ -14,13 +13,21 @@ const GlowingFish = ({ size, seen, position }: any) => {
         position: "absolute",
         bottom: position.bottom,
         top: position.top,
+        width: size.width,
+        height: size.height,
         right: position.right,
         left: position.left,
+        zIndex: "0",
       }}
     >
       <img
         src={LargeFish.src}
-        style={{ position: "absolute", zIndex: "1", left: "0", bottom: "0" }}
+        style={{
+          position: "absolute",
+          zIndex: "1",
+          left: "0",
+          bottom: "0",
+        }}
       />
       <div
         style={{

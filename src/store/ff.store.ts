@@ -9,6 +9,8 @@ import {
   getSingleSession,
   getUsersStats,
 } from "@/storage/utils/fetch";
+import { API } from "@/api/api";
+import { GetAddress } from "@/storage/utils/web3";
 
 // test
 export const ffStore = async () => {
@@ -24,6 +26,7 @@ export const ffStore = async () => {
       " https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png",
     level: 0,
   };
+  const address: any = await GetAddress();
   let calls: any = [
     GetItems().then(async (res: any) => {
       res = res.data;
@@ -33,20 +36,32 @@ export const ffStore = async () => {
         }
       }
     }),
-    GetActiveZone().then(async (res: any) => {
-      let subCalls: any = [];
-      for (let i = 0; i < res.data.length; i++) {
-        subCalls.push(
-          getSingleSession(res.data[i]).then((response: any) => {
-            response = response.data;
-            response.fishing_session !== null &&
-              (items = items.concat(response.fishing_session.slot_items));
-            fishingInfo.push(response);
-          })
-        );
+    API.External.WorldOfDefish.Graphql.getFishingSessionData(
+      address,
+      true,
+      true,
+      true
+    ).then(async (res: any) => {
+      for (let i = 0; i < res.data.fishings.length; i++) {
+        const session = res.data.fishings[i];
+        items = items.concat(session.slot_items);
+        fishingInfo.push(session);
       }
-      await Promise.all(subCalls);
     }),
+    // GetActiveZone().then(async (res: any) => {
+    //   let subCalls: any = [];
+    //   for (let i = 0; i < res.data.length; i++) {
+    //     subCalls.push(
+    //       getSingleSession(res.data[i]).then((response: any) => {
+    //         response = response.data;
+    //         response.fishing_session !== null &&
+    //           (items = items.concat(response.fishing_session.slot_items));
+    //         fishingInfo.push(response);
+    //       })
+    //     );
+    //   }
+    //   await Promise.all(subCalls);
+    // }),
     GetTools().then(async (res: any) => {
       res = res.data;
 

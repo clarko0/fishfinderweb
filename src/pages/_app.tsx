@@ -19,13 +19,10 @@ import { getEmailFromToken, sleep } from "@/storage/utils/tools";
 import LoginModal from "@/components/Modals/Authentication/Login";
 import SignupModal from "@/components/Modals/Authentication/Signup";
 import { ApiLocalStorage } from "@/local/api.local";
-import { AuthApi } from "@/api/auth.api";
 import { ISignupLoginData } from "@/interface/api.interface";
 import OneLastThingModal from "@/components/Modals/Authentication/OneLastThing";
-import { UserApi } from "@/api/user.api";
-
+import { API } from "@/api/api";
 import AuthenticateEmailModal from "@/components/Modals/Authentication/AuthenticateEmail";
-import { CryptoUtils } from "@/utils/crypto.utils";
 const inter = Inter({ subsets: ["latin"] });
 declare var window: any;
 
@@ -91,7 +88,7 @@ export default function MyApp({ Component, pageProps }: any) {
 
   const handleUserData = async () => {
     try {
-      let res: any = await UserApi.getMyData();
+      let res: any = await API.Internal.User.getMyData();
       res = res.data.data;
       if (!res.verified) {
         setIsEmailConfirm(true);
@@ -131,7 +128,7 @@ export default function MyApp({ Component, pageProps }: any) {
       try {
         setIsLoading(true);
         setOTPWrong(false);
-        const res = await AuthApi.completeSignup({
+        const res = await API.Internal.Auth.completeSignup({
           email: email,
           email_confirmation: newOTP.toString().replaceAll(",", ""),
         });
@@ -186,7 +183,7 @@ export default function MyApp({ Component, pageProps }: any) {
     setOTPWrong(false);
     let intervalId: NodeJS.Timeout | null = null;
     if (isEmailConfirm) {
-      AuthApi.resendVerification(email).then(() => {
+      API.Internal.Auth.resendVerification(email).then(() => {
         setCountDown(60);
         intervalId = setInterval(() => {
           setCountDown((prev: number) => {
@@ -212,7 +209,7 @@ export default function MyApp({ Component, pageProps }: any) {
     console.log(isEmailConfirm);
     let intervalId: NodeJS.Timeout | null = null;
     if (isEmailConfirm) {
-      AuthApi.resendVerification(email).then(() => {
+      API.Internal.Auth.resendVerification(email).then(() => {
         setCountDown(60);
         intervalId = setInterval(() => {
           setCountDown((prev: number) => {
@@ -255,7 +252,7 @@ export default function MyApp({ Component, pageProps }: any) {
             password: signupData.data.password,
           };
           try {
-            let res = await AuthApi.signup(signupD);
+            let res = await API.Internal.Auth.signup(signupD);
             res = res.data;
             ApiLocalStorage.WriteAuthToken(res.data.access_token);
             setIsSignup(false);
@@ -284,7 +281,7 @@ export default function MyApp({ Component, pageProps }: any) {
       password: loginData.data.password,
     };
     try {
-      const res = await AuthApi.login(loginD);
+      const res = await API.Internal.Auth.login(loginD);
       let data = res.data.data;
       setBadLogin(false);
       ApiLocalStorage.WriteAuthToken(data.access_token);

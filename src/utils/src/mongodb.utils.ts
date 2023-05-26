@@ -15,13 +15,15 @@ if (!dbName) {
   );
 }
 
-export async function connectToDatabase() {
-  const client = await MongoClient.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  } as ConnectOptions);
+export const MongoDb = {
+  async connectToDatabase() {
+    const client = await MongoClient.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    } as ConnectOptions);
 
-  const db = client.db(dbName);
+    const db = client.db(dbName);
 
-  return { client, db };
-}
+    return { client, db };
+  },
+};

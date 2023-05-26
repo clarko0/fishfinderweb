@@ -1,5 +1,7 @@
+import { isDocked } from "@/storage/utils/window";
 import { Button, Input, Modal, Text } from "@nextui-org/react";
 import { GoogleLogin } from "@react-oauth/google";
+import Router from "next/router";
 import Fish2 from "public/fish-2.png";
 import Squid from "public/squid-1.png";
 
@@ -203,6 +205,13 @@ const LoginModal = ({
           OR
         </Text>
         <Button
+          onClick={() => {
+            if (isDocked()) {
+              window.open(
+                "https://accounts.google.com/o/oauth2/auth/oauthchooseaccount?response_type=code&client_id=799925864767-vrnv378u0htn0tcijch7h48900f9bh1k.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fdev.fishfinder.games%2Fgoogle%2Fcomplete-signin&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20openid&state=zJUpZYOimV2yGZVMz35k5rw6715H65&access_type=offline&service=lso&o2v=1&flowName=GeneralOAuthFlow"
+              );
+            }
+          }}
           css={{
             background: "#fff",
             color: "#0A0808",
@@ -255,7 +264,6 @@ const LoginModal = ({
         >
           <span style={{ marginLeft: "12px" }}>Sign in with Google</span>
         </Button>
-        <GoogleLogin onSuccess={responseMessage} />
         <Text
           css={{
             display: "flex",

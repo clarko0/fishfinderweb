@@ -8,7 +8,7 @@ import { getSessionInfo } from "@/storage/utils/fetch";
 import { endSession } from "@/storage/utils/fetch";
 import { GetActiveZone } from "@/storage/utils/fetch";
 import { compareArrays, sleep } from "@/storage/utils/tools";
-import { connectToDatabase } from "@/util/mongodb";
+import { UTILS } from "@/utils/utils";
 import axios from "axios";
 
 const api = axios.create({
@@ -17,7 +17,7 @@ const api = axios.create({
 
 export default async function handler(req: any, res: any) {
   try {
-    connectToDatabase().then(async (result: any) => {
+    UTILS.MongoDb.connectToDatabase().then(async (result: any) => {
       const { client, db } = result;
 
       if (req.method !== "POST") {
@@ -47,7 +47,14 @@ export default async function handler(req: any, res: any) {
       let authToken = await active
         .find({ session_id: body.session_id })
         .toArray();
-      let userData = { address: "", auth: "", user_level: "", is_start: false };
+      let userData = {
+        time_stamp: Math.round(new Date().getTime() / 1000),
+        address: "",
+        auth: "",
+        user_level: "",
+        is_start: false,
+        current_sessions: [],
+      };
       if (authToken.length > 0) {
         userData.address = authToken[0].address;
         userData.auth = authToken[0].auth;
@@ -80,7 +87,13 @@ export default async function handler(req: any, res: any) {
         ),
         session_id: item.fishing_session._id,
       }));
-
+      const sessionData: any = results.map((item: any) => ({
+        zone_id: item.id,
+        items: item.fishing_session.slot_items.map((_: any) => {
+          return _.id;
+        }),
+      }));
+      userData.current_sessions = sessionData;
       data.length > 0 && (await fishing_history_coll.insertMany(data));
       await db
         .collection("ffpending")

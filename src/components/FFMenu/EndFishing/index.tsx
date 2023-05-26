@@ -8,6 +8,7 @@ import {
 
 const EndFishingMenu = ({
   setIsEndFishingMenu,
+  RefreshPing,
   endingFishing,
   setEndingFishing,
   sessionId,
@@ -115,6 +116,7 @@ const EndFishingMenu = ({
               onClick={async () => {
                 setEndingFishing(true);
                 await endAutoFishing(sessionId);
+                await RefreshPing();
                 setEndingFishing(false);
                 setIsEndFishingMenu(false);
               }}

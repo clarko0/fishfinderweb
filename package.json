@@ -22,6 +22,7 @@
     "axios": "^1.2.6",
     "base-64": "^1.0.0",
     "crypto-browserify": "^3.12.0",
+    "dns": "^0.2.2",
     "dotenv": "^16.0.3",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.6",
@@ -29,7 +30,8 @@
     "fs": "^0.0.1-security",
     "is-valid-domain": "^0.1.6",
     "jsonwebtoken": "^9.0.0",
-    "mongodb": "5.1.0",
+    "mongodb": "^5.1.0",
+    "net": "^1.0.2",
     "next": "13.1.6",
     "next-themes": "^0.2.1",
     "nprogress": "^0.2.0",
@@ -37,6 +39,8 @@
     "react-auth-code-input": "^3.2.1",
     "react-dom": "18.2.0",
     "react-progressbar": "^15.4.1",
+    "react-ripplejs": "^1.0.4",
+    "tls": "^0.0.1",
     "to-hex": "^0.0.18",
     "typescript": "4.9.4",
     "vercel": "^28.18.1",
@@ -47,6 +51,7 @@
   "devDependencies": {
     "@types/base-64": "^1.0.0",
     "@types/ms": "^0.7.31",
-    "@types/nprogress": "^0.2.0"
+    "@types/nprogress": "^0.2.0",
+    "@types/styled-components": "^5.1.26"
   }
 }

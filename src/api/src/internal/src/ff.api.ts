@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: process.env.API_BASE_URL + "/users",
 });
 
-export const FFApi = {
+export const FF = {
   async endFishing(sessionId: string) {
     return await api.post(
       "/end-fishing",

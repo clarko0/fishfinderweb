@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: process.env.API_BASE_URL + "/users",
 });
 
-export const UserApi = {
+export const User = {
   async getMyData() {
     return await api.get("/me", {
       headers: {

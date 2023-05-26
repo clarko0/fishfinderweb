@@ -35,3 +35,8 @@ export interface ICompleteSignUpData {
   email: string;
   email_confirmation: string;
 }
+
+export interface IGoogleCallback {
+  code: string;
+  email: string;
+}

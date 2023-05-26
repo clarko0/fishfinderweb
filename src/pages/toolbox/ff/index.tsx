@@ -27,13 +27,14 @@ import WelcomeMenu from "@/components/FFMenu/Welcome";
 import PageLoading from "@/components/PageLoading";
 import ActiveSessionMenu from "@/components/FFMenu/ActiveSessions";
 import EndFishingMenu from "@/components/FFMenu/EndFishing";
-import StartFishing from "@/components/FFMenu/StartFishing";
 import StartStopBtn from "@/components/Buttons/StartStopBtn";
 import RepairModal from "@/components/FFModal/RepairModal";
 import DashboardModal from "@/components/FFModal/DashboardModal";
 import { ffStore } from "@/store/ff.store";
 import FFGlobalStatistics from "@/components/FFGlobalStatistics";
 import { genRanHex } from "@/storage/constants/misc";
+import { API } from "@/api/api";
+import FishingSettingsModal from "@/components/Modals/FishermanFriend/FishingSettings";
 
 const FishermanFriend = () => {
   const [toolMenuData, setToolMenuData] = useState<any>({
@@ -120,6 +121,10 @@ const FishermanFriend = () => {
   const [consumableData, setConsumableData] = useState<any>([]);
   const [gettingSessions, setGettingSessions] = useState<boolean>(false);
 
+  const [isCurrentZones, setIsCurrentZones] = useState<boolean>(false);
+  const [isCurrentSets, setIsCurrentSets] = useState<boolean>(false);
+  const [isFishingSettings, setIsFishingSettings] = useState<boolean>(false);
+
   const calculateCost = () => {
     let c = 0;
     if (!isNaN(parseInt(numberOfRepairs))) {
@@ -138,6 +143,70 @@ const FishermanFriend = () => {
     }
     setToolCost(c);
   };
+
+  const RefreshPing = () => {
+    ffStore().then((res: any) => {
+      const items: IItems = {
+        common: [],
+        uncommon: [],
+        rare: [],
+        epic: [],
+        legendary: [],
+        artifact: [],
+      };
+
+      for (let i = 0; i < res.items.length; i++) {
+        const item = res.items[i];
+        if (item.rarity === 1) {
+          items.common.push(item);
+        } else if (item.rarity === 2) {
+          items.uncommon.push(item);
+        } else if (item.rarity === 3) {
+          items.rare.push(item);
+        } else if (item.rarity === 4) {
+          items.epic.push(item);
+        } else if (item.rarity === 5) {
+          items.legendary.push(item);
+        } else if (item.rarity === 6) {
+          items.artifact.push(item);
+        }
+      }
+      setPlayerLevel(res.userData.level);
+      setUserData({
+        username: res.userData.username,
+        avatar: res.userData.avatar,
+        tools: res.tools.sort((a: any, b: any) =>
+          a.rarity > b.rarity ? 1 : -1
+        ),
+        items: items,
+        isReady: true,
+        wodBalance: res.totalWod,
+      });
+      setSessions(res.fishingInfo);
+      setActiveSessionData(res.fishingInfo);
+      setStatus(res.initPing.status);
+      setStatisticsData(res.initPing.global_statistics);
+      setConsumableData(res.tools);
+      setIsFishing(res.initPing.bool);
+      setWodPrice(res.tokenPrice);
+      setSessionId(res.initPing.session_id);
+      setWodFarmed(res.initPing.wod_farmed);
+      setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
+      setNextRepair(res.initPing.next_repair);
+      if (
+        res.initPing.system_msg.title !== "" &&
+        res.initPing.system_msg.msg !== ""
+      ) {
+        setIsSystemMessage({
+          bool: true,
+          title: res.initPing.system_msg.title,
+          msg: res.initPing.system_msg.msg,
+        });
+      }
+    });
+  };
+
+  useEffect(() => {}, []);
 
   useEffect(() => {
     calculateCost();
@@ -178,126 +247,127 @@ const FishermanFriend = () => {
     const cards: any[] = [];
     let total: number = 0;
     let sessionWod: number = 0;
+    try {
+      console.log(activeSessionData);
 
-    for (let i = 0; i < activeSessionData.length; i++) {
-      const items: any[] = [];
-      total +=
-        activeSessionData[i].fishing_session?.wod_multiplier *
-        parseFloat(activeSessionData[i].wod_rate) *
-        60 *
-        60 *
-        (1 - activeSessionData[i].fee / 100);
-      sessionWod += activeSessionData[i].fishing_session.last_saved_wod_earned;
-      for (
-        let x = 0;
-        x < activeSessionData[i].fishing_session.slot_items.length;
-        x++
-      ) {
-        const item = activeSessionData[i].fishing_session.slot_items[x];
-        items.push(
-          <img style={{ width: "80px", height: "120px" }} src={item.image} />
-        );
-      }
-      cards.push(
-        <div key={genRanHex(64)} style={{ display: "flex", gap: "30px" }}>
-          <div style={{ display: "flex", alignItems: "center" }}>{items}</div>
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-          >
+      for (let i = 0; i < activeSessionData.length; i++) {
+        const zone = activeSessionData[i].zone;
+        const items: any[] = [];
+        total +=
+          zone.fishing_pool?.wod_multiplier *
+          parseFloat(activeSessionData[i].zone.random_wod_rate) *
+          60 *
+          60 *
+          (1 - activeSessionData[i].zone.fee / 100);
+        sessionWod += activeSessionData[i].last_saved_wod_earned;
+        for (let x = 0; x < activeSessionData[i].slot_items.length; x++) {
+          const item = activeSessionData[i].slot_items[x];
+          items.push(
+            <img
+              style={{ width: "80px", height: "120px" }}
+              src={item.rendered_image_url}
+            />
+          );
+        }
+        cards.push(
+          <div key={genRanHex(64)} style={{ display: "flex", gap: "30px" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>{items}</div>
             <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
-              <div style={{ fontSize: "20px", fontWeight: "500" }}>ZONE</div>
-              <div
-                style={{ textDecoration: "underline", cursor: "pointer" }}
-                onClick={() => {
-                  if (isDocked()) {
-                    window.open(
-                      `https://game.worldofdefish.com/zone/${activeSessionData[i].id}/fishing`
-                    );
-                  }
-                }}
-              >
-                {activeSessionData[i].id}
-              </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div style={{ fontSize: "20px", fontWeight: "500" }}>
-                $WoD/HOUR
-              </div>
               <div
                 style={{
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <img
-                  width="20px"
-                  src={Wod.src}
-                  style={{
-                    filter: "drop-shadow(0px 0px 10px #808000)",
+                <div style={{ fontSize: "20px", fontWeight: "500" }}>ZONE</div>
+                <div
+                  style={{ textDecoration: "underline", cursor: "pointer" }}
+                  onClick={() => {
+                    if (isDocked()) {
+                      window.open(
+                        `https://game.worldofdefish.com/zone/${activeSessionData[i].zone.id}/fishing`
+                      );
+                    }
                   }}
-                />
-                {(
-                  activeSessionData[i].fishing_session?.wod_multiplier *
-                  parseFloat(activeSessionData[i].wod_rate) *
-                  60 *
-                  60 *
-                  (1 - activeSessionData[i].fee / 100)
-                ).toFixed(2)}
+                >
+                  {activeSessionData[i].zone.id}
+                </div>
               </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div style={{ fontSize: "20px", fontWeight: "500" }}>
-                $WoD EARNED
-              </div>
-
               <div
                 style={{
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <img
-                  src={Wod.src}
-                  width="20px"
+                <div style={{ fontSize: "20px", fontWeight: "500" }}>
+                  $WoD/HOUR
+                </div>
+                <div
                   style={{
-                    filter: "drop-shadow(0px 0px 10px #808000)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                />
-                <div>
-                  {activeSessionData[
-                    i
-                  ].fishing_session.last_saved_wod_earned.toFixed(2)}
+                >
+                  <img
+                    width="20px"
+                    src={Wod.src}
+                    style={{
+                      filter: "drop-shadow(0px 0px 10px #808000)",
+                    }}
+                  />
+                  {(
+                    activeSessionData[i].zone.fishing_pool?.wod_multiplier *
+                    parseFloat(activeSessionData[i].zone.random_wod_rate) *
+                    60 *
+                    60 *
+                    (1 - activeSessionData[i].zone.fee / 100)
+                  ).toFixed(2)}
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div style={{ fontSize: "20px", fontWeight: "500" }}>
+                  $WoD EARNED
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src={Wod.src}
+                    width="20px"
+                    style={{
+                      filter: "drop-shadow(0px 0px 10px #808000)",
+                    }}
+                  />
+                  <div>
+                    {activeSessionData[i].last_saved_wod_earned.toFixed(2)}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      );
-      setCards(cards);
-    }
+        );
+        setCards(cards);
+      }
+    } catch (e) {}
     setWodPerHour(Number(total.toFixed(2)));
     setWodPerHourPrice(Number(total.toFixed(2)) * wodPrice);
     // setWodFarmed(
@@ -534,22 +604,17 @@ const FishermanFriend = () => {
       />
       <StartStopBtn
         size={size}
+        RefreshPing={RefreshPing}
         styling={styling}
         isFishing={isFishing}
+        setIsFishingSettings={setIsFishingSettings}
         status={status}
         setIsEndFishingMenu={setIsEndFishingMenu}
-        startAutoFishing={startAutoFishing}
-        playerLevel={playerLevel}
-      />
-      <StartFishing
-        isFishingMenu={isFishingMenu}
-        setIsFishingMenu={setIsFishingMenu}
-        canFish={canFish}
-        playerLevel={playerLevel}
       />
       <EndFishingMenu
         setIsEndFishingMenu={setIsEndFishingMenu}
         endingFishing={endingFishing}
+        RefreshPing={RefreshPing}
         setEndingFishing={setEndingFishing}
         sessionId={sessionId}
         isEndFishingMenu={isEndFishingMenu}
@@ -590,6 +655,17 @@ const FishermanFriend = () => {
         pageLoading={pageLoading}
         size={size}
         setIsSystemMessage={setIsSystemMessage}
+      />
+      <FishingSettingsModal
+        is_open={isFishingSettings}
+        RefreshPing={RefreshPing}
+        setIsFishingSettings={setIsFishingSettings}
+        isCurrentZones={isCurrentZones}
+        setIsCurrentZones={setIsCurrentZones}
+        isCurrentSets={isCurrentSets}
+        playerLevel={playerLevel}
+        setIsCurrentSets={setIsCurrentSets}
+        startAutoFishing={startAutoFishing}
       />
     </div>
   );
