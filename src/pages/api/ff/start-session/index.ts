@@ -10,6 +10,8 @@ import { VerifyAuth } from "@/storage/utils/web3";
 import { connectToDatabase } from "@/util/mongodb";
 import Web3 from "web3";
 
+//lol
+
 export default async function handler(req: any, res: any) {
   try {
     const web3 = new Web3();
