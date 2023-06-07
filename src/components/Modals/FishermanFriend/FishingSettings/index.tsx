@@ -3,6 +3,7 @@ import { sleep } from "@/storage/utils/tools";
 import { Animations } from "@/utils/src/animations.utils";
 import { UTILS } from "@/utils/utils";
 import { Modal } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 import Ripple from "react-ripplejs";
 
 const FishingSettingsModal = ({
@@ -18,6 +19,17 @@ const FishingSettingsModal = ({
   setIsSkipRepair,
   ...props
 }: any) => {
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isButtonDisabled) {
+      const timer = setTimeout(() => {
+        setIsButtonDisabled(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isButtonDisabled]);
   return (
     <Modal
       width="800px"
@@ -142,16 +154,25 @@ const FishingSettingsModal = ({
             position: "relative",
             marginBottom: "50px",
           }}
-          onClick={async () => {
-            setIsFishingSettings(false);
-            await startAutoFishing(
-              playerLevel,
-              isCurrentSets,
-              isCurrentZones,
-              isSkipRepair
-            );
+          onClick={async (e: any) => {
+            if (!isButtonDisabled) {
+              setIsButtonDisabled(true);
+              setIsFishingSettings((prev: any) => {
+                if (!prev) {
+                  return false;
+                }
+                return false;
+              });
 
-            await RefreshPing();
+              await startAutoFishing(
+                playerLevel,
+                isCurrentSets,
+                isCurrentZones,
+                isSkipRepair
+              );
+              e.target.style.display = "flex";
+              await RefreshPing();
+            }
           }}
         >
           <Ripple
