@@ -143,6 +143,7 @@ const FishingSettingsModal = ({
             marginBottom: "50px",
           }}
           onClick={async () => {
+            setIsFishingSettings(false);
             await startAutoFishing(
               playerLevel,
               isCurrentSets,
@@ -150,7 +151,6 @@ const FishingSettingsModal = ({
               isSkipRepair
             );
 
-            setIsFishingSettings(false);
             await RefreshPing();
           }}
         >
