@@ -6,6 +6,8 @@ import { Modal } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import Ripple from "react-ripplejs";
 
+///t
+
 const FishingSettingsModal = ({
   is_open,
   isCurrentZones,
