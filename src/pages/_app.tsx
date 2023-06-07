@@ -205,40 +205,6 @@ export default function MyApp({ Component, pageProps }: any) {
     };
   };
 
-  useEffect(() => {
-    console.log(isEmailConfirm);
-    let intervalId: NodeJS.Timeout | null = null;
-    if (isEmailConfirm) {
-      API.Internal.Auth.resendVerification(email).then(() => {
-        setCountDown(60);
-        intervalId = setInterval(() => {
-          setCountDown((prev: number) => {
-            if (prev > 0) {
-              return prev - 1;
-            } else {
-              clearInterval(intervalId!);
-              return 0;
-            }
-          });
-        }, 1000);
-      });
-    }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [isEmailConfirm]);
-
-  useEffect(() => {
-    if (countDown === 0) {
-      setOTPKeyTimeout(true);
-    } else {
-      setOTPKeyTimeout(false);
-    }
-  }, [countDown]);
-
   const signup = async () => {
     setSignupEmailInUse(false);
     if (isEmail(signupData.data.email)) {

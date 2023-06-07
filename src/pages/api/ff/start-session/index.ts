@@ -32,6 +32,7 @@ export default async function handler(req: any, res: any) {
         "level",
         "keep_zones",
         "keep_sets",
+        "skip_repair",
       ];
       if (!compareArrays(bodyKeys, reqKeys)) {
         throw new Error("Invalid body");
@@ -48,7 +49,8 @@ export default async function handler(req: any, res: any) {
       if (
         !(
           typeof body.keep_sets === "boolean" &&
-          typeof body.keep_zones === "boolean"
+          typeof body.keep_zones === "boolean" &&
+          typeof body.skip_repair === "boolean"
         )
       ) {
         throw new Error("Bad data type for keepsets or keepzones");
@@ -68,10 +70,9 @@ export default async function handler(req: any, res: any) {
         { address: body.address },
         {
           $set: {
-            setting: {
-              keep_sets: body.keep_sets,
-              keep_zones: body.keep_zones,
-            },
+            "setting.keep_sets": body.keep_sets,
+            "setting.keep_zones": body.keep_zones,
+            "setting.skip_repair": body.skip_repair,
           },
         }
       );

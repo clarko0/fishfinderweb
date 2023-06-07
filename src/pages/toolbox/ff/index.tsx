@@ -123,6 +123,7 @@ const FishermanFriend = () => {
 
   const [isCurrentZones, setIsCurrentZones] = useState<boolean>(false);
   const [isCurrentSets, setIsCurrentSets] = useState<boolean>(false);
+  const [isSkipRepair, setIsSkipRepair] = useState<boolean>(false);
   const [isFishingSettings, setIsFishingSettings] = useState<boolean>(false);
 
   const calculateCost = () => {
@@ -666,6 +667,8 @@ const FishermanFriend = () => {
         playerLevel={playerLevel}
         setIsCurrentSets={setIsCurrentSets}
         startAutoFishing={startAutoFishing}
+        isSkipRepair={isSkipRepair}
+        setIsSkipRepair={setIsSkipRepair}
       />
     </div>
   );

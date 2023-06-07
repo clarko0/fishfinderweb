@@ -3,6 +3,7 @@ import { sleep } from "@/storage/utils/tools";
 import { Animations } from "@/utils/src/animations.utils";
 import { UTILS } from "@/utils/utils";
 import { Modal } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 import Ripple from "react-ripplejs";
 
 const FishingSettingsModal = ({
@@ -14,8 +15,21 @@ const FishingSettingsModal = ({
   RefreshPing,
   playerLevel,
   setIsFishingSettings,
+  isSkipRepair,
+  setIsSkipRepair,
   ...props
 }: any) => {
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isButtonDisabled) {
+      const timer = setTimeout(() => {
+        setIsButtonDisabled(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isButtonDisabled]);
   return (
     <Modal
       width="800px"
@@ -140,11 +154,25 @@ const FishingSettingsModal = ({
             position: "relative",
             marginBottom: "50px",
           }}
-          onClick={async () => {
-            await startAutoFishing(playerLevel, isCurrentSets, isCurrentZones);
+          onClick={async (e: any) => {
+            if (!isButtonDisabled) {
+              setIsButtonDisabled(true);
+              setIsFishingSettings((prev: any) => {
+                if (!prev) {
+                  return false;
+                }
+                return false;
+              });
 
-            setIsFishingSettings(false);
-            await RefreshPing();
+              await startAutoFishing(
+                playerLevel,
+                isCurrentSets,
+                isCurrentZones,
+                isSkipRepair
+              );
+              e.target.style.display = "flex";
+              await RefreshPing();
+            }
           }}
         >
           <Ripple
@@ -207,35 +235,26 @@ const FishingSettingsModal = ({
             ></div>
             Use current items
           </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            fontSize: "12px",
-            gap: "10px",
-            bottom: "130px",
-            position: "absolute",
-            left: "10px",
-          }}
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M18 9C18 13.9706 13.9706 18 9 18C4.02944 18 0 13.9706 0 9C0 4.02944 4.02944 0 9 0C13.9706 0 18 4.02944 18 9ZM10 5C10 5.55228 9.55229 6 9 6C8.44771 6 8 5.55228 8 5C8 4.44772 8.44771 4 9 4C9.55229 4 10 4.44772 10 5ZM10 14V8H8V14H10Z"
-              fill="white"
-            />
-          </svg>
-          <div style={{ width: "200px", textAlign: "left" }}>
-            Requires for you to have sessions running before activating
-            Fisherman’s Friend
+          <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+            <div
+              style={{
+                width: "20px",
+                transition: "0.3s",
+                height: "20px",
+                borderRadius: "3px",
+                border: "1px solid #fff",
+                cursor: "pointer",
+                background: isSkipRepair ? "#195FC2" : "transparent",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={async (e: any) => {
+                setIsSkipRepair(!isSkipRepair);
+                await Animations.Rotation(e);
+              }}
+            ></div>
+            Skip repair on startup
           </div>
         </div>
       </div>
