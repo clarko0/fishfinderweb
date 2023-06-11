@@ -70,9 +70,9 @@ export default async function handler(req: any, res: any) {
         { address: body.address },
         {
           $set: {
-            "setting.keep_sets": body.keep_sets,
-            "setting.keep_zones": body.keep_zones,
-            "setting.skip_repair": body.skip_repair,
+            ["setting.keep_sets"]: body.keep_sets,
+            ["setting.keep_zones"]: body.keep_zones,
+            ["setting.skip_repair"]: body.skip_repair,
           },
         }
       );
