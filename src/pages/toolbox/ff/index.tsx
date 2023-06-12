@@ -119,6 +119,7 @@ const FishermanFriend = () => {
     isRepaired: true,
   });
   const [consumableData, setConsumableData] = useState<any>([]);
+  const [activeConsumableData, setActiveConsumableData] = useState<any>([]);
   const [gettingSessions, setGettingSessions] = useState<boolean>(false);
 
   const [isCurrentZones, setIsCurrentZones] = useState<boolean>(false);
@@ -126,21 +127,46 @@ const FishermanFriend = () => {
   const [isSkipRepair, setIsSkipRepair] = useState<boolean>(false);
   const [isFishingSettings, setIsFishingSettings] = useState<boolean>(false);
 
+  const [is25Repair, setIs25Repair] = useState<boolean>(true);
+  const [is50Repair, setIs50Repair] = useState<boolean>(false);
+  const [is100Repair, setIs100Repair] = useState<boolean>(false);
+
+  useEffect(() => {
+    let number = 3;
+    if (is25Repair) {
+    } else if (is50Repair) {
+      number = 2;
+    } else if (is100Repair) {
+      number = 1;
+    }
+    setActiveConsumableData(consumableData[number]);
+  }, [is25Repair, is50Repair, is100Repair, consumableData]);
+
   const calculateCost = () => {
     let c = 0;
+    let factor = 4;
+    if (is25Repair) {
+    } else if (is50Repair) {
+      factor = 2;
+    } else if (is100Repair) {
+      factor = 1;
+    }
+
     if (!isNaN(parseInt(numberOfRepairs))) {
       let number = parseInt(numberOfRepairs);
-      let num = toolMenuData.isDays ? number * 4 : number;
+      let num = toolMenuData.isDays ? number * factor : number;
       try {
         for (let i = 0; i < Object.keys(userData.items).length; i++) {
           if (toolMenuData.rarities[i + 1]) {
             c +=
               num *
               userData.items[Object.keys(userData.items)[i]].length *
-              consumableData[i].price;
+              activeConsumableData[i].price;
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log(e);
+      }
     }
     setToolCost(c);
   };
@@ -176,9 +202,7 @@ const FishermanFriend = () => {
       setUserData({
         username: res.userData.username,
         avatar: res.userData.avatar,
-        tools: res.tools.sort((a: any, b: any) =>
-          a.rarity > b.rarity ? 1 : -1
-        ),
+        tools: res.tools,
         items: items,
         isReady: true,
         wodBalance: res.totalWod,
@@ -207,7 +231,9 @@ const FishermanFriend = () => {
     });
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    setClicker(!clicker);
+  }, [is25Repair, is50Repair, is100Repair]);
 
   useEffect(() => {
     calculateCost();
@@ -222,35 +248,42 @@ const FishermanFriend = () => {
       5: 0,
       6: 0,
     };
-    let j = 0;
-    for (const i in userData.items) {
-      if (userData.tools[j] !== undefined) {
-        newToolVals[j + 1] = ~~(
-          userData.tools[j].quantity / userData.items[i].length
-        );
+    try {
+      let j = 0;
+      for (const i in userData.items) {
+        if (activeConsumableData[j] !== undefined) {
+          newToolVals[j + 1] = ~~(
+            activeConsumableData[j].quantity / userData.items[i].length
+          );
+        }
+        j++;
       }
-      j++;
-    }
-    if (isDays) {
-      for (const i in newToolVals) {
-        newToolVals[i] = parseFloat((newToolVals[i] / 4).toFixed(2));
+      if (isDays) {
+        let divisor = 4;
+        const firstEle = activeConsumableData[0];
+        if (firstEle.repair_amount === 3) {
+        } else if (firstEle.repair_amount === 2) {
+          divisor = 2;
+        } else if (firstEle.repair_amount === 1) {
+          divisor = 1;
+        }
+        for (const i in newToolVals) {
+          newToolVals[i] = parseFloat((newToolVals[i] / divisor).toFixed(2));
+        }
       }
-    }
-
+    } catch (e) {}
     setToolMenuData({ ...toolMenuData, toolVals: newToolVals });
   };
 
   useEffect(() => {
     determineRepair(toolMenuData.isDays);
-  }, [userData, toolMenuData.isDays]);
+  }, [userData, toolMenuData.isDays, activeConsumableData]);
 
   useEffect(() => {
     const cards: any[] = [];
     let total: number = 0;
     let sessionWod: number = 0;
     try {
-      console.log(activeSessionData);
-
       for (let i = 0; i < activeSessionData.length; i++) {
         const zone = activeSessionData[i].zone;
         const items: any[] = [];
@@ -435,9 +468,7 @@ const FishermanFriend = () => {
       setUserData({
         username: res.userData.username,
         avatar: res.userData.avatar,
-        tools: res.tools.sort((a: any, b: any) =>
-          a.rarity > b.rarity ? 1 : -1
-        ),
+        tools: res.tools,
         items: items,
         isReady: true,
         wodBalance: res.totalWod,
@@ -495,9 +526,7 @@ const FishermanFriend = () => {
         setUserData({
           username: res.userData.username,
           avatar: res.userData.avatar,
-          tools: res.tools.sort((a: any, b: any) =>
-            a.rarity > b.rarity ? 1 : -1
-          ),
+          tools: res.tools,
           items: items,
           isReady: true,
           wodBalance: res.totalWod,
@@ -533,7 +562,7 @@ const FishermanFriend = () => {
   useEffect(() => {
     if (userData.isReady) {
       setFishingTime(
-        CaclulateFishingTime(userData.items, userData.tools).string
+        CaclulateFishingTime(userData.items, activeConsumableData).string
       );
     }
   }, [userData]);
@@ -586,10 +615,16 @@ const FishermanFriend = () => {
         status={status}
         gettingSessions={gettingSessions}
         setToolMenuData={setToolMenuData}
-        consumableData={consumableData}
+        consumableData={activeConsumableData}
         userData={userData}
         fishingTime={fishingTime}
         setIsToolsMenu={setIsToolsMenu}
+        is25Repair={is25Repair}
+        setIs25Repair={setIs25Repair}
+        is50Repair={is50Repair}
+        setIs50Repair={setIs50Repair}
+        is100Repair={is100Repair}
+        setIs100Repair={setIs100Repair}
       />
       <FFGlobalStatistics
         size={size}
@@ -630,8 +665,14 @@ const FishermanFriend = () => {
         numberOfRepairs={numberOfRepairs}
         setNumberOfRepairs={setNumberOfRepairs}
         userData={userData}
-        consumableData={consumableData}
+        consumableData={activeConsumableData}
         wodPrice={wodPrice}
+        is25Repair={is25Repair}
+        setIs25Repair={setIs25Repair}
+        is50Repair={is50Repair}
+        setIs50Repair={setIs50Repair}
+        is100Repair={is100Repair}
+        setIs100Repair={setIs100Repair}
       />
       <PageLoading
         text={"Loading Fisherman's Friend..."}
@@ -654,6 +695,8 @@ const FishermanFriend = () => {
         is_open={isFishingSettings}
         RefreshPing={RefreshPing}
         setIsFishingSettings={setIsFishingSettings}
+        userData={userData}
+        consumableData={activeConsumableData}
         isCurrentZones={isCurrentZones}
         setIsCurrentZones={setIsCurrentZones}
         isCurrentSets={isCurrentSets}
@@ -662,6 +705,12 @@ const FishermanFriend = () => {
         startAutoFishing={startAutoFishing}
         isSkipRepair={isSkipRepair}
         setIsSkipRepair={setIsSkipRepair}
+        is25Repair={is25Repair}
+        setIs25Repair={setIs25Repair}
+        is50Repair={is50Repair}
+        setIs50Repair={setIs50Repair}
+        is100Repair={is100Repair}
+        setIs100Repair={setIs100Repair}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import { UTILS } from "@/utils/utils";
 import { Modal } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import Ripple from "react-ripplejs";
+import ToolBar from "./ToolBar";
 
 ///t
 
@@ -19,10 +20,17 @@ const FishingSettingsModal = ({
   setIsFishingSettings,
   isSkipRepair,
   setIsSkipRepair,
+  is25Repair,
+  setIs25Repair,
+  is50Repair,
+  setIs50Repair,
+  is100Repair,
+  setIs100Repair,
+  consumableData,
+  userData,
   ...props
 }: any) => {
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-
   useEffect(() => {
     if (isButtonDisabled) {
       const timer = setTimeout(() => {
@@ -85,7 +93,7 @@ const FishingSettingsModal = ({
             height: "250px",
             borderRadius: "3px",
             border: "1px solid #fff",
-            marginTop: "70px",
+            marginTop: "24px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -142,6 +150,111 @@ const FishingSettingsModal = ({
             Calculates best sets Finds #1 zones to fish in
           </div>
         </div>
+        <div style={{ display: "flex", gap: "35px", marginTop: "24px" }}>
+          <div>Choose The Repair Amount:</div>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+              }}
+            >
+              <div
+                style={{
+                  width: "20px",
+                  transition: "0.3s",
+                  height: "20px",
+                  borderRadius: "3px",
+                  border: `1px solid rgba(255, 255, 255, ${
+                    is25Repair ? "1" : "0.4"
+                  })`,
+                  background: `rgba(255, 255, 255, ${
+                    is25Repair ? "1" : "0.4"
+                  })`,
+                  cursor: "pointer",
+                }}
+                onClick={async (e: any) => {
+                  setIs100Repair(false);
+                  setIs50Repair(false);
+                  setIs25Repair(true);
+                  if (!is25Repair) {
+                    await Animations.Rotation(e);
+                  }
+                }}
+              ></div>
+              25%
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+              }}
+            >
+              <div
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  transition: "0.3s",
+                  borderRadius: "3px",
+                  border: `1px solid rgba(255, 255, 255, ${
+                    is50Repair ? "1" : "0.4"
+                  })`,
+                  background: `rgba(255, 255, 255, ${
+                    is50Repair ? "1" : "0.4"
+                  })`,
+                  cursor: "pointer",
+                }}
+                onClick={async (e: any) => {
+                  setIs100Repair(false);
+                  setIs50Repair(true);
+                  setIs25Repair(false);
+                  if (!is50Repair) {
+                    await Animations.Rotation(e);
+                  }
+                }}
+              ></div>
+              50%
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+              }}
+            >
+              <div
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  transition: "0.3s",
+                  borderRadius: "3px",
+                  border: `1px solid rgba(255, 255, 255, ${
+                    is100Repair ? "1" : "0.4"
+                  })`,
+                  background: `rgba(255, 255, 255, ${
+                    is100Repair ? "1" : "0.4"
+                  })`,
+                  cursor: "pointer",
+                }}
+                onClick={async (e: any) => {
+                  setIs100Repair(true);
+                  setIs50Repair(false);
+                  setIs25Repair(false);
+                  if (!is100Repair) {
+                    await Animations.Rotation(e);
+                  }
+                }}
+              ></div>
+              100%
+            </div>
+          </div>
+        </div>
+        <ToolBar consumableData={consumableData} userData={userData} />
         <div
           style={{
             width: "200px",
@@ -165,12 +278,20 @@ const FishingSettingsModal = ({
                 }
                 return false;
               });
+              let repair_level: number = 3;
+              if (is25Repair) {
+              } else if (is50Repair) {
+                repair_level = 2;
+              } else if (is100Repair) {
+                repair_level = 1;
+              }
 
               await startAutoFishing(
                 playerLevel,
                 isCurrentSets,
                 isCurrentZones,
-                isSkipRepair
+                isSkipRepair,
+                repair_level
               );
               e.target.style.display = "flex";
               await RefreshPing();

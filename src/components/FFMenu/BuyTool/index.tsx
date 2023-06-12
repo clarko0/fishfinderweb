@@ -26,11 +26,19 @@ const BuyToolMenu = ({
   wodPrice,
   clicker,
   setClicker,
+  is25Repair,
+  setIs25Repair,
+  is50Repair,
+  setIs50Repair,
+  consumableData,
+  is100Repair,
+  setIs100Repair,
 }: any) => {
   const [isOffchain, setIsOffchain] = useState<boolean>(false);
   const [toolsBought, setToolsBought] = useState<boolean>(false);
   useEffect(() => {
     console.log(toolCost, wodPrice);
+    console.log(toolMenuData);
   }, []);
   return (
     <div
@@ -70,6 +78,7 @@ const BuyToolMenu = ({
             display: "flex",
             alignItems: "center",
             flexDirection: "column",
+            gap: "20px",
           }}
         >
           <div
@@ -134,9 +143,9 @@ const BuyToolMenu = ({
                   marginTop: " 30px",
                 }}
               >
-                Enter the number of 25% repairs for all your items:
+                Enter the number of repairs for all your items:
               </div>
-              <div style={{ marginTop: "24px" }}>
+              <div style={{}}>
                 <div
                   style={{
                     display: "flex",
@@ -224,7 +233,8 @@ const BuyToolMenu = ({
                   </div>
                 </div>
               </div>
-              <div style={{ marginTop: "12px" }}>
+
+              <div style={{}}>
                 <div
                   style={{
                     display: "flex",
@@ -257,7 +267,6 @@ const BuyToolMenu = ({
                         alignItems: "center",
                         gap: "55px",
                         justifyContent: "center",
-                        marginTop: "3px",
                         fontWeight: "600",
                       }}
                     >
@@ -287,12 +296,66 @@ const BuyToolMenu = ({
               </div>
               <div
                 style={{
+                  display: "flex",
+                  fontSize: "16px",
+                  gap: "10px",
+                  right: "30px",
+                }}
+              >
+                <div>Repair amount</div>
+                <span
+                  style={{
+                    fontWeight: is100Repair ? "600" : "500",
+                    transition: "0.3s",
+                    color: is100Repair ? "#fff" : "grey",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setIs100Repair(true);
+                    setIs25Repair(false);
+                    setIs50Repair(false);
+                  }}
+                >
+                  100%
+                </span>
+                <span
+                  style={{
+                    fontWeight: is50Repair ? "600" : "500",
+                    transition: "0.3s",
+                    color: is50Repair ? "#fff" : "grey",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setIs100Repair(false);
+                    setIs25Repair(false);
+                    setIs50Repair(true);
+                  }}
+                >
+                  50%
+                </span>
+                <span
+                  style={{
+                    fontWeight: is25Repair ? "600" : "500",
+                    transition: "0.3s",
+                    color: is25Repair ? "#fff" : "grey",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setIs100Repair(false);
+                    setIs25Repair(true);
+                    setIs50Repair(false);
+                  }}
+                >
+                  25%
+                </span>
+              </div>
+              <div
+                style={{
                   width: "320px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "column",
-                  marginTop: "50px",
                 }}
               >
                 <div
@@ -459,50 +522,57 @@ const BuyToolMenu = ({
           )}
           <div
             style={{
-              fontWeight: "600",
-              fontSize: "35px",
-              color: "#fff",
-              marginTop: "20px",
-            }}
-          >
-            Total Cost
-          </div>
-          <div
-            style={{
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              fontWeight: "500",
             }}
           >
-            <img src={Wod.src} />
-            <div>{toolCost.toFixed(2)}</div>
             <div
               style={{
-                fontSize: "10px",
-                color: "#4F4F4F",
+                fontWeight: "500",
               }}
             >
-              (${(wodPrice * toolCost).toFixed(2)})
+              Use Offchain $WoD?
+              <input
+                style={{ marginLeft: "7px" }}
+                type="checkbox"
+                onClick={() => {
+                  setIsOffchain(!isOffchain);
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                fontWeight: "600",
+                fontSize: "24px",
+                color: "#fff",
+              }}
+            >
+              Total Cost
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "500",
+              }}
+            >
+              <img src={Wod.src} />
+              <div>{toolCost.toFixed(2)}</div>
+              <div
+                style={{
+                  fontSize: "10px",
+                  color: "#4F4F4F",
+                }}
+              >
+                (${(wodPrice * toolCost).toFixed(2)})
+              </div>
             </div>
           </div>
-          <div
-            style={{
-              position: "absolute",
-              fontWeight: "500",
-              marginTop: "417px",
-            }}
-          >
-            Use Offchain $WoD?
-            <input
-              style={{ marginLeft: "7px" }}
-              type="checkbox"
-              onClick={() => {
-                setIsOffchain(!isOffchain);
-              }}
-            />
-          </div>
-          <div style={{ display: "flex" }}></div>
+
           <ReqBtn
             width={"250px"}
             height={"60px"}
@@ -514,13 +584,21 @@ const BuyToolMenu = ({
             }
             text="Buy"
             func={() => {
+              let factor = 4;
+              if (is25Repair) {
+              } else if (is50Repair) {
+                factor = 2;
+              } else if (is100Repair) {
+                factor = 1;
+              }
               isOffchain
                 ? BuyTools(
                     toolMenuData.isDays
-                      ? parseInt(numberOfRepairs.toString()) * 4
+                      ? parseInt(numberOfRepairs.toString()) * factor
                       : parseInt(numberOfRepairs.toString()),
                     toolMenuData.rarities,
-                    userData.items
+                    userData.items,
+                    consumableData
                   ).then(() => {
                     setToolsBought(true);
                     sleep(5000).then(() => {
@@ -529,7 +607,7 @@ const BuyToolMenu = ({
                   })
                 : fullBuyTools(
                     toolMenuData.isDays
-                      ? parseInt(numberOfRepairs.toString()) * 4
+                      ? parseInt(numberOfRepairs.toString()) * factor
                       : parseInt(numberOfRepairs.toString()),
                     userData.items,
                     toolMenuData.rarities

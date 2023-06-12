@@ -1,0 +1,79 @@
+import Artifact from "public/artifact.png";
+import Legendary from "public/legendary.png";
+import Epic from "public/epic.png";
+import Rare from "public/rare.png";
+import Uncommon from "public/uncommon.png";
+import Common from "public/common.png";
+import { useEffect, useState } from "react";
+import { genRanHex } from "@/storage/constants/misc";
+
+const images: any = {
+  6: Artifact.src,
+  5: Legendary.src,
+  4: Epic.src,
+  3: Rare.src,
+  2: Uncommon.src,
+  1: Common.src,
+};
+const ToolBar = ({ consumableData, userData, ...props }: any) => {
+  const [values, setValues] = useState<any>([]);
+  useEffect(() => {
+    // consumableData &&
+    //   consumableData.map((item: any) => {
+    //     console.log(userData.items);
+    //     for (const i in userData.items) {
+    //       console.log(userData.items[i]);
+    //     }
+    //   });
+    const temp = [];
+    for (const i in userData.items) {
+      const firstEle = userData.items[i][0];
+      for (let x = 0; x < consumableData.length; x++) {
+        if (firstEle.rarity === consumableData[x].rarity) {
+          temp.push({
+            amount: Number(
+              Math.floor(consumableData[x].quantity / userData.items[i].length)
+            ),
+            image: images[consumableData[x].rarity],
+          });
+        }
+      }
+    }
+    setValues(temp);
+  }, [consumableData]);
+  return (
+    <div style={{ display: "flex", gap: "" }}>
+      {values.map((item: any) => {
+        return (
+          <div
+            key={genRanHex(24)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: "500",
+              gap: "-10px",
+            }}
+          >
+            <img src={item.image} />
+            <div
+              style={{
+                background: item.amount < 11 ? "#FF0000" : "transparent",
+                paddingTop: item.amount < 11 ? "4px" : "",
+                paddingBottom: item.amount < 11 ? "4px" : "",
+                paddingLeft: item.amount < 11 ? "10px" : "",
+                paddingRight: item.amount < 11 ? "10px" : "",
+                borderRadius: "40px",
+              }}
+            >
+              {item.amount}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default ToolBar;

@@ -15,7 +15,8 @@ export const startAutoFishing = async (
   playerLevel: number,
   keep_sets: boolean,
   keep_zones: boolean,
-  skip_repair: boolean
+  skip_repair: boolean,
+  repair_level: number
 ) => {
   console.log(keep_sets, keep_zones, skip_repair);
   const test = await api.post("/ff/start-session", {
@@ -25,6 +26,7 @@ export const startAutoFishing = async (
     keep_zones: keep_zones,
     keep_sets: keep_sets,
     skip_repair: skip_repair,
+    repair_level: repair_level,
   });
 };
 

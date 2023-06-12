@@ -2,7 +2,6 @@ const ReqBtn = (props: any) => {
   return (
     <div
       style={{
-        marginTop: "25px",
         fontSize: "30px",
         fontWeight: "600",
         width: props.width,

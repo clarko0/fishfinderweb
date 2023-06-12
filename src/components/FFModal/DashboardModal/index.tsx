@@ -28,9 +28,17 @@ const DashboardModal = ({
   setToolMenuData,
   userData,
   setIsToolsMenu,
+  is25Repair,
+  setIs25Repair,
+  is50Repair,
+  setIs50Repair,
+  is100Repair,
+  setIs100Repair,
 }: any) => {
   const getQuantityByRarity = (rarity: number) =>
-    consumableData.find((item: any) => item.rarity === rarity)?.quantity || 0;
+    (consumableData !== undefined &&
+      consumableData.find((item: any) => item.rarity === rarity)?.quantity) ||
+    0;
 
   return (
     <div
@@ -317,6 +325,62 @@ const DashboardModal = ({
           marginTop: "15px",
         }}
       >
+        <div
+          style={{
+            position: "absolute",
+            display: "flex",
+            fontSize: "10px",
+            flexDirection: "column",
+            gap: "10px",
+            right: "30px",
+          }}
+        >
+          <span
+            style={{
+              fontWeight: is100Repair ? "600" : "500",
+              transition: "0.3s",
+              color: is100Repair ? "#fff" : "grey",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setIs100Repair(true);
+              setIs25Repair(false);
+              setIs50Repair(false);
+            }}
+          >
+            100%
+          </span>
+          <span
+            style={{
+              fontWeight: is50Repair ? "600" : "500",
+              transition: "0.3s",
+              color: is50Repair ? "#fff" : "grey",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setIs100Repair(false);
+              setIs25Repair(false);
+              setIs50Repair(true);
+            }}
+          >
+            50%
+          </span>
+          <span
+            style={{
+              fontWeight: is25Repair ? "600" : "500",
+              transition: "0.3s",
+              color: is25Repair ? "#fff" : "grey",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setIs100Repair(false);
+              setIs25Repair(true);
+              setIs50Repair(false);
+            }}
+          >
+            25%
+          </span>
+        </div>
         <div
           style={{
             position: "absolute",

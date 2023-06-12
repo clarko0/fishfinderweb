@@ -356,37 +356,43 @@ export const GetAllConsumablePrices = async () => {
   return marketItems;
 };
 
-export const BuyTools = async (amount: number, rarities: any, items: any) => {
+export const BuyTools = async (
+  amount: number,
+  rarities: any,
+  items: any,
+  consumableData: any
+) => {
   const calls = [];
-  let toolInfo: any = {
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-  };
+  let toolInfo: any = {};
+  for (let i = 0; i < consumableData.length; i++) {
+    toolInfo[consumableData[i].rarity] = {
+      id: consumableData[i].id,
+      amount: 0,
+    };
+  }
   const nonUsedRarites: any = Object.keys(rarities).filter((item: any) => {
     return !rarities[item];
   });
-
   for (const i in items) {
     try {
       if (!nonUsedRarites.includes(items[i][0].rarity.toString())) {
-        toolInfo[Object.keys(items).indexOf(i) + 1] = items[i].length;
+        let element = toolInfo[items[i][0].rarity];
+        element = { ...element, amount: items[i].length };
+        toolInfo[items[i][0].rarity] = element;
       }
     } catch (e) {}
   }
 
-  for (const key in toolInfo) {
-    if (toolInfo[key] !== 0) {
+  for (const i in toolInfo) {
+    console.log(toolInfo);
+    if (toolInfo[i].amount !== 0) {
       calls.push(
         axios.post(
           "https://api.defish.games/graphql",
           {
-            query: `mutation {repairmentCollectionUpdate(input: {consumable_vendor_id: ${
-              (parseInt(key) - 1) * 3
-            }, amount_to_add: ${toolInfo[key] * amount},},) {id}}`,
+            query: `mutation {repairmentCollectionUpdate(input: {consumable_vendor_id: ${parseInt(
+              toolInfo[i].id
+            )}, amount_to_add: ${toolInfo[i].amount * amount},},) {id}}`,
           },
           {
             headers: {
@@ -397,5 +403,6 @@ export const BuyTools = async (amount: number, rarities: any, items: any) => {
       );
     }
   }
+
   await Promise.all(calls);
 };

@@ -15,7 +15,11 @@ import { GetAddress } from "@/storage/utils/web3";
 // test
 export const ffStore = async () => {
   let items: any[] = [];
-  let tools: any[] = [];
+  let tools: any = {
+    1: [],
+    2: [],
+    3: [],
+  };
   let fishingInfo: any[] = [];
   let totalWod: number = 0;
   let tokenPrice: number = 0;
@@ -66,24 +70,62 @@ export const ffStore = async () => {
       res = res.data;
 
       for (let i = 0; i < res.length; i++) {
-        if (res[i].repair_amount === 25) {
-          tools.push({
+        let repair_amount = res[i].repair_amount;
+
+        if (repair_amount !== 75) {
+          if (repair_amount === 25) {
+            repair_amount = 3;
+          } else if (repair_amount === 50) {
+            repair_amount = 2;
+          } else {
+            repair_amount = 1;
+          }
+          tools[repair_amount].push({
             quantity: res[i].quantity,
             rarity: res[i].rarity,
+            repair_amount: repair_amount,
           });
         }
       }
+
+      for (const i in tools) {
+        tools[i].sort((a: any, b: any) => (a.rarity > b.rarity ? 1 : -1));
+      }
+
       let rawData = await GetAllConsumablePrices();
       for (let i = 0; i < rawData.length; i++) {
-        if (rawData[i].repairNum === 25) {
-          for (let x = 0; x < tools.length; x++) {
-            if (tools[x].rarity === rawData[i].rarity) {
-              tools[x].price = rawData[i].price;
+        let repair_amount = rawData[i].repairNum;
+        if (repair_amount !== 75) {
+          if (repair_amount === 25) {
+            repair_amount = 3;
+          } else if (repair_amount === 50) {
+            repair_amount = 2;
+          } else if (repair_amount === 100) {
+            repair_amount = 1;
+          }
+          for (let x = 0; x < tools[repair_amount].length; x++) {
+            let ele = tools[repair_amount][x];
+            if (ele.rarity === rawData[i].rarity) {
+              ele.price = rawData[i].price;
+              ele.id = rawData[i].id;
             }
           }
         }
       }
+
+      console.log(tools);
     }),
+
+    //   for (let i = 0; i < rawData.length; i++) {
+    //     if (rawData[i].repairNum === 25) {
+    //       for (let x = 0; x < tools.length; x++) {
+    //         if (tools[x].rarity === rawData[i].rarity) {
+    //           tools[x].price = rawData[i].price;
+    //         }
+    //       }
+    //     }
+    //   }
+    // }),
     getUsersStats().then((res: any) => {
       res = res.data;
       totalWod = res.total_wod;

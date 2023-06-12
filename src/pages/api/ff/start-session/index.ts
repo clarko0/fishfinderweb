@@ -33,6 +33,7 @@ export default async function handler(req: any, res: any) {
         "keep_zones",
         "keep_sets",
         "skip_repair",
+        "repair_level",
       ];
       if (!compareArrays(bodyKeys, reqKeys)) {
         throw new Error("Invalid body");
@@ -55,6 +56,9 @@ export default async function handler(req: any, res: any) {
       ) {
         throw new Error("Bad data type for keepsets or keepzones");
       }
+      if (!([1, 2, 3].indexOf(body.repair_level) !== -1)) {
+        throw new Error("Invalid repair level");
+      }
       const pending = await db
         .collection("ffpending")
         .find({ projection: { address: body.address } })
@@ -73,6 +77,7 @@ export default async function handler(req: any, res: any) {
             ["setting.keep_sets"]: body.keep_sets,
             ["setting.keep_zones"]: body.keep_zones,
             ["setting.skip_repair"]: body.skip_repair,
+            ["setting.repair_level"]: body.repair_level,
           },
         }
       );

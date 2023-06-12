@@ -23,7 +23,13 @@ const StartStopBtn = ({
         marginLeft: "-200px",
         top: "70%",
         marginTop:
-          size.width > 1650 ? "0px" : size.width > 600 ? "120px" : "50px",
+          size.width > 1650
+            ? "0px"
+            : size.width > 600
+            ? "120px"
+            : size.height > 800
+            ? "50px"
+            : "100px",
         fontWeight: "600",
         display: "flex",
         alignItems: "center",
