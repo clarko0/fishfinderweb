@@ -26,8 +26,12 @@ const ToolBar = ({ consumableData, userData, ...props }: any) => {
     //     }
     //   });
     const temp = [];
+    const usedRarities: any[] = [];
     for (const i in userData.items) {
       const firstEle = userData.items[i][0];
+      if (!firstEle) {
+        continue;
+      }
       for (let x = 0; x < consumableData.length; x++) {
         if (firstEle.rarity === consumableData[x].rarity) {
           temp.push({
@@ -35,11 +39,25 @@ const ToolBar = ({ consumableData, userData, ...props }: any) => {
               Math.floor(consumableData[x].quantity / userData.items[i].length)
             ),
             image: images[consumableData[x].rarity],
+            rarity: consumableData[x].rarity,
           });
+          usedRarities.push(consumableData[x].rarity);
         }
       }
     }
-    setValues(temp);
+    const numbers = [1, 2, 3, 4, 5, 6];
+    const notUsedRarities: any[] = numbers.filter(
+      (num) => !usedRarities.includes(num)
+    );
+    for (let i = 0; i < notUsedRarities.length; i++) {
+      temp.push({
+        amount: 0,
+        noItems: true,
+        image: images[notUsedRarities[i]],
+        rarity: notUsedRarities[i],
+      });
+    }
+    setValues(temp.sort((a: any, b: any) => b.rarity - a.rarity));
   }, [consumableData]);
   return (
     <div style={{ display: "flex", gap: "" }}>
@@ -59,11 +77,12 @@ const ToolBar = ({ consumableData, userData, ...props }: any) => {
             <img src={item.image} />
             <div
               style={{
-                background: item.amount < 11 ? "#FF0000" : "transparent",
-                paddingTop: item.amount < 11 ? "4px" : "",
-                paddingBottom: item.amount < 11 ? "4px" : "",
-                paddingLeft: item.amount < 11 ? "10px" : "",
-                paddingRight: item.amount < 11 ? "10px" : "",
+                background:
+                  item.amount < 11 && !item.noItems ? "#FF0000" : "transparent",
+                paddingTop: item.amount < 11 && !item.noItems ? "4px" : "",
+                paddingBottom: item.amount < 11 && !item.noItems ? "4px" : "",
+                paddingLeft: item.amount < 11 && !item.noItems ? "10px" : "",
+                paddingRight: item.amount < 11 && !item.noItems ? "10px" : "",
                 borderRadius: "40px",
               }}
             >
