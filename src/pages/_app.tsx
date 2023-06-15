@@ -1,21 +1,15 @@
 import "../styles/styles.css";
 import { Inter } from "@next/font/google";
 import Head from "next/head";
-import { useEffect, useState, useRef } from "react";
-import Router from "next/router";
-import {
-  Button,
-  Input,
-  Modal,
-  NextUIProvider,
-  Text,
-  createTheme,
-} from "@nextui-org/react";
+import { useEffect, useState, useRef, createContext } from "react";
+import Router, { useRouter } from "next/router";
+import { NextUIProvider, createTheme } from "@nextui-org/react";
+import Navbar from "src/components/Navbar";
 import "@/styles/globals.css";
-import { ClearAuthToken } from "@/storage/utils/local";
+import { CheckTheme, ClearAuthToken } from "@/storage/utils/local";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { CreateRerouteUrl } from "@/storage/utils/url";
-import { getEmailFromToken, sleep } from "@/storage/utils/tools";
+import { getEmailFromToken, sleep, useWindowSize } from "@/storage/utils/tools";
 import LoginModal from "@/components/Modals/Authentication/Login";
 import SignupModal from "@/components/Modals/Authentication/Signup";
 import { ApiLocalStorage } from "@/local/api.local";
@@ -23,11 +17,21 @@ import { ISignupLoginData } from "@/interface/api.interface";
 import OneLastThingModal from "@/components/Modals/Authentication/OneLastThing";
 import { API } from "@/api/api";
 import AuthenticateEmailModal from "@/components/Modals/Authentication/AuthenticateEmail";
+import { globalstore } from "@/store/global.store";
+import { IGlobalData } from "@/interface/storage.interface";
+import { isDocked } from "@/storage/utils/window";
+import { IStylingObject } from "@/storage/constants/interfaces";
+import { STYLING } from "@/storage/constants/styling";
 const inter = Inter({ subsets: ["latin"] });
 declare var window: any;
 
 let currentOTPIndex: number = 0;
+
+export const WindowSizeContext = createContext(null);
+
 export default function MyApp({ Component, pageProps }: any) {
+  const windowSize = useWindowSize();
+
   useEffect(() => {
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", async () => {
@@ -85,6 +89,8 @@ export default function MyApp({ Component, pageProps }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [otpWrong, setOTPWrong] = useState<boolean>(false);
   const [countDown, setCountDown] = useState<number>(0);
+
+  const router = useRouter();
 
   const handleUserData = async () => {
     try {
@@ -303,67 +309,107 @@ export default function MyApp({ Component, pageProps }: any) {
     }
   };
 
+  const [globalData, setGlobalData] = useState<IGlobalData>({
+    components: {
+      navbar: {
+        shown: false,
+      },
+    },
+    user_data: {
+      username: "",
+      avatar: "",
+    },
+  });
+  const [styling, setStyling] = useState<IStylingObject>({});
+  useEffect(() => {
+    setStyling(STYLING[CheckTheme()]);
+    if (isDocked()) {
+      globalstore().then((res: any) => {
+        setGlobalData((prevData: IGlobalData) => {
+          const newData = { ...prevData };
+          newData.user_data = res.user_data;
+
+          return newData;
+        });
+      });
+    }
+  }, []);
+
+  if (!WindowSizeContext) {
+    return <></>;
+  }
   return (
     <>
       <GoogleOAuthProvider clientId="799925864767-vrnv378u0htn0tcijch7h48900f9bh1k.apps.googleusercontent.com">
         <NextUIProvider theme={theme}>
-          <Head>
-            <link rel="shortcut icon" href="/favicon.png" />
-            <title>Fish Finder - #1 QOL tool for WoD</title>
-          </Head>
-          <div style={{ fontFamily: "inter" }} id="app">
-            <Component {...pageProps} />
-            <SignupModal
-              signupHelperEmail={signupHelperEmail}
-              signupSamePassword={signupSamePassword}
-              signupSecurePassword={signupSecurePassword}
-              signup={signup}
-              is_open={isSignup}
-              signupClicker={signupClicker}
-              setSignupClicker={setSignupClicker}
-              setIsLogin={setIsLogin}
-              setIsSignup={setIsSignup}
-              setSignupData={setSignupData}
-              setLoginData={setLoginData}
-              signupEmailInUse={signupEmailInUse}
-            />
-            <AuthenticateEmailModal
-              is_open={isEmailConfirm}
-              email={email}
-              handleEmailPasscode={handleEmailPasscode}
-              otp={otp}
-              inputRef={inputRef}
-              isLoading={isLoading}
-              activeOTPIndex={activeOTPIndex}
-              handleKeyDown={handleKeyDown}
-              handlePaste={handlePaste}
-              handleBackButton={handleBackButton}
-              otpWrong={otpWrong}
-              otpKeyTimeout={otpKeyTimeout}
-              setOTPKeyTimeout={setOTPKeyTimeout}
-              countDown={countDown}
-              handleResendVerification={handleResendVerification}
-            />
-            <LoginModal
-              is_open={isLogin}
-              loginClicker={loginClicker}
-              setSignupData={setSignupData}
-              setLoginClicker={setLoginClicker}
-              setIsLogin={setIsLogin}
-              login={login}
-              badLogin={badLogin}
-              setBadLogin={setBadLogin}
-              setIsSignup={setIsSignup}
-              setLoginData={setLoginData}
-            />
-            <OneLastThingModal
-              is_open={false}
-              oltData={oltData}
-              setOltImage={setOltImage}
-              oltImage={oltImage}
-              setOltData={setOltData}
-            />
-          </div>
+          <WindowSizeContext.Provider value={windowSize}>
+            <Head>
+              <link rel="shortcut icon" href="/favicon.png" />
+              <title>Fish Finder - #1 QOL tool for WoD</title>
+            </Head>
+            <div style={{ fontFamily: "inter" }} id="app">
+              <Component {...pageProps} />
+              {!["/", "/login"].includes(router.pathname) ? (
+                <Navbar
+                  avatar={globalData.user_data.avatar}
+                  username={globalData.user_data.username}
+                  styling={styling}
+                />
+              ) : (
+                <></>
+              )}
+              {/* <SignupModal
+                signupHelperEmail={signupHelperEmail}
+                signupSamePassword={signupSamePassword}
+                signupSecurePassword={signupSecurePassword}
+                signup={signup}
+                is_open={isSignup}
+                signupClicker={signupClicker}
+                setSignupClicker={setSignupClicker}
+                setIsLogin={setIsLogin}
+                setIsSignup={setIsSignup}
+                setSignupData={setSignupData}
+                setLoginData={setLoginData}
+                signupEmailInUse={signupEmailInUse}
+              />
+              <AuthenticateEmailModal
+                is_open={isEmailConfirm}
+                email={email}
+                handleEmailPasscode={handleEmailPasscode}
+                otp={otp}
+                inputRef={inputRef}
+                isLoading={isLoading}
+                activeOTPIndex={activeOTPIndex}
+                handleKeyDown={handleKeyDown}
+                handlePaste={handlePaste}
+                handleBackButton={handleBackButton}
+                otpWrong={otpWrong}
+                otpKeyTimeout={otpKeyTimeout}
+                setOTPKeyTimeout={setOTPKeyTimeout}
+                countDown={countDown}
+                handleResendVerification={handleResendVerification}
+              />
+              <LoginModal
+                is_open={isLogin}
+                loginClicker={loginClicker}
+                setSignupData={setSignupData}
+                setLoginClicker={setLoginClicker}
+                setIsLogin={setIsLogin}
+                login={login}
+                badLogin={badLogin}
+                setBadLogin={setBadLogin}
+                setIsSignup={setIsSignup}
+                setLoginData={setLoginData}
+              />
+              <OneLastThingModal
+                is_open={false}
+                oltData={oltData}
+                setOltImage={setOltImage}
+                oltImage={oltImage}
+                setOltData={setOltData}
+              /> */}
+            </div>
+          </WindowSizeContext.Provider>
         </NextUIProvider>
       </GoogleOAuthProvider>
     </>

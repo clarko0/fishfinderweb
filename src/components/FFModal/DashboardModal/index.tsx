@@ -6,39 +6,75 @@ import Epic from "public/epic.png";
 import Rare from "public/rare.png";
 import Uncommon from "public/uncommon.png";
 import Common from "public/common.png";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CaclulateFishingTime } from "@/storage/utils/tools";
 import { genRanHex } from "@/storage/constants/misc";
-import { Button, Tooltip } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 
 const DashboardModal = ({
-  size,
-  timer,
-  statusColor,
-  sessions,
-  setIsActiveSessionMenu,
-  wodFarmed,
-  wodFarmedPrice,
-  wodPerHour,
-  wodPerHourPrice,
-  status,
-  gettingSessions,
-  toolMenuData,
+  windowSize,
+  updatePageData,
+  componentData,
   consumableData,
-  setToolMenuData,
-  userData,
-  setIsToolsMenu,
-  is25Repair,
-  setIs25Repair,
-  is50Repair,
-  setIs50Repair,
-  is100Repair,
-  setIs100Repair,
+  repairMode,
+  fishingStatus,
+  isDays,
 }: any) => {
-  const getQuantityByRarity = (rarity: number) =>
-    (consumableData !== undefined &&
-      consumableData.find((item: any) => item.rarity === rarity)?.quantity) ||
-    0;
+  ///
+  const getDataByRarity = (
+    rarity: number
+  ): { quantity: number; repairs: number } => {
+    const defaultData = { quantity: 0, repairs: 0 };
+
+    if (consumableData !== undefined) {
+      const data = consumableData.find((item: any) => item.rarity === rarity);
+      if (data !== undefined) {
+        return {
+          quantity: data.quantity,
+          repairs: isDays ? data.repairs.in_days : data.repairs.quantity,
+        };
+      }
+    }
+
+    return defaultData;
+  };
+
+  const [statusColor, setStatusColor] = useState<string>("#fff");
+  const [statusText, setStatusText] = useState<string>("Not Started");
+
+  useEffect(() => {
+    switch (fishingStatus) {
+      case 0:
+        setStatusColor("#fff");
+        setStatusText("Not Started");
+        break;
+      case 1:
+        setStatusColor("rgb(236, 217, 119)");
+        setStatusText("Starting Up");
+        break;
+      case 2:
+        setStatusColor("rgb(57, 255, 20)");
+        setStatusText("Running");
+        break;
+      default:
+        // setStatusColor("#fff");
+        // setStatusText("Not Started");
+        break;
+    }
+  }, [fishingStatus]);
+
+  if (!windowSize) {
+    return <></>;
+  }
+  const { width, height } = windowSize;
+
+  const timer = componentData.next_repair_counter;
+
+  const sessions = componentData.sessions_running;
+
+  const wodPerHour = componentData.data.farm_statistics.wod_per_hour;
+
+  const wodFarmed = componentData.data.farm_statistics.wod_farmed;
 
   return (
     <div
@@ -46,16 +82,16 @@ const DashboardModal = ({
         width: "440px",
         height: "700px",
         position: "absolute",
-        transform: size.width > 600 ? "scale(1)" : "scale(0.8)",
+        transform: width > 600 ? "scale(1)" : "scale(0.8)",
         background: "#000",
         boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
         border: "1px solid #16172E",
         borderRadius: "10px",
         top: "50%",
         zIndex: "10",
-        marginTop: size.width > 600 ? "-300px" : "-300px",
-        marginLeft: size.width > 1150 ? "125px" : "-220px",
-        left: size.width > 1150 ? "0px" : "50%",
+        marginTop: width > 600 ? "-300px" : "-300px",
+        marginLeft: width > 1150 ? "125px" : "-220px",
+        left: width > 1150 ? "0px" : "50%",
         display: "flex",
         flexDirection: "column",
       }}
@@ -145,9 +181,7 @@ const DashboardModal = ({
                 borderRadius: "999px",
               }}
             ></div>
-            <div style={{ marginLeft: "15px" }}>
-              {status === "Pending" ? "Starting Up" : status}
-            </div>
+            <div style={{ marginLeft: "15px" }}>{statusText}</div>
           </div>
         </div>
       </div>
@@ -156,30 +190,12 @@ const DashboardModal = ({
           <div style={{ fontSize: "20px", fontWeight: "500" }}>
             Sessions Running
           </div>
-          <div style={{ fontSize: "14px" }}>
-            {sessions !== undefined ? (
-              gettingSessions ? (
-                <div
-                  style={{
-                    width: "50px",
-                    height: "14px",
-                    background: "#fff",
-                    borderRadius: "3px",
-                  }}
-                ></div>
-              ) : (
-                sessions.length
-              )
-            ) : (
-              "0"
-            )}
-            {!gettingSessions && `/15`}
-          </div>
+          <div style={{ fontSize: "14px" }}>{sessions}/15</div>
           <div
             style={{
               marginLeft: "-30px",
               cursor: "pointer",
-              display: size.width < 900 || gettingSessions ? "none" : "flex",
+              display: width < 900 ? "none" : "flex",
             }}
           >
             <svg
@@ -189,7 +205,7 @@ const DashboardModal = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               onClick={() => {
-                setIsActiveSessionMenu(true);
+                updatePageData("components.menu.fishing.open", true);
               }}
             >
               <path
@@ -228,32 +244,10 @@ const DashboardModal = ({
               }}
             />
             <div style={{ fontSize: "14px" }}>
-              {gettingSessions ? (
-                <div
-                  style={{
-                    width: "80px",
-                    height: "14px",
-                    background: "#fff",
-                    borderRadius: "3px",
-                  }}
-                ></div>
-              ) : (
-                wodFarmed.toFixed(2)
-              )}
+              {wodFarmed.amount.toFixed(2)}
             </div>
             <div style={{ fontSize: "10px", color: "#777E90" }}>
-              {gettingSessions ? (
-                <div
-                  style={{
-                    width: "40px",
-                    height: "10px",
-                    background: "#4F4F4F",
-                    borderRadius: "3px",
-                  }}
-                ></div>
-              ) : (
-                `≈ ${wodFarmedPrice.toFixed(2)} $`
-              )}
+              {`≈ ${wodFarmed.price.toFixed(2)} $`}
             </div>
           </div>
         </div>
@@ -275,35 +269,11 @@ const DashboardModal = ({
                 filter: "drop-shadow(0px 0px 10px #808000)",
               }}
             />
-            <div style={{ fontSize: "14px" }}>
-              {status === "Pending" ? (
-                "Loading..."
-              ) : gettingSessions ? (
-                <div
-                  style={{
-                    width: "80px",
-                    height: "14px",
-                    background: "#fff",
-                    borderRadius: "3px",
-                  }}
-                ></div>
-              ) : (
-                `${wodPerHour.toFixed(2)}`
-              )}
-            </div>
+            <div style={{ fontSize: "14px" }}>{`${wodPerHour.amount.toFixed(
+              2
+            )}`}</div>
             <div style={{ fontSize: "10px", color: "#777E90" }}>
-              {gettingSessions ? (
-                <div
-                  style={{
-                    width: "40px",
-                    height: "10px",
-                    background: "#4F4F4F",
-                    borderRadius: "3px",
-                  }}
-                ></div>
-              ) : (
-                `≈ ${wodPerHourPrice.toFixed(2)} $`
-              )}
+              {`≈ ${wodPerHour.price.toFixed(2)} $`}
             </div>
           </div>
         </div>
@@ -337,45 +307,39 @@ const DashboardModal = ({
         >
           <span
             style={{
-              fontWeight: is100Repair ? "600" : "500",
+              fontWeight: repairMode === 1 ? "600" : "500",
               transition: "0.3s",
-              color: is100Repair ? "#fff" : "grey",
+              color: repairMode === 1 ? "#fff" : "grey",
               cursor: "pointer",
             }}
             onClick={() => {
-              setIs100Repair(true);
-              setIs25Repair(false);
-              setIs50Repair(false);
+              updatePageData("global.repair_mode", 1);
             }}
           >
             100%
           </span>
           <span
             style={{
-              fontWeight: is50Repair ? "600" : "500",
+              fontWeight: repairMode === 2 ? "600" : "500",
               transition: "0.3s",
-              color: is50Repair ? "#fff" : "grey",
+              color: repairMode === 2 ? "#fff" : "grey",
               cursor: "pointer",
             }}
             onClick={() => {
-              setIs100Repair(false);
-              setIs25Repair(false);
-              setIs50Repair(true);
+              updatePageData("global.repair_mode", 2);
             }}
           >
             50%
           </span>
           <span
             style={{
-              fontWeight: is25Repair ? "600" : "500",
+              fontWeight: repairMode === 3 ? "600" : "500",
               transition: "0.3s",
-              color: is25Repair ? "#fff" : "grey",
+              color: repairMode === 3 ? "#fff" : "grey",
               cursor: "pointer",
             }}
             onClick={() => {
-              setIs100Repair(false);
-              setIs25Repair(true);
-              setIs50Repair(false);
+              updatePageData("global.repair_mode", 3);
             }}
           >
             25%
@@ -399,13 +363,13 @@ const DashboardModal = ({
         >
           <span
             style={{
-              fontSize: toolMenuData.isDays ? "8px" : "10px",
-              color: toolMenuData.isDays ? "#777E90" : "#fff",
-              cursor: toolMenuData.isDays ? "pointer" : "default",
+              fontSize: isDays ? "8px" : "10px",
+              color: isDays ? "#777E90" : "#fff",
+              cursor: isDays ? "pointer" : "default",
               transition: "0.5s",
             }}
             onClick={() => {
-              setToolMenuData({ ...toolMenuData, isDays: false });
+              updatePageData("global.is_days", false);
             }}
           >
             Repairs
@@ -413,13 +377,13 @@ const DashboardModal = ({
           /
           <span
             style={{
-              fontSize: !toolMenuData.isDays ? "8px" : "10px",
-              color: !toolMenuData.isDays ? "#777E90" : "#fff",
-              cursor: !toolMenuData.isDays ? "pointer" : "default",
+              fontSize: !isDays ? "8px" : "10px",
+              color: !isDays ? "#777E90" : "#fff",
+              cursor: !isDays ? "pointer" : "default",
               transition: "0.5s",
             }}
             onClick={() => {
-              setToolMenuData({ ...toolMenuData, isDays: true });
+              updatePageData("global.is_days", true);
             }}
           >
             Days
@@ -452,40 +416,34 @@ const DashboardModal = ({
           }}
         >
           <RaritySegment
-            key={genRanHex(64)}
+            key={genRanHex(24)}
             image={Artifact.src}
-            topNum={toolMenuData.toolVals[6]}
-            tools={getQuantityByRarity(6)}
+            data={getDataByRarity(6)}
           />
           <RaritySegment
-            key={genRanHex(64)}
+            key={genRanHex(24)}
             image={Legendary.src}
-            topNum={toolMenuData.toolVals[5]}
-            tools={getQuantityByRarity(5)}
+            data={getDataByRarity(5)}
           />
           <RaritySegment
-            key={genRanHex(64)}
+            key={genRanHex(24)}
             image={Epic.src}
-            topNum={toolMenuData.toolVals[4]}
-            tools={getQuantityByRarity(4)}
+            data={getDataByRarity(4)}
           />
           <RaritySegment
-            key={genRanHex(64)}
+            key={genRanHex(24)}
             image={Rare.src}
-            topNum={toolMenuData.toolVals[3]}
-            tools={getQuantityByRarity(3)}
+            data={getDataByRarity(3)}
           />
           <RaritySegment
-            key={genRanHex(64)}
+            key={genRanHex(24)}
             image={Uncommon.src}
-            topNum={toolMenuData.toolVals[2]}
-            tools={getQuantityByRarity(2)}
+            data={getDataByRarity(2)}
           />
           <RaritySegment
-            key={genRanHex(64)}
+            key={genRanHex(24)}
             image={Common.src}
-            topNum={toolMenuData.toolVals[1]}
-            tools={getQuantityByRarity(1)}
+            data={getDataByRarity(1)}
           />
         </div>
       </div>
@@ -501,7 +459,7 @@ const DashboardModal = ({
       <div
         style={{
           color: "#fff",
-          display: size.width > 1150 ? "flex" : "none",
+          display: width > 1150 ? "flex" : "none",
           alignItems: "center",
           justifyContent: "center",
           fontSize: "20px",
@@ -512,7 +470,7 @@ const DashboardModal = ({
       </div>
       <div
         style={{
-          display: size.width > 1150 ? "flex" : "none",
+          display: width > 1150 ? "flex" : "none",
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
@@ -528,45 +486,9 @@ const DashboardModal = ({
             marginTop: "2px",
           }}
         >
-          {gettingSessions ? (
-            <div
-              style={{
-                width: "50px",
-                height: "20px",
-                background: "#fff",
-                borderRadius: "3px",
-              }}
-            ></div>
-          ) : userData.isReady ? (
-            (
-              wodPerHour *
-              (CaclulateFishingTime(userData.items, userData.tools).seconds /
-                3600)
-            ).toFixed(2)
-          ) : (
-            "0.00"
-          )}
+          {"0.00"}
         </div>
-        <div style={{ color: "#777E90", fontSize: "10px" }}>
-          {gettingSessions ? (
-            <div
-              style={{
-                width: "50px",
-                height: "12px",
-                background: "rgb(79, 79, 79)",
-                borderRadius: "3px",
-              }}
-            ></div>
-          ) : userData.isReady ? (
-            `≈ ${(
-              wodPerHourPrice *
-              (CaclulateFishingTime(userData.items, userData.tools).seconds /
-                3600)
-            ).toFixed(2)} $`
-          ) : (
-            "≈ 0.00 $"
-          )}
-        </div>
+        <div style={{ color: "#777E90", fontSize: "10px" }}>{"≈ 0.00 $"}</div>
       </div>
       <div
         style={{
@@ -575,18 +497,18 @@ const DashboardModal = ({
           justifyContent: "center",
         }}
       >
-        {!gettingSessions && (
+        {
           <Button
             color={"gradient"}
             auto
             style={{ width: "170px", height: "50px", marginTop: "10px" }}
-            onClick={() => {
-              setIsToolsMenu(true);
+            onPress={() => {
+              updatePageData("global.fishing_status", 2);
             }}
           >
             Buy More Tools
           </Button>
-        )}
+        }
       </div>
     </div>
   );

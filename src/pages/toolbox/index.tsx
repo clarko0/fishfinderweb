@@ -66,11 +66,6 @@ const Toolbox = () => {
         transition: "0.5s",
       }}
     >
-      <Navbar
-        avatar={userData.avatar}
-        username={userData.username}
-        styling={styling}
-      />
       <div
         style={{
           display: "flex",

@@ -90,24 +90,25 @@ export const toBytes = (text: string): number[] => {
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export function useWindowSize() {
+export const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState<any>({
     width: undefined,
     height: undefined,
   });
   useEffect(() => {
     function handleResize() {
-      setWindowSize({
+      const newWindowSize = {
         width: window.innerWidth,
         height: window.innerHeight,
-      });
+      };
+      setWindowSize(newWindowSize);
     }
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   return windowSize;
-}
+};
 
 export const determineTRID = (props: any) => {
   if (props.zone) {

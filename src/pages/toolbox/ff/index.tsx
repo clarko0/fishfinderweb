@@ -19,7 +19,7 @@ import ItemsPNG from "@/storage/png/ItemsPNG";
 import { pingFishing, startAutoFishing } from "@/storage/utils/api";
 import { CheckTheme, FFWelcomeMessage } from "@/storage/utils/local";
 import Wod from "public/wod.png";
-import { createRef, useEffect, useRef, useState } from "react";
+import { createRef, useContext, useEffect, useRef, useState } from "react";
 import { isDocked } from "@/storage/utils/window";
 import BuyToolMenu from "@/components/FFMenu/BuyTool";
 import SystemMessage from "@/components/FFMenu/SystemMessage";
@@ -35,537 +35,661 @@ import FFGlobalStatistics from "@/components/FFGlobalStatistics";
 import { genRanHex } from "@/storage/constants/misc";
 import { API } from "@/api/api";
 import FishingSettingsModal from "@/components/Modals/FishermanFriend/FishingSettings";
+import { IFFData } from "@/interface/storage.interface";
+import { WindowSizeContext } from "@/pages/_app";
+import { Storage } from "@/utils/src/storage.utils";
 
 const FishermanFriend = () => {
-  const [toolMenuData, setToolMenuData] = useState<any>({
-    rarities: {
-      1: true,
-      2: true,
-      3: true,
-      4: true,
-      5: false,
-      6: false,
-    },
-    toolVals: {
-      1: 0,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0,
-      6: 0,
-    },
-    isDays: false,
-  });
+  // const [toolMenuData, setToolMenuData] = useState<any>({
+  //   rarities: {
+  //     1: true,
+  //     2: true,
+  //     3: true,
+  //     4: true,
+  //     5: false,
+  //     6: false,
+  //   },
+  //   toolVals: {
+  //     1: 0,
+  //     2: 0,
+  //     3: 0,
+  //     4: 0,
+  //     5: 0,
+  //     6: 0,
+  //   },
+  //   isDays: false,
+  // });
   const [styling, setStyling] = useState<IStylingObject>({});
-  const [isEndFishingMenu, setIsEndFishingMenu] = useState<boolean>(false);
-  const [sessionId, setSessionId] = useState<string>("");
-  const [wodPrice, setWodPrice] = useState<any>(0);
-  const [isDark, setIsDark] = useState<boolean>(false);
-  const [wodFarmed, setWodFarmed] = useState<number>(0);
-  const [clicker, setClicker] = useState<boolean>(false);
-  const [activeSessionData, setActiveSessionData] = useState<any>({});
-  const [playerLevel, setPlayerLevel] = useState<number>(0);
-  const [status, setStatus] = useState<string>("Not Started");
-  const [sessions, setSessions] = useState<any[]>([]);
-  const [statusColor, setStatusColor] = useState<string>("#fff");
-  const [isConfirmationMenu, setIsConfirmationMenu] = useState<boolean>(false);
-  const [isActiveSessionMenu, setIsActiveSessionMenu] =
-    useState<boolean>(false);
-  const size = useWindowSize();
-  const [endingFishing, setEndingFishing] = useState<boolean>(false);
-  const [isWelcomeMenu, setIsWelcomeMenu] = useState<boolean | undefined>(
-    FFWelcomeMessage()
-  );
-  const [isSystemMessage, setIsSystemMessage] = useState<any>({
-    bool: false,
-    title: "",
-    msg: "",
-  });
-  const [numberOfRepairs, setNumberOfRepairs] = useState<any>("");
-  const [userData, setUserData] = useState<any>({
-    username: "",
-    avatar: "",
-    tools: [],
-    items: {
-      common: [],
-      uncommon: [],
-      rare: [],
-      epic: [],
-      legendary: [],
-      artifact: [],
-    },
-    isReady: false,
-  });
-  const [wodOnSignup, setWodOnSignup] = useState<number>(0);
-  const [timer, setTimer] = useState("00 : 00 : 00");
-  const [fishingTime, setFishingTime] = useState("00 : 00 : 00 : 00 : 00");
-  const [isFishing, setIsFishing] = useState<boolean>(false);
-  const [nextRepair, setNextRepair] = useState<string>("");
-  const [isFishingMenu, setIsFishingMenu] = useState<boolean>(false);
-  const [wodFarmedPrice, setWodFarmedPrice] = useState<number>(0.0);
+  // const [isEndFishingMenu, setIsEndFishingMenu] = useState<boolean>(false);
+  // const [sessionId, setSessionId] = useState<string>("");
+  // const [wodPrice, setWodPrice] = useState<any>(0);
+  // const [isDark, setIsDark] = useState<boolean>(false);
+  // const [wodFarmed, setWodFarmed] = useState<number>(0);
+  // const [clicker, setClicker] = useState<boolean>(false);
+  // const [activeSessionData, setActiveSessionData] = useState<any>({});
+  // const [playerLevel, setPlayerLevel] = useState<number>(0);
+  // const [status, setStatus] = useState<string>("Not Started");
+  // const [sessions, setSessions] = useState<any[]>([]);
+  // const [statusColor, setStatusColor] = useState<string>("#fff");
+  // const [isConfirmationMenu, setIsConfirmationMenu] = useState<boolean>(false);
+  // const [isActiveSessionMenu, setIsActiveSessionMenu] =
+  //   useState<boolean>(false);
+  const windowSize = useContext(WindowSizeContext);
+  // const [endingFishing, setEndingFishing] = useState<boolean>(false);
+  // const [isWelcomeMenu, setIsWelcomeMenu] = useState<boolean | undefined>(
+  //   FFWelcomeMessage()
+  // );
+  // const [isSystemMessage, setIsSystemMessage] = useState<any>({
+  //   bool: false,
+  //   title: "",
+  //   msg: "",
+  // });
+  // const [numberOfRepairs, setNumberOfRepairs] = useState<any>("");
+  // const [userData, setUserData] = useState<any>({
+  //   username: "",
+  //   avatar: "",
+  //   tools: [],
+  //   items: {
+  //     common: [],
+  //     uncommon: [],
+  //     rare: [],
+  //     epic: [],
+  //     legendary: [],
+  //     artifact: [],
+  //   },
+  //   isReady: false,
+  // });
+  // const [wodOnSignup, setWodOnSignup] = useState<number>(0);
+  // const [timer, setTimer] = useState("00 : 00 : 00");
+  // const [fishingTime, setFishingTime] = useState("00 : 00 : 00 : 00 : 00");
+  // const [isFishing, setIsFishing] = useState<boolean>(false);
+  // const [nextRepair, setNextRepair] = useState<string>("");
+  // const [isFishingMenu, setIsFishingMenu] = useState<boolean>(false);
+  // const [wodFarmedPrice, setWodFarmedPrice] = useState<number>(0.0);
   const [timerCount, setTimerCount] = useState<number>(0);
-  const [wodPerHour, setWodPerHour] = useState<number>(0.0);
-  const [cards, setCards] = useState<any[]>([]);
-  const [pageLoading, setPageLoading] = useState<boolean>(false);
-  const [wodPerHourPrice, setWodPerHourPrice] = useState<number>(0.0);
-  const [isToolsMenu, setIsToolsMenu] = useState<boolean>(false);
+  // const [wodPerHour, setWodPerHour] = useState<number>(0.0);
+  // const [cards, setCards] = useState<any[]>([]);
+  // const [pageLoading, setPageLoading] = useState<boolean>(false);
+  // const [wodPerHourPrice, setWodPerHourPrice] = useState<number>(0.0);
+  // const [isToolsMenu, setIsToolsMenu] = useState<boolean>(false);
+
   const timerCountRef = useRef(0);
-  const [toolCost, setToolCost] = useState<number>(0);
-  const [statisticsData, setStatisticsData] = useState<any>({});
-  const [isToolsConfirmationMenu, setIsToolsConfirmationMenu] =
-    useState<boolean>(false);
-  const [canFish, setCanFish] = useState<ICanFish>({
-    hasSets: false,
-    isRepaired: true,
+  // const [toolCost, setToolCost] = useState<number>(0);
+
+  // const [statisticsData, setStatisticsData] = useState<any>({});
+
+  // const [consumableData, setConsumableData] = useState<any>([]);
+  // const [activeConsumableData, setActiveConsumableData] = useState<any>([]);
+
+  // const [isCurrentZones, setIsCurrentZones] = useState<boolean>(false);
+  // const [isCurrentSets, setIsCurrentSets] = useState<boolean>(false);
+  // const [isSkipRepair, setIsSkipRepair] = useState<boolean>(false);
+  // const [isFishingSettings, setIsFishingSettings] = useState<boolean>(false);
+
+  // const [is25Repair, setIs25Repair] = useState<boolean>(true);
+  // const [is50Repair, setIs50Repair] = useState<boolean>(false);
+  // const [is100Repair, setIs100Repair] = useState<boolean>(false);
+
+  const [pageData, setPageData] = useState<IFFData>({
+    page_loading: false,
+    global: {
+      repair_mode: 1,
+      is_days: false,
+      wod_price: 0,
+      is_fishing: false,
+      fishing_status: 0,
+      session_id: "",
+    },
+    components: {
+      system_message: {
+        shown: false,
+        message: {
+          title: "",
+          msg: "",
+        },
+      },
+      dashboard: {
+        next_repair_counter: "00 : 00 : 00",
+        sessions_running: 0,
+        repairs: {
+          amount: {
+            1: { amount: 0, in_days: 0 },
+            2: { amount: 0, in_days: 0 },
+            3: { amount: 0, in_days: 0 },
+            4: { amount: 0, in_days: 0 },
+            5: { amount: 0, in_days: 0 },
+            6: { amount: 0, in_days: 0 },
+          },
+        },
+        estimated_earnings: {
+          amount: 0,
+          price: 0,
+        },
+        data: {
+          farm_statistics: {
+            wod_per_hour: {
+              amount: 0,
+              price: 0,
+            },
+            wod_farmed: {
+              amount: 0,
+              price: 0,
+            },
+          },
+          next_repair: new Date(),
+        },
+      },
+      global_statistics: {
+        data: {
+          wod_farmed: 0,
+          nft_count: 0,
+          fisherman_count: 0,
+        },
+      },
+      menu: {
+        end_fishing: {
+          open: false,
+          is_ending: false,
+        },
+        fishing_settings: {
+          open: false,
+          form: {
+            keep_zones: false,
+            keep_sets: false,
+            skip_repair: false,
+          },
+        },
+        tool: {
+          open: false,
+          form: {
+            rarities: {
+              1: false,
+              2: false,
+              3: false,
+              4: false,
+              5: false,
+              6: false,
+            },
+            offchain_wod: false,
+          },
+        },
+        fishing: {
+          open: false,
+          cards: [],
+        },
+      },
+    },
+    active_data: {
+      consumable_data: [],
+    },
+    data: {
+      consumable_data: {
+        1: [],
+        2: [],
+        3: [],
+      },
+      items: [],
+      sets: [],
+      active_session_data: [],
+    },
   });
-  const [consumableData, setConsumableData] = useState<any>([]);
-  const [activeConsumableData, setActiveConsumableData] = useState<any>([]);
-  const [gettingSessions, setGettingSessions] = useState<boolean>(false);
-
-  const [isCurrentZones, setIsCurrentZones] = useState<boolean>(false);
-  const [isCurrentSets, setIsCurrentSets] = useState<boolean>(false);
-  const [isSkipRepair, setIsSkipRepair] = useState<boolean>(false);
-  const [isFishingSettings, setIsFishingSettings] = useState<boolean>(false);
-
-  const [is25Repair, setIs25Repair] = useState<boolean>(true);
-  const [is50Repair, setIs50Repair] = useState<boolean>(false);
-  const [is100Repair, setIs100Repair] = useState<boolean>(false);
 
   useEffect(() => {
-    let number = 3;
-    if (is25Repair) {
-    } else if (is50Repair) {
-      number = 2;
-    } else if (is100Repair) {
-      number = 1;
-    }
-    setActiveConsumableData(consumableData[number]);
-  }, [is25Repair, is50Repair, is100Repair, consumableData]);
+    console.log(pageData);
+  }, [pageData]);
 
-  const calculateCost = () => {
-    let c = 0;
-    let factor = 4;
-    if (is25Repair) {
-    } else if (is50Repair) {
-      factor = 2;
-    } else if (is100Repair) {
-      factor = 1;
-    }
+  // useEffect(() => {
+  //   let number = 3;
+  //   if (is25Repair) {
+  //   } else if (is50Repair) {
+  //     number = 2;
+  //   } else if (is100Repair) {
+  //     number = 1;
+  //   }
+  //   setActiveConsumableData(consumableData[number]);
+  // }, [is25Repair, is50Repair, is100Repair, consumableData]);
 
-    if (!isNaN(parseInt(numberOfRepairs))) {
-      let number = parseInt(numberOfRepairs);
-      let num = toolMenuData.isDays ? number * factor : number;
-      try {
-        for (let i = 0; i < Object.keys(userData.items).length; i++) {
-          if (toolMenuData.rarities[i + 1]) {
-            c +=
-              num *
-              userData.items[Object.keys(userData.items)[i]].length *
-              activeConsumableData[i].price;
-          }
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    setToolCost(c);
+  // const calculateCost = () => {
+  //   let c = 0;
+  //   let factor = 4;
+  //   if (is25Repair) {
+  //   } else if (is50Repair) {
+  //     factor = 2;
+  //   } else if (is100Repair) {
+  //     factor = 1;
+  //   }
+
+  //   if (!isNaN(parseInt(numberOfRepairs))) {
+  //     let number = parseInt(numberOfRepairs);
+  //     let num = toolMenuData.isDays ? number * factor : number;
+  //     try {
+  //       for (let i = 0; i < Object.keys(userData.items).length; i++) {
+  //         if (toolMenuData.rarities[i + 1]) {
+  //           c +=
+  //             num *
+  //             userData.items[Object.keys(userData.items)[i]].length *
+  //             activeConsumableData[i].price;
+  //         }
+  //       }
+  //     } catch (e) {
+  //       console.log(e);
+  //     }
+  //   }
+  //   setToolCost(c);
+  // };
+
+  // const RefreshPing = () => {
+  //   ffStore().then((res: any) => {
+  //     const items: IItems = {
+  //       common: [],
+  //       uncommon: [],
+  //       rare: [],
+  //       epic: [],
+  //       legendary: [],
+  //       artifact: [],
+  //     };
+
+  //     for (let i = 0; i < res.items.length; i++) {
+  //       const item = res.items[i];
+  //       if (item.rarity === 1) {
+  //         items.common.push(item);
+  //       } else if (item.rarity === 2) {
+  //         items.uncommon.push(item);
+  //       } else if (item.rarity === 3) {
+  //         items.rare.push(item);
+  //       } else if (item.rarity === 4) {
+  //         items.epic.push(item);
+  //       } else if (item.rarity === 5) {
+  //         items.legendary.push(item);
+  //       } else if (item.rarity === 6) {
+  //         items.artifact.push(item);
+  //       }
+  //     }
+  //     setPlayerLevel(res.userData.level);
+  //     setUserData({
+  //       username: res.userData.username,
+  //       avatar: res.userData.avatar,
+  //       tools: res.tools,
+  //       items: items,
+  //       isReady: true,
+  //       wodBalance: res.totalWod,
+  //     });
+  //     setSessions(res.fishingInfo);
+  //     setActiveSessionData(res.fishingInfo);
+  //     setStatus(res.initPing.status);
+  //     setStatisticsData(res.initPing.global_statistics);
+  //     setConsumableData(res.tools);
+  //     setIsFishing(res.initPing.bool);
+  //     setWodPrice(res.tokenPrice);
+  //     setSessionId(res.initPing.session_id);
+  //     setWodFarmed(res.initPing.wod_farmed);
+  //     setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
+  //     setNextRepair(res.initPing.next_repair);
+  //     if (
+  //       res.initPing.system_msg.title !== "" &&
+  //       res.initPing.system_msg.msg !== ""
+  //     ) {
+  //       setIsSystemMessage({
+  //         bool: true,
+  //         title: res.initPing.system_msg.title,
+  //         msg: res.initPing.system_msg.msg,
+  //       });
+  //     }
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   setClicker(!clicker);
+  // }, [is25Repair, is50Repair, is100Repair]);
+
+  // useEffect(() => {
+  //   calculateCost();
+  // }, [numberOfRepairs, clicker]);
+
+  // const determineRepair = (isDays: boolean) => {
+  //   let newToolVals: any = {
+  //     1: 0,
+  //     2: 0,
+  //     3: 0,
+  //     4: 0,
+  //     5: 0,
+  //     6: 0,
+  //   };
+  //   try {
+  //     let j = 0;
+  //     for (const i in userData.items) {
+  //       if (activeConsumableData[j] !== undefined) {
+  //         newToolVals[j + 1] = ~~(
+  //           activeConsumableData[j].quantity / userData.items[i].length
+  //         );
+  //       }
+  //       j++;
+  //     }
+  //     if (isDays) {
+  //       let divisor = 4;
+  //       const firstEle = activeConsumableData[0];
+  //       if (firstEle.repair_amount === 3) {
+  //       } else if (firstEle.repair_amount === 2) {
+  //         divisor = 2;
+  //       } else if (firstEle.repair_amount === 1) {
+  //         divisor = 1;
+  //       }
+  //       for (const i in newToolVals) {
+  //         newToolVals[i] = parseFloat((newToolVals[i] / divisor).toFixed(2));
+  //       }
+  //     }
+  //   } catch (e) {}
+  //   setToolMenuData({ ...toolMenuData, toolVals: newToolVals });
+  // };
+
+  // useEffect(() => {
+  //   determineRepair(toolMenuData.isDays);
+  // }, [userData, toolMenuData.isDays, activeConsumableData]);
+
+  // useEffect(() => {
+  //   const cards: any[] = [];
+  //   let total: number = 0;
+  //   let sessionWod: number = 0;
+  //   try {
+  //     for (let i = 0; i < activeSessionData.length; i++) {
+  //       const zone = activeSessionData[i].zone;
+  //       const items: any[] = [];
+  //       total +=
+  //         zone.fishing_pool?.wod_multiplier *
+  //         parseFloat(activeSessionData[i].zone.random_wod_rate) *
+  //         60 *
+  //         60 *
+  //         (1 - activeSessionData[i].zone.fee / 100);
+  //       sessionWod += activeSessionData[i].last_saved_wod_earned;
+  //       for (let x = 0; x < activeSessionData[i].slot_items.length; x++) {
+  //         const item = activeSessionData[i].slot_items[x];
+  //         items.push(
+  //           <img
+  //             style={{ width: "80px", height: "120px" }}
+  //             src={item.rendered_image_url}
+  //           />
+  //         );
+  //       }
+  //       cards.push(
+  //         <div key={genRanHex(64)} style={{ display: "flex", gap: "30px" }}>
+  //           <div style={{ display: "flex", alignItems: "center" }}>{items}</div>
+  //           <div
+  //             style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+  //           >
+  //             <div
+  //               style={{
+  //                 display: "flex",
+  //                 flexDirection: "column",
+  //                 alignItems: "center",
+  //                 justifyContent: "center",
+  //               }}
+  //             >
+  //               <div style={{ fontSize: "20px", fontWeight: "500" }}>ZONE</div>
+  //               <div
+  //                 style={{ textDecoration: "underline", cursor: "pointer" }}
+  //                 onClick={() => {
+  //                   if (isDocked()) {
+  //                     window.open(
+  //                       `https://game.worldofdefish.com/zone/${activeSessionData[i].zone.id}/fishing`
+  //                     );
+  //                   }
+  //                 }}
+  //               >
+  //                 {activeSessionData[i].zone.id}
+  //               </div>
+  //             </div>
+  //             <div
+  //               style={{
+  //                 display: "flex",
+  //                 flexDirection: "column",
+  //                 alignItems: "center",
+  //                 justifyContent: "center",
+  //               }}
+  //             >
+  //               <div style={{ fontSize: "20px", fontWeight: "500" }}>
+  //                 $WoD/HOUR
+  //               </div>
+  //               <div
+  //                 style={{
+  //                   display: "flex",
+  //                   alignItems: "center",
+  //                   justifyContent: "center",
+  //                 }}
+  //               >
+  //                 <img
+  //                   width="20px"
+  //                   src={Wod.src}
+  //                   style={{
+  //                     filter: "drop-shadow(0px 0px 10px #808000)",
+  //                   }}
+  //                 />
+  //                 {(
+  //                   activeSessionData[i].zone.fishing_pool?.wod_multiplier *
+  //                   parseFloat(activeSessionData[i].zone.random_wod_rate) *
+  //                   60 *
+  //                   60 *
+  //                   (1 - activeSessionData[i].zone.fee / 100)
+  //                 ).toFixed(2)}
+  //               </div>
+  //             </div>
+  //             <div
+  //               style={{
+  //                 display: "flex",
+  //                 flexDirection: "column",
+  //                 alignItems: "center",
+  //                 justifyContent: "center",
+  //               }}
+  //             >
+  //               <div style={{ fontSize: "20px", fontWeight: "500" }}>
+  //                 $WoD EARNED
+  //               </div>
+
+  //               <div
+  //                 style={{
+  //                   display: "flex",
+  //                   alignItems: "center",
+  //                   justifyContent: "center",
+  //                 }}
+  //               >
+  //                 <img
+  //                   src={Wod.src}
+  //                   width="20px"
+  //                   style={{
+  //                     filter: "drop-shadow(0px 0px 10px #808000)",
+  //                   }}
+  //                 />
+  //                 <div>
+  //                   {activeSessionData[i].last_saved_wod_earned.toFixed(2)}
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       );
+  //       setCards(cards);
+  //     }
+  //   } catch (e) {}
+  //   setWodPerHour(Number(total.toFixed(2)));
+  //   setWodPerHourPrice(Number(total.toFixed(2)) * wodPrice);
+  // }, [activeSessionData]);
+
+  // useEffect(() => {
+  //   if (isFishing) {
+  //     setStatusColor("#39ff14");
+  //   } else if (status === "Pending") {
+  //     setStatusColor("#FFAD00");
+  //   } else {
+  //     setStatusColor("#fff");
+  //   }
+  // }, [status]);
+
+  // useEffect(() => {
+  //   var timeZoneOffset = new Date().getTimezoneOffset() / 60;
+  //   var targetTime = new Date(nextRepair);
+  //   targetTime.setHours(targetTime.getHours() - timeZoneOffset);
+  //   const targetMS = targetTime.getTime();
+
+  //   const intervalId = setInterval(() => {
+  //     const now = new Date().getTime();
+  //     const timeToTarget = (targetMS - now) / 1000;
+  //     const hours = `0${Math.floor(timeToTarget / 3600)}`.slice(-2);
+  //     const minutes = `0${Math.floor((timeToTarget % 3600) / 60)}`.slice(-2);
+  //     const seconds = `0${Math.floor(timeToTarget % 60)}`.slice(-2);
+  //     setTimer(`${hours} : ${minutes} : ${seconds}`);
+  //   }, 1000);
+
+  //   return () => clearInterval(intervalId);
+  // }, [nextRepair]);
+
+  // useEffect(() => {
+  //   setPageLoading(true);
+  //   setStyling(STYLING[CheckTheme()]);
+  //   setIsDark(CheckTheme() === "dark");
+  //   ffStore().then((res: any) => {
+  //     const items: IItems = {
+  //       common: [],
+  //       uncommon: [],
+  //       rare: [],
+  //       epic: [],
+  //       legendary: [],
+  //       artifact: [],
+  //     };
+
+  //     for (let i = 0; i < res.items.length; i++) {
+  //       const item = res.items[i];
+  //       if (item.rarity === 1) {
+  //         items.common.push(item);
+  //       } else if (item.rarity === 2) {
+  //         items.uncommon.push(item);
+  //       } else if (item.rarity === 3) {
+  //         items.rare.push(item);
+  //       } else if (item.rarity === 4) {
+  //         items.epic.push(item);
+  //       } else if (item.rarity === 5) {
+  //         items.legendary.push(item);
+  //       } else if (item.rarity === 6) {
+  //         items.artifact.push(item);
+  //       }
+  //     }
+  //     setPlayerLevel(res.userData.level);
+  //     setUserData({
+  //       username: res.userData.username,
+  //       avatar: res.userData.avatar,
+  //       tools: res.tools,
+  //       items: items,
+  //       isReady: true,
+  //       wodBalance: res.totalWod,
+  //     });
+  //     setSessions(res.fishingInfo);
+  //     setActiveSessionData(res.fishingInfo);
+  //     setStatus(res.initPing.status);
+  //     setStatisticsData(res.initPing.global_statistics);
+  //     setConsumableData(res.tools);
+  //     setIsFishing(res.initPing.bool);
+  //     setWodPrice(res.tokenPrice);
+  //     setSessionId(res.initPing.session_id);
+  //     setWodFarmed(res.initPing.wod_farmed);
+  //     setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
+  //     setNextRepair(res.initPing.next_repair);
+  //     if (
+  //       res.initPing.system_msg.title !== "" &&
+  //       res.initPing.system_msg.msg !== ""
+  //     ) {
+  //       setIsSystemMessage({
+  //         bool: true,
+  //         title: res.initPing.system_msg.title,
+  //         msg: res.initPing.system_msg.msg,
+  //       });
+  //     }
+  //     setPageLoading(false);
+  //   });
+  //   const interval = setInterval(() => {
+  //     ffStore().then((res: any) => {
+  //       const items: IItems = {
+  //         common: [],
+  //         uncommon: [],
+  //         rare: [],
+  //         epic: [],
+  //         legendary: [],
+  //         artifact: [],
+  //       };
+  //       for (let i = 0; i < res.items.length; i++) {
+  //         const item = res.items[i];
+  //         if (item.rarity === 1) {
+  //           items.common.push(item);
+  //         } else if (item.rarity === 2) {
+  //           items.uncommon.push(item);
+  //         } else if (item.rarity === 3) {
+  //           items.rare.push(item);
+  //         } else if (item.rarity === 4) {
+  //           items.epic.push(item);
+  //         } else if (item.rarity === 5) {
+  //           items.legendary.push(item);
+  //         } else if (item.rarity === 6) {
+  //           items.artifact.push(item);
+  //         }
+  //       }
+  //       setPlayerLevel(res.userData.level);
+  //       setUserData({
+  //         username: res.userData.username,
+  //         avatar: res.userData.avatar,
+  //         tools: res.tools,
+  //         items: items,
+  //         isReady: true,
+  //         wodBalance: res.totalWod,
+  //       });
+  //       setSessions(res.fishingInfo);
+  //       setActiveSessionData(res.fishingInfo);
+  //       setStatus(res.initPing.status);
+  //       setConsumableData(res.tools);
+  //       setIsFishing(res.initPing.bool);
+  //       setStatisticsData(res.initPing.global_statistics);
+  //       setWodPrice(res.tokenPrice);
+  //       setSessionId(res.initPing.session_id);
+  //       setWodOnSignup(res.initPing.wod_signup);
+  //       setNextRepair(res.initPing.next_repair);
+  //       if (
+  //         res.initPing.system_msg.title !== "" &&
+  //         res.initPing.system_msg.msg !== ""
+  //       ) {
+  //         setIsSystemMessage({
+  //           bool: true,
+  //           title: res.initPing.system_msg.title,
+  //           msg: res.initPing.system_msg.msg,
+  //         });
+  //       }
+  //       setPageLoading(false);
+  //     });
+  //     timerCountRef.current += 1;
+  //   }, 10000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  // useEffect(() => {
+  //   if (userData.isReady) {
+  //     setFishingTime(
+  //       CaclulateFishingTime(userData.items, activeConsumableData).string
+  //     );
+  //   }
+  // }, [userData]);
+
+  if (!pageData) {
+    return <></>;
+  }
+
+  if (!windowSize) {
+    return <></>;
+  }
+
+  const [rerender, setRerender] = useState<string>(genRanHex(24));
+
+  const { width, height } = windowSize;
+
+  const updatePageData = (key: keyof IFFData, value: any) => {
+    Storage.updateData(setPageData, key, value);
+    setRerender(genRanHex(24));
   };
-
-  const RefreshPing = () => {
-    ffStore().then((res: any) => {
-      const items: IItems = {
-        common: [],
-        uncommon: [],
-        rare: [],
-        epic: [],
-        legendary: [],
-        artifact: [],
-      };
-
-      for (let i = 0; i < res.items.length; i++) {
-        const item = res.items[i];
-        if (item.rarity === 1) {
-          items.common.push(item);
-        } else if (item.rarity === 2) {
-          items.uncommon.push(item);
-        } else if (item.rarity === 3) {
-          items.rare.push(item);
-        } else if (item.rarity === 4) {
-          items.epic.push(item);
-        } else if (item.rarity === 5) {
-          items.legendary.push(item);
-        } else if (item.rarity === 6) {
-          items.artifact.push(item);
-        }
-      }
-      setPlayerLevel(res.userData.level);
-      setUserData({
-        username: res.userData.username,
-        avatar: res.userData.avatar,
-        tools: res.tools,
-        items: items,
-        isReady: true,
-        wodBalance: res.totalWod,
-      });
-      setSessions(res.fishingInfo);
-      setActiveSessionData(res.fishingInfo);
-      setStatus(res.initPing.status);
-      setStatisticsData(res.initPing.global_statistics);
-      setConsumableData(res.tools);
-      setIsFishing(res.initPing.bool);
-      setWodPrice(res.tokenPrice);
-      setSessionId(res.initPing.session_id);
-      setWodFarmed(res.initPing.wod_farmed);
-      setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
-      setNextRepair(res.initPing.next_repair);
-      if (
-        res.initPing.system_msg.title !== "" &&
-        res.initPing.system_msg.msg !== ""
-      ) {
-        setIsSystemMessage({
-          bool: true,
-          title: res.initPing.system_msg.title,
-          msg: res.initPing.system_msg.msg,
-        });
-      }
-    });
-  };
-
-  useEffect(() => {
-    setClicker(!clicker);
-  }, [is25Repair, is50Repair, is100Repair]);
-
-  useEffect(() => {
-    calculateCost();
-  }, [numberOfRepairs, clicker]);
-
-  const determineRepair = (isDays: boolean) => {
-    let newToolVals: any = {
-      1: 0,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0,
-      6: 0,
-    };
-    try {
-      let j = 0;
-      for (const i in userData.items) {
-        if (activeConsumableData[j] !== undefined) {
-          newToolVals[j + 1] = ~~(
-            activeConsumableData[j].quantity / userData.items[i].length
-          );
-        }
-        j++;
-      }
-      if (isDays) {
-        let divisor = 4;
-        const firstEle = activeConsumableData[0];
-        if (firstEle.repair_amount === 3) {
-        } else if (firstEle.repair_amount === 2) {
-          divisor = 2;
-        } else if (firstEle.repair_amount === 1) {
-          divisor = 1;
-        }
-        for (const i in newToolVals) {
-          newToolVals[i] = parseFloat((newToolVals[i] / divisor).toFixed(2));
-        }
-      }
-    } catch (e) {}
-    setToolMenuData({ ...toolMenuData, toolVals: newToolVals });
-  };
-
-  useEffect(() => {
-    determineRepair(toolMenuData.isDays);
-  }, [userData, toolMenuData.isDays, activeConsumableData]);
-
-  useEffect(() => {
-    const cards: any[] = [];
-    let total: number = 0;
-    let sessionWod: number = 0;
-    try {
-      for (let i = 0; i < activeSessionData.length; i++) {
-        const zone = activeSessionData[i].zone;
-        const items: any[] = [];
-        total +=
-          zone.fishing_pool?.wod_multiplier *
-          parseFloat(activeSessionData[i].zone.random_wod_rate) *
-          60 *
-          60 *
-          (1 - activeSessionData[i].zone.fee / 100);
-        sessionWod += activeSessionData[i].last_saved_wod_earned;
-        for (let x = 0; x < activeSessionData[i].slot_items.length; x++) {
-          const item = activeSessionData[i].slot_items[x];
-          items.push(
-            <img
-              style={{ width: "80px", height: "120px" }}
-              src={item.rendered_image_url}
-            />
-          );
-        }
-        cards.push(
-          <div key={genRanHex(64)} style={{ display: "flex", gap: "30px" }}>
-            <div style={{ display: "flex", alignItems: "center" }}>{items}</div>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <div style={{ fontSize: "20px", fontWeight: "500" }}>ZONE</div>
-                <div
-                  style={{ textDecoration: "underline", cursor: "pointer" }}
-                  onClick={() => {
-                    if (isDocked()) {
-                      window.open(
-                        `https://game.worldofdefish.com/zone/${activeSessionData[i].zone.id}/fishing`
-                      );
-                    }
-                  }}
-                >
-                  {activeSessionData[i].zone.id}
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <div style={{ fontSize: "20px", fontWeight: "500" }}>
-                  $WoD/HOUR
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <img
-                    width="20px"
-                    src={Wod.src}
-                    style={{
-                      filter: "drop-shadow(0px 0px 10px #808000)",
-                    }}
-                  />
-                  {(
-                    activeSessionData[i].zone.fishing_pool?.wod_multiplier *
-                    parseFloat(activeSessionData[i].zone.random_wod_rate) *
-                    60 *
-                    60 *
-                    (1 - activeSessionData[i].zone.fee / 100)
-                  ).toFixed(2)}
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <div style={{ fontSize: "20px", fontWeight: "500" }}>
-                  $WoD EARNED
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <img
-                    src={Wod.src}
-                    width="20px"
-                    style={{
-                      filter: "drop-shadow(0px 0px 10px #808000)",
-                    }}
-                  />
-                  <div>
-                    {activeSessionData[i].last_saved_wod_earned.toFixed(2)}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-        setCards(cards);
-      }
-    } catch (e) {}
-    setWodPerHour(Number(total.toFixed(2)));
-    setWodPerHourPrice(Number(total.toFixed(2)) * wodPrice);
-  }, [activeSessionData]);
-
-  useEffect(() => {
-    if (isFishing) {
-      setStatusColor("#39ff14");
-    } else if (status === "Pending") {
-      setStatusColor("#FFAD00");
-    } else {
-      setStatusColor("#fff");
-    }
-  }, [status]);
-
-  useEffect(() => {
-    var timeZoneOffset = new Date().getTimezoneOffset() / 60;
-    var targetTime = new Date(nextRepair);
-    targetTime.setHours(targetTime.getHours() - timeZoneOffset);
-    const targetMS = targetTime.getTime();
-
-    const intervalId = setInterval(() => {
-      const now = new Date().getTime();
-      const timeToTarget = (targetMS - now) / 1000;
-      const hours = `0${Math.floor(timeToTarget / 3600)}`.slice(-2);
-      const minutes = `0${Math.floor((timeToTarget % 3600) / 60)}`.slice(-2);
-      const seconds = `0${Math.floor(timeToTarget % 60)}`.slice(-2);
-      setTimer(`${hours} : ${minutes} : ${seconds}`);
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [nextRepair]);
-
-  useEffect(() => {
-    setPageLoading(true);
-    setStyling(STYLING[CheckTheme()]);
-    setIsDark(CheckTheme() === "dark");
-    ffStore().then((res: any) => {
-      const items: IItems = {
-        common: [],
-        uncommon: [],
-        rare: [],
-        epic: [],
-        legendary: [],
-        artifact: [],
-      };
-
-      for (let i = 0; i < res.items.length; i++) {
-        const item = res.items[i];
-        if (item.rarity === 1) {
-          items.common.push(item);
-        } else if (item.rarity === 2) {
-          items.uncommon.push(item);
-        } else if (item.rarity === 3) {
-          items.rare.push(item);
-        } else if (item.rarity === 4) {
-          items.epic.push(item);
-        } else if (item.rarity === 5) {
-          items.legendary.push(item);
-        } else if (item.rarity === 6) {
-          items.artifact.push(item);
-        }
-      }
-      setPlayerLevel(res.userData.level);
-      setUserData({
-        username: res.userData.username,
-        avatar: res.userData.avatar,
-        tools: res.tools,
-        items: items,
-        isReady: true,
-        wodBalance: res.totalWod,
-      });
-      setSessions(res.fishingInfo);
-      setActiveSessionData(res.fishingInfo);
-      setStatus(res.initPing.status);
-      setStatisticsData(res.initPing.global_statistics);
-      setConsumableData(res.tools);
-      setIsFishing(res.initPing.bool);
-      setWodPrice(res.tokenPrice);
-      setSessionId(res.initPing.session_id);
-      setWodFarmed(res.initPing.wod_farmed);
-      setWodFarmedPrice(res.initPing.wod_farmed * res.tokenPrice);
-      setNextRepair(res.initPing.next_repair);
-      if (
-        res.initPing.system_msg.title !== "" &&
-        res.initPing.system_msg.msg !== ""
-      ) {
-        setIsSystemMessage({
-          bool: true,
-          title: res.initPing.system_msg.title,
-          msg: res.initPing.system_msg.msg,
-        });
-      }
-      setPageLoading(false);
-    });
-    const interval = setInterval(() => {
-      ffStore().then((res: any) => {
-        const items: IItems = {
-          common: [],
-          uncommon: [],
-          rare: [],
-          epic: [],
-          legendary: [],
-          artifact: [],
-        };
-        for (let i = 0; i < res.items.length; i++) {
-          const item = res.items[i];
-          if (item.rarity === 1) {
-            items.common.push(item);
-          } else if (item.rarity === 2) {
-            items.uncommon.push(item);
-          } else if (item.rarity === 3) {
-            items.rare.push(item);
-          } else if (item.rarity === 4) {
-            items.epic.push(item);
-          } else if (item.rarity === 5) {
-            items.legendary.push(item);
-          } else if (item.rarity === 6) {
-            items.artifact.push(item);
-          }
-        }
-        setPlayerLevel(res.userData.level);
-        setUserData({
-          username: res.userData.username,
-          avatar: res.userData.avatar,
-          tools: res.tools,
-          items: items,
-          isReady: true,
-          wodBalance: res.totalWod,
-        });
-        setSessions(res.fishingInfo);
-        setActiveSessionData(res.fishingInfo);
-        setStatus(res.initPing.status);
-        setConsumableData(res.tools);
-        setIsFishing(res.initPing.bool);
-        setStatisticsData(res.initPing.global_statistics);
-        setWodPrice(res.tokenPrice);
-        setSessionId(res.initPing.session_id);
-        setWodOnSignup(res.initPing.wod_signup);
-        setNextRepair(res.initPing.next_repair);
-        if (
-          res.initPing.system_msg.title !== "" &&
-          res.initPing.system_msg.msg !== ""
-        ) {
-          setIsSystemMessage({
-            bool: true,
-            title: res.initPing.system_msg.title,
-            msg: res.initPing.system_msg.msg,
-          });
-        }
-        setPageLoading(false);
-      });
-      timerCountRef.current += 1;
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (userData.isReady) {
-      setFishingTime(
-        CaclulateFishingTime(userData.items, activeConsumableData).string
-      );
-    }
-  }, [userData]);
 
   return (
     <div
@@ -577,12 +701,6 @@ const FishermanFriend = () => {
         userSelect: "none",
       }}
     >
-      <Navbar
-        avatar={userData.avatar}
-        username={userData.username}
-        styling={styling}
-      />
-
       <div
         style={{
           fontWeight: "700",
@@ -596,37 +714,23 @@ const FishermanFriend = () => {
           userSelect: "none",
           top: "200px",
           width: "600px",
-          display: size.width > 1650 ? "flex" : "none",
+          display: width > 1650 ? "flex" : "none",
         }}
       >
         Fisherman&apos;s Friend
       </div>
+      <div></div>
       <DashboardModal
-        size={size}
-        timer={timer}
-        statusColor={statusColor}
-        sessions={sessions}
-        setIsActiveSessionMenu={setIsActiveSessionMenu}
-        wodFarmed={wodFarmed}
-        wodFarmedPrice={wodFarmedPrice}
-        wodPerHour={wodPerHour}
-        wodPerHourPrice={wodPerHourPrice}
-        toolMenuData={toolMenuData}
-        status={status}
-        gettingSessions={gettingSessions}
-        setToolMenuData={setToolMenuData}
-        consumableData={activeConsumableData}
-        userData={userData}
-        fishingTime={fishingTime}
-        setIsToolsMenu={setIsToolsMenu}
-        is25Repair={is25Repair}
-        setIs25Repair={setIs25Repair}
-        is50Repair={is50Repair}
-        setIs50Repair={setIs50Repair}
-        is100Repair={is100Repair}
-        setIs100Repair={setIs100Repair}
+        // key={rerender}
+        windowSize={windowSize}
+        updatePageData={updatePageData}
+        componentData={pageData.components.dashboard}
+        consumableData={pageData.active_data.consumable_data}
+        repairMode={pageData.global.repair_mode}
+        fishingStatus={pageData.global.fishing_status}
+        isDays={pageData.global.is_days}
       />
-      <FFGlobalStatistics
+      {/* <FFGlobalStatistics
         size={size}
         styling={styling}
         statisticsData={statisticsData}
@@ -711,7 +815,7 @@ const FishermanFriend = () => {
         setIs50Repair={setIs50Repair}
         is100Repair={is100Repair}
         setIs100Repair={setIs100Repair}
-      />
+      /> */}
     </div>
   );
 };

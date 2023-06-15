@@ -934,11 +934,6 @@ const TheCove = () => {
       }}
       className="cove"
     >
-      <Navbar
-        avatar={userData.avatar}
-        username={userData.username}
-        styling={styling}
-      />
       <div
         style={{
           fontWeight: "700",

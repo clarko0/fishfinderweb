@@ -21,10 +21,6 @@ export interface IItem {
 export interface IUserData {
   username: string;
   avatar: string;
-  tools: ITool[];
-  items: IItems;
-  isReady: boolean;
-  doublyReady: boolean;
 }
 
 export interface IFilters {

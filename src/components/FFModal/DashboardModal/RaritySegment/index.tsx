@@ -1,4 +1,4 @@
-const RaritySegment = ({ image, topNum, tools }: any) => {
+const RaritySegment = ({ image, data }: any) => {
   return (
     <div
       style={{
@@ -12,7 +12,7 @@ const RaritySegment = ({ image, topNum, tools }: any) => {
     >
       <img src={image} width={"36"} height={"36"} />
       <div style={{ color: "#fff", fontWeight: "500", fontSize: "14px" }}>
-        {topNum}
+        {data.repairs}
       </div>
       <div
         style={{
@@ -34,7 +34,7 @@ const RaritySegment = ({ image, topNum, tools }: any) => {
           marginTop: "3px",
         }}
       >
-        {tools}
+        {data.quantity}
       </div>
     </div>
   );
