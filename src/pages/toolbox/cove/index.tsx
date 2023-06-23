@@ -48,17 +48,6 @@ const TheCove = () => {
   const [userData, setUserData] = useState<IUserData>({
     username: "",
     avatar: "",
-    tools: [],
-    items: {
-      common: [],
-      uncommon: [],
-      rare: [],
-      epic: [],
-      legendary: [],
-      artifact: [],
-    },
-    isReady: false,
-    doublyReady: false,
   });
   const [response, setResponse] = useState<any>("");
 
@@ -896,17 +885,6 @@ const TheCove = () => {
           res.data.avatar_url === null
             ? "https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png"
             : res.data.avatar_url,
-        tools: [],
-        items: {
-          common: [],
-          uncommon: [],
-          rare: [],
-          epic: [],
-          legendary: [],
-          artifact: [],
-        },
-        isReady: true,
-        doublyReady: false,
       });
     });
   }, []);

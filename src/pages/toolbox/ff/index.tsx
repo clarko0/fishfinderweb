@@ -10,7 +10,6 @@ import PageLoading from "@/components/PageLoading";
 import ActiveSessionMenu from "@/components/FFMenu/ActiveSessions";
 import EndFishingMenu from "@/components/FFMenu/EndFishing";
 import StartStopBtn from "@/components/Buttons/StartStopBtn";
-import RepairModal from "@/components/FFModal/RepairModal";
 import DashboardModal from "@/components/FFModal/DashboardModal";
 import { ffStore } from "@/store/ff.store";
 import FFGlobalStatistics from "@/components/FFGlobalStatistics";
@@ -273,6 +272,7 @@ const FishermanFriend = () => {
 
           const itemCards = item.slot_items.map((i: IItem) => (
             <Image
+              key={genRanHex(24)}
               width={80}
               height={120}
               src={i.rendered_image_url}
@@ -282,6 +282,7 @@ const FishermanFriend = () => {
 
           return (
             <FishingCard
+              key={genRanHex(24)}
               itemCards={itemCards}
               wodEarned={item.last_saved_wod_earned}
               wodPerHour={wodPerHour}

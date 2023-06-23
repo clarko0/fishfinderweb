@@ -13,17 +13,6 @@ const Toolbox = () => {
   const [userData, setUserData] = useState<IUserData>({
     username: "",
     avatar: "",
-    tools: [],
-    items: {
-      common: [],
-      uncommon: [],
-      rare: [],
-      epic: [],
-      legendary: [],
-      artifact: [],
-    },
-    isReady: false,
-    doublyReady: false,
   });
   const [isDark, setIsDark] = useState<boolean>(false);
   const [styling, setStyling] = useState<IStylingObject>({});
@@ -41,17 +30,6 @@ const Toolbox = () => {
             res.data.avatar_url === null
               ? "https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png"
               : res.data.avatar_url,
-          tools: [],
-          items: {
-            common: [],
-            uncommon: [],
-            rare: [],
-            epic: [],
-            legendary: [],
-            artifact: [],
-          },
-          isReady: true,
-          doublyReady: false,
         });
       });
       WalletListener();
