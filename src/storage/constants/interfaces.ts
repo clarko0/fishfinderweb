@@ -11,11 +11,12 @@ export interface ITool {
 export interface IItem {
   name: string;
   id: string;
-  image: string;
+  rendered_image_url: string;
   slot_key: string;
   wod_multiplier: number;
   rarity: number;
   durability: number;
+  is_teleported: boolean;
 }
 
 export interface IUserData {

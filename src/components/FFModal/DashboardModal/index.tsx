@@ -11,6 +11,15 @@ import { CaclulateFishingTime } from "@/storage/utils/tools";
 import { genRanHex } from "@/storage/constants/misc";
 import { Button } from "@nextui-org/react";
 
+const images = [
+  Common.src,
+  Uncommon.src,
+  Rare.src,
+  Epic.src,
+  Legendary.src,
+  Artifact.src,
+];
+
 const DashboardModal = ({
   windowSize,
   updatePageData,
@@ -19,25 +28,26 @@ const DashboardModal = ({
   repairMode,
   fishingStatus,
   isDays,
+  timer,
 }: any) => {
   ///
-  const getDataByRarity = (
-    rarity: number
-  ): { quantity: number; repairs: number } => {
-    const defaultData = { quantity: 0, repairs: 0 };
+  // const getDataByRarity = (
+  //   rarity: number
+  // ): { quantity: number; repairs: number } => {
+  //   const defaultData = { quantity: 0, repairs: 0 };
 
-    if (consumableData !== undefined) {
-      const data = consumableData.find((item: any) => item.rarity === rarity);
-      if (data !== undefined) {
-        return {
-          quantity: data.quantity,
-          repairs: isDays ? data.repairs.in_days : data.repairs.quantity,
-        };
-      }
-    }
+  //   if (consumableData !== undefined) {
+  //     const data = consumableData.find((item: any) => item.rarity === rarity);
+  //     if (data !== undefined) {
+  //       return {
+  //         quantity: data.quantity,
+  //         repairs: isDays ? data.repairs.in_days : data.repairs.quantity,
+  //       };
+  //     }
+  //   }
 
-    return defaultData;
-  };
+  //   return defaultData;
+  // };
 
   const [statusColor, setStatusColor] = useState<string>("#fff");
   const [statusText, setStatusText] = useState<string>("Not Started");
@@ -67,8 +77,6 @@ const DashboardModal = ({
     return <></>;
   }
   const { width, height } = windowSize;
-
-  const timer = componentData.next_repair_counter;
 
   const sessions = componentData.sessions_running;
 
@@ -415,36 +423,22 @@ const DashboardModal = ({
             justifyContent: "center",
           }}
         >
-          <RaritySegment
-            key={genRanHex(24)}
-            image={Artifact.src}
-            data={getDataByRarity(6)}
-          />
-          <RaritySegment
-            key={genRanHex(24)}
-            image={Legendary.src}
-            data={getDataByRarity(5)}
-          />
-          <RaritySegment
-            key={genRanHex(24)}
-            image={Epic.src}
-            data={getDataByRarity(4)}
-          />
-          <RaritySegment
-            key={genRanHex(24)}
-            image={Rare.src}
-            data={getDataByRarity(3)}
-          />
-          <RaritySegment
-            key={genRanHex(24)}
-            image={Uncommon.src}
-            data={getDataByRarity(2)}
-          />
-          <RaritySegment
-            key={genRanHex(24)}
-            image={Common.src}
-            data={getDataByRarity(1)}
-          />
+          {Object.keys(consumableData)
+            .map((item: any) => {
+              return (
+                <RaritySegment
+                  key={genRanHex(24)}
+                  image={images[parseInt(item) - 1]}
+                  quantity={consumableData[item].amount}
+                  repairs={
+                    isDays
+                      ? consumableData[item].repairs.in_days
+                      : consumableData[item].repairs.amount
+                  }
+                />
+              );
+            })
+            .reverse()}
         </div>
       </div>
       <div
@@ -486,9 +480,13 @@ const DashboardModal = ({
             marginTop: "2px",
           }}
         >
-          {"0.00"}
+          {componentData.estimated_earnings.amount &&
+            componentData.estimated_earnings.amount.toFixed(2)}
         </div>
-        <div style={{ color: "#777E90", fontSize: "10px" }}>{"≈ 0.00 $"}</div>
+        <div style={{ color: "#777E90", fontSize: "10px" }}>{`≈ ${
+          componentData.estimated_earnings.price &&
+          componentData.estimated_earnings.price.toFixed(2)
+        } $`}</div>
       </div>
       <div
         style={{
@@ -503,7 +501,7 @@ const DashboardModal = ({
             auto
             style={{ width: "170px", height: "50px", marginTop: "10px" }}
             onPress={() => {
-              updatePageData("global.fishing_status", 2);
+              updatePageData("components.menu.tool.open", true);
             }}
           >
             Buy More Tools

@@ -1,12 +1,9 @@
-const ActiveSessionMenu = ({
-  isActiveSessionMenu,
-  setIsActiveSessionMenu,
-  cards,
-}: any) => {
+const ActiveSessionMenu = ({ updatePageData, componentData }: any) => {
+  const { open, cards } = componentData;
   return (
     <div
       style={{
-        width: isActiveSessionMenu ? "100vw" : "0px",
+        width: open ? "100vw" : "0px",
         height: "100vh",
         overflow: "hidden",
         transition: "0.5s",
@@ -55,7 +52,7 @@ const ActiveSessionMenu = ({
             marginTop: "40px",
           }}
           onClick={() => {
-            setIsActiveSessionMenu(false);
+            updatePageData("components.menu.fishing.open", false);
           }}
         >
           <path

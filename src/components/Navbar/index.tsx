@@ -6,22 +6,21 @@ import { isDocked } from "@/storage/utils/window";
 import Router from "next/router";
 import Wod from "public/wod.png";
 import Logo from "public/logo.png";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getWodBalance } from "@/storage/utils/method";
 import { Tooltip } from "@nextui-org/react";
 import { GetUserdata } from "@/storage/utils/fetch";
+import { StylingContext } from "@/pages/_app";
 
 const Navbar = (props: any) => {
-  const [styling, setStyling] = useState<IStylingObject>(props.styling);
   const [isToolboxMenu, setIsToolboxMenu] = useState<boolean>(false);
   const [isBurgerMenu, setIsBurgerMenu] = useState<boolean>(false);
   const [isSocialsMenu, setIsSocialsMenu] = useState<boolean>(false);
   const [wodBalance, setWodBalance] = useState<any>(0);
   const [offchainWodBalance, setOffchainWodBalance] = useState<any>(0);
+
+  const styling = useContext(StylingContext);
   const size = useWindowSize();
-  useEffect(() => {
-    setStyling(props.styling);
-  }, [props]);
 
   useEffect(() => {
     getWodBalance().then((res: any) => {

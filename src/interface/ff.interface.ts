@@ -25,22 +25,31 @@ export interface IGlobalStatistics {
 }
 
 export interface IActiveSessionData {
-  items: IItem[];
+  slot_items: IItem[];
+  last_saved_wod_earned: number;
   wod_multiplier: number;
   zone: IZone;
 }
 
 export interface IZone {
   id: number;
-  agents: number;
-  wod_multiplier: number;
+  random_wod_rate: number;
+  fishing_pool: {
+    agents_amount: number;
+    wod_multiplier: number;
+  };
   fee: number;
 }
 
 export interface IItem {
-  image_url: string;
-  rarity: number;
+  name: string;
+  id: string;
+  rendered_image_url: string;
+  slot_key: string;
   wod_multiplier: number;
+  rarity: number;
+  durability: number;
+  is_teleported: boolean;
 }
 
 export interface ISet {

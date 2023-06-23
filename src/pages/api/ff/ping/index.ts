@@ -93,15 +93,15 @@ export default async function handler(req: any, res: any) {
         .sort()
         .limit(1)
         .toArray();
-      let status: string;
+      let status: number;
 
       let isFishing: boolean = false;
       if (pending.length === 0 && active.length === 0) {
-        status = "Not Started";
+        status = 0;
       } else if (pending.length >= 1 && active.length === 0) {
-        status = "Pending";
+        status = 1;
       } else {
-        status = "Running";
+        status = 2;
         isFishing = true;
       }
 

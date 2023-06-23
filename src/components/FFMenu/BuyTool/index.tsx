@@ -13,37 +13,33 @@ import { genRanHex } from "@/storage/constants/misc";
 import { BuyTools } from "@/storage/utils/fetch";
 import { sleep } from "@/storage/utils/tools";
 
+const images = [
+  Common.src,
+  Uncommon.src,
+  Rare.src,
+  Epic.src,
+  Legendary.src,
+  Artifact.src,
+];
+
 const BuyToolMenu = ({
-  setIsToolsMenu,
-  isToolsConfirmationMenu,
-  toolMenuData,
-  setToolMenuData,
-  numberOfRepairs,
-  setNumberOfRepairs,
-  userData,
-  isToolsMenu,
-  toolCost,
-  wodPrice,
-  clicker,
-  setClicker,
-  is25Repair,
-  setIs25Repair,
-  is50Repair,
-  setIs50Repair,
+  updatePageData,
+  repairMode,
+  componentData,
   consumableData,
-  is100Repair,
-  setIs100Repair,
+  itemsInSets,
+  isDays,
+  consumablePrices,
+  refetchSiteData,
 }: any) => {
-  const [isOffchain, setIsOffchain] = useState<boolean>(false);
   const [toolsBought, setToolsBought] = useState<boolean>(false);
-  useEffect(() => {
-    console.log(toolCost, wodPrice);
-    console.log(toolMenuData);
-  }, []);
+
+  const { open, formData } = componentData;
+
   return (
     <div
       style={{
-        width: isToolsMenu ? "100vw" : "0px",
+        width: open ? "100vw" : "0px",
         height: "100vh",
         transition: "0.5s",
         overflow: "hidden",
@@ -114,7 +110,7 @@ const BuyToolMenu = ({
                 right: "48.54px",
               }}
               onClick={() => {
-                setIsToolsMenu(false);
+                updatePageData("components.menu.tool.open", false);
               }}
             >
               <path
@@ -134,7 +130,7 @@ const BuyToolMenu = ({
               />
             </svg>
           </div>
-          {!isToolsConfirmationMenu && (
+          {
             <>
               <div
                 style={{
@@ -170,66 +166,17 @@ const BuyToolMenu = ({
                     >
                       Rarity
                     </div>
-                    <RarityBtn
-                      setToolMenuData={setToolMenuData}
-                      toolMenuData={toolMenuData}
-                      imgSrc={Artifact.src}
-                      idA="imgA"
-                      setClicker={setClicker}
-                      clicker={clicker}
-                      rarity={6}
-                      idB="crossA"
-                    />
-                    <RarityBtn
-                      setToolMenuData={setToolMenuData}
-                      toolMenuData={toolMenuData}
-                      imgSrc={Legendary.src}
-                      setClicker={setClicker}
-                      clicker={clicker}
-                      rarity={5}
-                      idA="imgB"
-                      idB="crossB"
-                    />
-                    <RarityBtn
-                      setToolMenuData={setToolMenuData}
-                      toolMenuData={toolMenuData}
-                      imgSrc={Epic.src}
-                      setClicker={setClicker}
-                      clicker={clicker}
-                      rarity={4}
-                      idA="imgC"
-                      idB="crossC"
-                    />
-                    <RarityBtn
-                      setToolMenuData={setToolMenuData}
-                      toolMenuData={toolMenuData}
-                      imgSrc={Rare.src}
-                      setClicker={setClicker}
-                      clicker={clicker}
-                      idA="imgD"
-                      rarity={3}
-                      idB="crossD"
-                    />
-                    <RarityBtn
-                      setToolMenuData={setToolMenuData}
-                      toolMenuData={toolMenuData}
-                      imgSrc={Uncommon.src}
-                      setClicker={setClicker}
-                      clicker={clicker}
-                      idA="imgE"
-                      rarity={2}
-                      idB="crossE"
-                    />
-                    <RarityBtn
-                      setToolMenuData={setToolMenuData}
-                      toolMenuData={toolMenuData}
-                      imgSrc={Common.src}
-                      setClicker={setClicker}
-                      clicker={clicker}
-                      idA="imgF"
-                      rarity={1}
-                      idB="crossF"
-                    />
+                    {images.map((img: any, index: number) => {
+                      return (
+                        <RarityBtn
+                          key={genRanHex(24)}
+                          updatePageData={updatePageData}
+                          rarity={index + 1}
+                          imgSrc={img}
+                          rarities={componentData.form.rarities}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -257,7 +204,7 @@ const BuyToolMenu = ({
                         marginLeft: "-138px",
                       }}
                     >
-                      {toolMenuData.isDays
+                      {isDays
                         ? "Current Repair Time (days)"
                         : "Current Number of Repairs"}
                     </div>
@@ -270,26 +217,26 @@ const BuyToolMenu = ({
                         fontWeight: "600",
                       }}
                     >
-                      {Object.keys(toolMenuData.toolVals)
-                        .map((item: any) => {
-                          return (
-                            <div
-                              key={genRanHex(64)}
-                              style={{
-                                fontSize: "16px",
-                                width: "10px",
-                                height: "12px",
-                                marginLeft: "-2px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
-                            >
-                              {toolMenuData.toolVals[item]}
-                            </div>
-                          );
-                        })
-                        .reverse()}
+                      {Object.keys(consumableData).map((item: any) => {
+                        return (
+                          <div
+                            key={genRanHex(24)}
+                            style={{
+                              fontSize: "16px",
+                              width: "10px",
+                              height: "12px",
+                              marginLeft: "-2px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            {isDays
+                              ? consumableData[item].repairs.in_days.toFixed(2)
+                              : parseInt(consumableData[item].repairs.amount)}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -305,45 +252,39 @@ const BuyToolMenu = ({
                 <div>Repair amount</div>
                 <span
                   style={{
-                    fontWeight: is100Repair ? "600" : "500",
+                    fontWeight: repairMode === 1 ? "600" : "500",
                     transition: "0.3s",
-                    color: is100Repair ? "#fff" : "grey",
+                    color: repairMode === 1 ? "#fff" : "grey",
                     cursor: "pointer",
                   }}
                   onClick={() => {
-                    setIs100Repair(true);
-                    setIs25Repair(false);
-                    setIs50Repair(false);
+                    updatePageData("global.repair_mode", 1);
                   }}
                 >
                   100%
                 </span>
                 <span
                   style={{
-                    fontWeight: is50Repair ? "600" : "500",
+                    fontWeight: repairMode === 2 ? "600" : "500",
                     transition: "0.3s",
-                    color: is50Repair ? "#fff" : "grey",
+                    color: repairMode === 2 ? "#fff" : "grey",
                     cursor: "pointer",
                   }}
                   onClick={() => {
-                    setIs100Repair(false);
-                    setIs25Repair(false);
-                    setIs50Repair(true);
+                    updatePageData("global.repair_mode", 2);
                   }}
                 >
                   50%
                 </span>
                 <span
                   style={{
-                    fontWeight: is25Repair ? "600" : "500",
+                    fontWeight: repairMode === 3 ? "600" : "500",
                     transition: "0.3s",
-                    color: is25Repair ? "#fff" : "grey",
+                    color: repairMode === 3 ? "#fff" : "grey",
                     cursor: "pointer",
                   }}
                   onClick={() => {
-                    setIs100Repair(false);
-                    setIs25Repair(true);
-                    setIs50Repair(false);
+                    updatePageData("global.repair_mode", 3);
                   }}
                 >
                   25%
@@ -375,18 +316,14 @@ const BuyToolMenu = ({
                 >
                   <span
                     style={{
-                      color: toolMenuData.isDays ? "#777E90" : "#fff",
-                      fontSize: toolMenuData.isDays ? "" : "20px",
-                      textDecoration: toolMenuData.isDays ? "" : "underline",
-                      cursor: toolMenuData.isDays ? "pointer" : "default",
+                      color: isDays ? "#777E90" : "#fff",
+                      fontSize: isDays ? "" : "20px",
+                      textDecoration: isDays ? "none" : "underline",
+                      cursor: isDays ? "pointer" : "default",
                       transition: "0.5s",
                     }}
                     onClick={() => {
-                      setClicker(!clicker);
-                      setToolMenuData((prevData: any) => ({
-                        ...prevData,
-                        isDays: false,
-                      }));
+                      updatePageData("global.is_days", false);
                     }}
                   >
                     REPAIRS
@@ -394,18 +331,14 @@ const BuyToolMenu = ({
                   /{" "}
                   <span
                     style={{
-                      color: !toolMenuData.isDays ? "#777E90" : "#fff",
-                      fontSize: !toolMenuData.isDays ? "" : "20px",
-                      textDecoration: !toolMenuData.isDays ? "" : "underline",
-                      cursor: !toolMenuData.isDays ? "pointer" : "default",
+                      color: !isDays ? "#777E90" : "#fff",
+                      fontSize: !isDays ? "" : "20px",
+                      textDecoration: !isDays ? "" : "underline",
+                      cursor: !isDays ? "pointer" : "default",
                       transition: "0.5s",
                     }}
                     onClick={() => {
-                      setClicker(!clicker);
-                      setToolMenuData((prevData: any) => ({
-                        ...prevData,
-                        isDays: true,
-                      }));
+                      updatePageData("global.is_days", true);
                     }}
                   >
                     DAYS
@@ -415,9 +348,12 @@ const BuyToolMenu = ({
                   type="number"
                   name="cost"
                   placeholder="Enter a number..."
-                  value={numberOfRepairs}
+                  value={componentData.form.tools.amount}
                   onChange={(e) => {
-                    setNumberOfRepairs(e.target.value);
+                    updatePageData(
+                      "components.menu.tool.form.tools.amount",
+                      e.target.value
+                    );
                   }}
                   style={{
                     width: "320px",
@@ -434,7 +370,7 @@ const BuyToolMenu = ({
                 <div
                   style={{
                     transition: "0.5s",
-                    width: toolMenuData.isDays ? "20px" : "0px",
+                    width: isDays ? "20px" : "0px",
                   }}
                 ></div>
                 <div
@@ -459,11 +395,20 @@ const BuyToolMenu = ({
                       justifyContent: "center",
                     }}
                     onClick={() => {
-                      if (isNaN(parseInt(numberOfRepairs.toString()))) {
-                        setNumberOfRepairs(1);
+                      if (
+                        isNaN(
+                          parseInt(componentData.form.tools.amount.toString())
+                        )
+                      ) {
+                        updatePageData(
+                          "components.menu.tool.form.tools.amount",
+                          1
+                        );
                       } else {
-                        setNumberOfRepairs(
-                          parseInt(numberOfRepairs.toString()) + 1
+                        updatePageData(
+                          "components.menu.tool.form.tools.amount",
+                          parseInt(componentData.form.tools.amount.toString()) +
+                            1
                         );
                       }
                     }}
@@ -490,15 +435,32 @@ const BuyToolMenu = ({
                       justifyContent: "center",
                     }}
                     onClick={() => {
-                      if (isNaN(parseInt(numberOfRepairs.toString()))) {
-                        setNumberOfRepairs(0);
+                      if (
+                        isNaN(
+                          parseInt(componentData.form.tools.amount.toString())
+                        )
+                      ) {
+                        updatePageData(
+                          "components.menu.tool.form.tools.amount",
+                          0
+                        );
                       } else {
-                        if (parseInt(numberOfRepairs.toString()) - 1 >= 0) {
-                          setNumberOfRepairs(
-                            parseInt(numberOfRepairs.toString()) + -1
+                        if (
+                          parseInt(componentData.form.tools.amount.toString()) -
+                            1 >=
+                          0
+                        ) {
+                          updatePageData(
+                            "components.menu.tool.form.tools.amount",
+                            parseInt(
+                              componentData.form.tools.amount.toString()
+                            ) + -1
                           );
                         } else {
-                          setNumberOfRepairs(0);
+                          updatePageData(
+                            "components.menu.tool.form.tools.amount",
+                            0
+                          );
                         }
                       }
                     }}
@@ -519,7 +481,7 @@ const BuyToolMenu = ({
                 </div>
               </div>
             </>
-          )}
+          }
           <div
             style={{
               display: "flex",
@@ -538,7 +500,10 @@ const BuyToolMenu = ({
                 style={{ marginLeft: "7px" }}
                 type="checkbox"
                 onClick={() => {
-                  setIsOffchain(!isOffchain);
+                  updatePageData(
+                    "components.menu.tool.form.offchain_wod",
+                    !componentData.form.offchain_wod
+                  );
                 }}
               />
             </div>
@@ -561,14 +526,15 @@ const BuyToolMenu = ({
               }}
             >
               <img src={Wod.src} />
-              <div>{toolCost.toFixed(2)}</div>
+              <div>{componentData.form.tools.price.toFixed(2)}</div>
               <div
                 style={{
                   fontSize: "10px",
                   color: "#4F4F4F",
                 }}
               >
-                (${(wodPrice * toolCost).toFixed(2)})
+                ($
+                {componentData.form.tools.usd.toFixed(2)})
               </div>
             </div>
           </div>
@@ -578,39 +544,42 @@ const BuyToolMenu = ({
             height={"60px"}
             condition={
               !(
-                isNaN(parseInt(numberOfRepairs.toString())) ||
-                parseInt(numberOfRepairs.toString()) === 0
+                isNaN(parseInt(componentData.form.tools.amount.toString())) ||
+                parseInt(componentData.form.tools.amount.toString()) === 0
               )
             }
             text="Buy"
             func={() => {
               let factor = 4;
-              if (is25Repair) {
-              } else if (is50Repair) {
+              if (repairMode === 1) {
+              } else if (repairMode === 2) {
                 factor = 2;
-              } else if (is100Repair) {
+              } else if (repairMode === 3) {
                 factor = 1;
               }
-              isOffchain
+              componentData.form.offchain_wod
                 ? BuyTools(
-                    toolMenuData.isDays
-                      ? parseInt(numberOfRepairs.toString()) * factor
-                      : parseInt(numberOfRepairs.toString()),
-                    toolMenuData.rarities,
-                    userData.items,
-                    consumableData
+                    isDays
+                      ? parseInt(componentData.form.tools.amount.toString()) *
+                          factor
+                      : parseInt(componentData.form.tools.amount.toString()),
+                    componentData.form.rarities,
+                    itemsInSets,
+                    consumablePrices[repairMode]
                   ).then(() => {
                     setToolsBought(true);
+                    refetchSiteData();
                     sleep(5000).then(() => {
                       setToolsBought(false);
                     });
                   })
                 : fullBuyTools(
-                    toolMenuData.isDays
-                      ? parseInt(numberOfRepairs.toString()) * factor
-                      : parseInt(numberOfRepairs.toString()),
-                    userData.items,
-                    toolMenuData.rarities
+                    isDays
+                      ? parseInt(componentData.form.tools.amount.toString()) *
+                          factor
+                      : parseInt(componentData.form.tools.amount.toString()),
+                    itemsInSets,
+                    componentData.form.rarities
                   );
             }}
           />
@@ -646,14 +615,14 @@ const BuyToolMenu = ({
             cy="16"
             r="12"
             stroke="#30C04F"
-            stroke-width="2"
-            stroke-linecap="round"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
           <path
             d="M11.3334 16.6667L13.5347 19.4184C13.783 19.7287 14.2458 19.7543 14.5267 19.4733L20.6667 13.3333"
             stroke="#30C04F"
-            stroke-width="2"
-            stroke-linecap="round"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
         </svg>
         Tools successfully bought

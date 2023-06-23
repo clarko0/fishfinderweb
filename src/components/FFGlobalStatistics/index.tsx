@@ -1,26 +1,19 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Tooltip } from "@nextui-org/react";
 import GlobalItem from "./GlobalItem";
 import { intToString } from "@/storage/utils/tools";
 import Wod from "public/Wod40x40.png";
+import { StylingContext } from "@/pages/_app";
 
-const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
-  const [toolTip, setToolTip] = useState<any>({
-    fisher_count: false,
-  });
+const FFGlobalStatistics = ({ windowSize, statisticsData, styling }: any) => {
 
-  const [wodFarmed, setWodFarmed] = useState<any>(0);
-
-  useEffect(() => {
-    if (statisticsData.wod_farmed !== undefined) {
-      setWodFarmed(intToString(statisticsData.wod_farmed));
-    }
-  }, [statisticsData]);
+  const { width, height } = windowSize;
+  const { nft_count, wod_farmed, fisherman_count } = statisticsData;
 
   return (
     <div
       style={{
-        display: size.width > 1250 ? "flex" : "none",
+        display: width > 1250 ? "flex" : "none",
         color: styling.font_primary,
         alignItems: "center",
         position: "absolute",
@@ -28,8 +21,8 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
         width: "600px",
         height: "170px",
         marginLeft: "-300px",
-        left: size.width > 1650 ? "50%" : "940px",
-        top: size.width > 1650 ? "350px" : "200px",
+        left: width > 1650 ? "50%" : "940px",
+        top: width > 1650 ? "350px" : "200px",
       }}
     >
       <div style={{ fontSize: "20px", fontWeight: "600" }}>
@@ -51,12 +44,12 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
       >
         <GlobalItem
           content={"$WoD Farmed"}
-          value={wodFarmed}
+          value={wod_farmed}
           image={<img width={30} src={Wod.src} />}
         />
         <GlobalItem
           content={"NFTs Farmed"}
-          value={statisticsData.nft_count}
+          value={nft_count}
           image={
             <svg
               width="30"
@@ -74,7 +67,7 @@ const FFGlobalStatistics = ({ statisticsData, styling, size }: any) => {
         />
         <GlobalItem
           content={"People Fishing"}
-          value={statisticsData.fisherman_count}
+          value={fisherman_count}
           image={
             <svg
               width="40"

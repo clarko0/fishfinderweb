@@ -4,9 +4,11 @@ import Fish from "public/lowpolyfish.png";
 const WelcomeMenu = ({
   isWelcomeMenu,
   pageLoading,
-  size,
-  setIsWelcomeMenu,
+  windowSize,
+  updatePageData,
 }: any) => {
+  const { width, height } = windowSize;
+
   return (
     <div
       style={{
@@ -45,7 +47,7 @@ const WelcomeMenu = ({
             transition: "0.5s",
             left: "-100px",
             bottom: "-100px",
-            display: size.width > 1050 ? "flex" : "none",
+            display: width > 1050 ? "flex" : "none",
             marginLeft: isWelcomeMenu && !pageLoading ? "0px" : "-10000px",
           }}
         />
@@ -56,7 +58,7 @@ const WelcomeMenu = ({
             transition: "0.5s",
             right: "-100px",
             top: "-100px",
-            display: size.width > 1050 ? "flex" : "none",
+            display: width > 1050 ? "flex" : "none",
             marginLeft: isWelcomeMenu && !pageLoading ? "0px" : "-10000px",
           }}
         />
@@ -132,7 +134,7 @@ const WelcomeMenu = ({
             cursor: "pointer",
           }}
           onClick={() => {
-            setIsWelcomeMenu(false);
+            updatePageData("global.is_welcome_menu", false);
           }}
         >
           Continue

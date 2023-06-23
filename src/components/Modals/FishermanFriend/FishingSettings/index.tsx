@@ -10,25 +10,12 @@ import ToolBar from "./ToolBar";
 ///t
 
 const FishingSettingsModal = ({
-  is_open,
-  isCurrentZones,
-  setIsCurrentZones,
-  isCurrentSets,
-  setIsCurrentSets,
-  RefreshPing,
-  playerLevel,
-  setIsFishingSettings,
-  isSkipRepair,
-  setIsSkipRepair,
-  is25Repair,
-  setIs25Repair,
-  is50Repair,
-  setIs50Repair,
-  is100Repair,
-  setIs100Repair,
+  componentData,
+  updatePageData,
+  repairMode,
   consumableData,
-  userData,
-  ...props
+  startAutoFishing,
+  refetchSiteData,
 }: any) => {
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
   useEffect(() => {
@@ -40,12 +27,15 @@ const FishingSettingsModal = ({
       return () => clearTimeout(timer);
     }
   }, [isButtonDisabled]);
+
+  const { keep_zones, keep_sets, skip_repair } = componentData.form;
+
   return (
     <Modal
       width="800px"
       blur
       preventClose
-      open={is_open}
+      open={componentData.open}
       style={{ background: "#000", fontFamily: "inter" }}
     >
       <div
@@ -69,7 +59,7 @@ const FishingSettingsModal = ({
             cursor: "pointer",
           }}
           onClick={() => {
-            setIsFishingSettings(false);
+            updatePageData("components.menu.fishing_settings.open", false);
           }}
         >
           <path
@@ -168,18 +158,16 @@ const FishingSettingsModal = ({
                   height: "20px",
                   borderRadius: "3px",
                   border: `1px solid rgba(255, 255, 255, ${
-                    is25Repair ? "1" : "0.4"
+                    repairMode === 3 ? "1" : "0.4"
                   })`,
                   background: `rgba(255, 255, 255, ${
-                    is25Repair ? "1" : "0.4"
+                    repairMode === 3 ? "1" : "0.4"
                   })`,
                   cursor: "pointer",
                 }}
                 onClick={async (e: any) => {
-                  setIs100Repair(false);
-                  setIs50Repair(false);
-                  setIs25Repair(true);
-                  if (!is25Repair) {
+                  updatePageData("global.repair_mode", 3);
+                  if (!(repairMode === 3)) {
                     await Animations.Rotation(e);
                   }
                 }}
@@ -201,18 +189,16 @@ const FishingSettingsModal = ({
                   transition: "0.3s",
                   borderRadius: "3px",
                   border: `1px solid rgba(255, 255, 255, ${
-                    is50Repair ? "1" : "0.4"
+                    repairMode === 2 ? "1" : "0.4"
                   })`,
                   background: `rgba(255, 255, 255, ${
-                    is50Repair ? "1" : "0.4"
+                    repairMode === 2 ? "1" : "0.4"
                   })`,
                   cursor: "pointer",
                 }}
                 onClick={async (e: any) => {
-                  setIs100Repair(false);
-                  setIs50Repair(true);
-                  setIs25Repair(false);
-                  if (!is50Repair) {
+                  updatePageData("global.repair_mode", 2);
+                  if (!(repairMode === 2)) {
                     await Animations.Rotation(e);
                   }
                 }}
@@ -234,18 +220,16 @@ const FishingSettingsModal = ({
                   transition: "0.3s",
                   borderRadius: "3px",
                   border: `1px solid rgba(255, 255, 255, ${
-                    is100Repair ? "1" : "0.4"
+                    repairMode === 1 ? "1" : "0.4"
                   })`,
                   background: `rgba(255, 255, 255, ${
-                    is100Repair ? "1" : "0.4"
+                    repairMode === 1 ? "1" : "0.4"
                   })`,
                   cursor: "pointer",
                 }}
                 onClick={async (e: any) => {
-                  setIs100Repair(true);
-                  setIs50Repair(false);
-                  setIs25Repair(false);
-                  if (!is100Repair) {
+                  updatePageData("global.repair_mode", 1);
+                  if (!(repairMode === 1)) {
                     await Animations.Rotation(e);
                   }
                 }}
@@ -254,7 +238,7 @@ const FishingSettingsModal = ({
             </div>
           </div>
         </div>
-        <ToolBar consumableData={consumableData} userData={userData} />
+        <ToolBar consumableData={consumableData} />
         <div
           style={{
             width: "200px",
@@ -272,29 +256,18 @@ const FishingSettingsModal = ({
           onClick={async (e: any) => {
             if (!isButtonDisabled) {
               setIsButtonDisabled(true);
-              setIsFishingSettings((prev: any) => {
-                if (!prev) {
-                  return false;
-                }
-                return false;
-              });
-              let repair_level: number = 3;
-              if (is25Repair) {
-              } else if (is50Repair) {
-                repair_level = 2;
-              } else if (is100Repair) {
-                repair_level = 1;
-              }
+              updatePageData("components.menu.fishing_settings.open", false);
 
-              await startAutoFishing(
-                playerLevel,
-                isCurrentSets,
-                isCurrentZones,
-                isSkipRepair,
-                repair_level
-              );
+              startAutoFishing(
+                keep_zones,
+                keep_sets,
+                skip_repair,
+                repairMode
+              ).then(() => {
+                refetchSiteData();
+              });
+
               e.target.style.display = "flex";
-              await RefreshPing();
             }
           }}
         >
@@ -325,13 +298,16 @@ const FishingSettingsModal = ({
                 borderRadius: "3px",
                 border: "1px solid #fff",
                 cursor: "pointer",
-                background: isCurrentZones ? "#195FC2" : "transparent",
+                background: keep_zones ? "#195FC2" : "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
               onClick={async (e: any) => {
-                setIsCurrentZones(!isCurrentZones);
+                updatePageData(
+                  "components.menu.fishing_settings.form.keep_zones",
+                  !keep_zones
+                );
                 await Animations.Rotation(e);
               }}
             ></div>
@@ -346,13 +322,16 @@ const FishingSettingsModal = ({
                 borderRadius: "3px",
                 border: "1px solid #fff",
                 cursor: "pointer",
-                background: isCurrentSets ? "#195FC2" : "transparent",
+                background: keep_sets ? "#195FC2" : "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
               onClick={async (e: any) => {
-                setIsCurrentSets(!isCurrentSets);
+                updatePageData(
+                  "components.menu.fishing_settings.form.keep_sets",
+                  !keep_sets
+                );
                 await Animations.Rotation(e);
               }}
             ></div>
@@ -367,13 +346,16 @@ const FishingSettingsModal = ({
                 borderRadius: "3px",
                 border: "1px solid #fff",
                 cursor: "pointer",
-                background: isSkipRepair ? "#195FC2" : "transparent",
+                background: skip_repair ? "#195FC2" : "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
               onClick={async (e: any) => {
-                setIsSkipRepair(!isSkipRepair);
+                updatePageData(
+                  "components.menu.fishing_settings.form.skip_repair",
+                  !skip_repair
+                );
                 await Animations.Rotation(e);
               }}
             ></div>

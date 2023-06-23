@@ -2,20 +2,21 @@ import Seahorse from "public/lowpolyseahorse.png";
 import Fish from "public/lowpolyfish.png";
 
 const SystemMessage = ({
-  isSystemMessage,
+  systemMessage,
   pageLoading,
-  size,
-  setIsSystemMessage,
+  windowSize,
+  updatePageData,
 }: any) => {
+  const { width, height } = windowSize;
   return (
     <div
       style={{
         transition: "backdrop-filter 0.3s",
-        width: isSystemMessage.bool && !pageLoading ? "100vw" : "0px",
+        width: systemMessage.shown && !pageLoading ? "100vw" : "0px",
         overflow: "hidden",
         height: "100vh",
         backdropFilter:
-          isSystemMessage.bool && !pageLoading ? "blur(9px)" : "blur(0px)",
+          systemMessage.shown && !pageLoading ? "blur(9px)" : "blur(0px)",
         position: "absolute",
         zIndex: "99999",
         display: "flex",
@@ -31,7 +32,7 @@ const SystemMessage = ({
           background: "#161616",
           position: "relative",
           display: "flex",
-          marginLeft: isSystemMessage.bool && !pageLoading ? "0px" : "-10000px",
+          marginLeft: systemMessage.shown && !pageLoading ? "0px" : "-10000px",
           flexDirection: "column",
           borderRadius: "10px",
           alignItems: "center",
@@ -45,9 +46,9 @@ const SystemMessage = ({
             transition: "0.5s",
             left: "-100px",
             bottom: "-100px",
-            display: size.width > 1050 ? "flex" : "none",
+            display: width > 1050 ? "flex" : "none",
             marginLeft:
-              isSystemMessage.bool && !pageLoading ? "0px" : "-10000px",
+              systemMessage.shown && !pageLoading ? "0px" : "-10000px",
           }}
         />
         <img
@@ -57,9 +58,9 @@ const SystemMessage = ({
             transition: "0.5s",
             right: "-100px",
             top: "-100px",
-            display: size.width > 1050 ? "flex" : "none",
+            display: width > 1050 ? "flex" : "none",
             marginLeft:
-              isSystemMessage.bool && !pageLoading ? "0px" : "-10000px",
+              systemMessage.shown && !pageLoading ? "0px" : "-10000px",
           }}
         />
         <div
@@ -74,7 +75,7 @@ const SystemMessage = ({
             alignItems: "center",
           }}
         >
-          {isSystemMessage.title}
+          {systemMessage.message.title}
         </div>
         <div
           style={{
@@ -109,7 +110,7 @@ const SystemMessage = ({
               fontWeight: "400",
             }}
           >
-            {isSystemMessage.msg}
+            {systemMessage.message.msg}
           </div>
         </div>
         <div
@@ -127,7 +128,10 @@ const SystemMessage = ({
             cursor: "pointer",
           }}
           onClick={() => {
-            setIsSystemMessage({ bool: false, msg: "", title: "" });
+            updatePageData("components.system_message", {
+              shown: false,
+              message: { msg: "", title: "" },
+            });
           }}
         >
           Continue

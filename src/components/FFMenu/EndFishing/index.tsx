@@ -7,17 +7,17 @@ import {
 } from "@/storage/utils/fetch";
 
 const EndFishingMenu = ({
-  setIsEndFishingMenu,
-  RefreshPing,
-  endingFishing,
-  setEndingFishing,
+  windowSize,
+  updatePageData,
+  componentData,
   sessionId,
-  isEndFishingMenu,
+  refetchSiteData,
 }: any) => {
+  const { open, is_ending } = componentData;
   return (
     <div
       style={{
-        width: isEndFishingMenu ? "100vw" : "0px",
+        width: open ? "100vw" : "0px",
         height: "100vh",
         overflow: "hidden",
         transition: "0.5s",
@@ -58,7 +58,7 @@ const EndFishingMenu = ({
             xmlns="http://www.w3.org/2000/svg"
             style={{ cursor: "pointer" }}
             onClick={() => {
-              setIsEndFishingMenu(false);
+              updatePageData("components.menu.end_fishing.open", false);
             }}
           >
             <path
@@ -78,7 +78,7 @@ const EndFishingMenu = ({
             />
           </svg>
         </div>
-        {!endingFishing ? (
+        {!is_ending ? (
           <>
             <div
               style={{
@@ -114,11 +114,11 @@ const EndFishingMenu = ({
                 cursor: "pointer",
               }}
               onClick={async () => {
-                setEndingFishing(true);
+                updatePageData("components.menu.end_fishing.is_ending", true);
                 await endAutoFishing(sessionId);
-                await RefreshPing();
-                setEndingFishing(false);
-                setIsEndFishingMenu(false);
+                refetchSiteData();
+                updatePageData("components.menu.end_fishing.open", false);
+                updatePageData("components.menu.end_fishing.is_ending", false);
               }}
             >
               Confirm

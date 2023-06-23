@@ -28,6 +28,7 @@ declare var window: any;
 let currentOTPIndex: number = 0;
 
 export const WindowSizeContext = createContext(null);
+export const StylingContext = createContext<IStylingObject>({});
 
 export default function MyApp({ Component, pageProps }: any) {
   const windowSize = useWindowSize();
@@ -220,7 +221,6 @@ export default function MyApp({ Component, pageProps }: any) {
   };
 
   useEffect(() => {
-    console.log(isEmailConfirm);
     let intervalId: NodeJS.Timeout | null = null;
     if (isEmailConfirm) {
       API.Internal.Auth.resendVerification(email).then(() => {
@@ -275,7 +275,6 @@ export default function MyApp({ Component, pageProps }: any) {
             setSignupEmailInUse(false);
             setEmail(signupData.data.email);
           } catch (error) {
-            console.log(error);
             setSignupEmailInUse(true);
           }
         } else {
@@ -338,27 +337,31 @@ export default function MyApp({ Component, pageProps }: any) {
   if (!WindowSizeContext) {
     return <></>;
   }
+
+  if (!StylingContext) {
+    return <></>;
+  }
   return (
     <>
       <GoogleOAuthProvider clientId="799925864767-vrnv378u0htn0tcijch7h48900f9bh1k.apps.googleusercontent.com">
         <NextUIProvider theme={theme}>
           <WindowSizeContext.Provider value={windowSize}>
-            <Head>
-              <link rel="shortcut icon" href="/favicon.png" />
-              <title>Fish Finder - #1 QOL tool for WoD</title>
-            </Head>
-            <div style={{ fontFamily: "inter" }} id="app">
-              <Component {...pageProps} />
-              {!["/", "/login"].includes(router.pathname) ? (
-                <Navbar
-                  avatar={globalData.user_data.avatar}
-                  username={globalData.user_data.username}
-                  styling={styling}
-                />
-              ) : (
-                <></>
-              )}
-              {/* <SignupModal
+            <StylingContext.Provider value={styling}>
+              <Head>
+                <link rel="shortcut icon" href="/favicon.png" />
+                <title>Fish Finder - #1 QOL tool for WoD</title>
+              </Head>
+              <div style={{ fontFamily: "inter" }} id="app">
+                <Component {...pageProps} />
+                {!["/", "/login"].includes(router.pathname) ? (
+                  <Navbar
+                    avatar={globalData.user_data.avatar}
+                    username={globalData.user_data.username}
+                  />
+                ) : (
+                  <></>
+                )}
+                {/* <SignupModal
                 signupHelperEmail={signupHelperEmail}
                 signupSamePassword={signupSamePassword}
                 signupSecurePassword={signupSecurePassword}
@@ -408,7 +411,8 @@ export default function MyApp({ Component, pageProps }: any) {
                 oltImage={oltImage}
                 setOltData={setOltData}
               /> */}
-            </div>
+              </div>
+            </StylingContext.Provider>
           </WindowSizeContext.Provider>
         </NextUIProvider>
       </GoogleOAuthProvider>

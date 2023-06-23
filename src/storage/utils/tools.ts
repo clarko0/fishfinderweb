@@ -1,74 +1,56 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { IItem, IItems, ITool } from "../constants/interfaces";
+import { IItems } from "../constants/interfaces";
 import { isDocked } from "./window";
-import { type } from "os";
 import { ApiLocalStorage } from "@/local/api.local";
+import { IConsumable, IItem } from "@/interface/ff.interface";
 
-export const CaclulateFishingTime = (items: IItems, tools: ITool[]) => {
-  let k = 0;
-  for (const i in items) {
-    if (items[i].length === 0) {
-      k++;
+export const CaclulateFishingTime = (items: IItem[], tools: IConsumable[]) => {
+  if (tools.length === 0 || items.length === 0) {
+    return 0;
+  }
+  const itemsInRarity: any = {};
+  items.map((item: IItem) => {
+    if (!(item.rarity in itemsInRarity)) {
+      itemsInRarity[item.rarity] = 0;
     }
-  }
-  if (k === 5) {
-    return { string: "00 : 00 : 00 : 00 : 00", seconds: 0 };
-  }
+    itemsInRarity[item.rarity]++;
+  });
   let repairs: any = [];
-  let smallest = {
-    number_of_repairs: 0,
+  let smallest: any = {
+    numberOfRepairs: 0,
   };
   try {
-    for (const k in items) {
-      if (items[k].length === 0) {
-        continue;
-      }
+    for (const k in itemsInRarity) {
       for (let i = 0; i < tools.length; i++) {
-        if (items[k][0].rarity === tools[i].rarity) {
+        if (k === tools[i].rarity.toString()) {
           repairs.push({
             rarity: k,
-            number_of_repairs: Math.floor(tools[i].quantity / items[k].length),
+            numberOfRepairs: Math.floor(tools[i].quantity / itemsInRarity[k]),
           });
         }
       }
     }
     smallest = repairs[0];
     for (let i = 0; i < repairs.length; i++) {
-      if (repairs[i].number_of_repairs < smallest.number_of_repairs) {
+      if (repairs[i].numberOfRepairs < smallest.numberOfRepairs) {
+        if (repairs[i] === undefined) {
+          break;
+        }
         smallest = repairs[i];
       }
     }
-  } catch (e) {}
-  const monthInSeconds = 2628000;
-  const dayInSeconds = 86400;
-  const hourInSeconds = 3600;
-  const minuteInSeconds = 60;
-  if (smallest === undefined) {
-    return { string: "00 : 00 : 00 : 00 : 00", seconds: 0 };
+  } catch (e) {
+    console.log(e);
   }
-  let seconds = 83700 + 21150 * smallest.number_of_repairs;
-  let months = Math.floor(seconds / monthInSeconds);
-  seconds = seconds % monthInSeconds;
 
-  let days = Math.floor(seconds / dayInSeconds);
-  seconds = seconds % dayInSeconds;
+  if (smallest === undefined) {
+    return 0;
+  }
 
-  let hours = Math.floor(seconds / hourInSeconds);
-  seconds = seconds % hourInSeconds;
+  let seconds = 83700 + 21150 * smallest.numberOfRepairs;
 
-  let minutes = Math.floor(seconds / minuteInSeconds);
-  seconds = seconds % minuteInSeconds;
-
-  return {
-    string:
-      `${months.toString().padStart(2, "0")} : ` +
-      `${days.toString().padStart(2, "0")} : ` +
-      `${hours.toString().padStart(2, "0")} : ` +
-      `${minutes.toString().padStart(2, "0")} : ` +
-      `${seconds.toString().padStart(2, "0")}`,
-    seconds: 83700 + 21150 * smallest.number_of_repairs,
-  };
+  return seconds;
 };
 
 export const GetTokenPrice = async (tokens: number) => {

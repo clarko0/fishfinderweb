@@ -1,6 +1,8 @@
 import axios from "axios";
 import { GetAuthToken, GetCurrentAddress } from "./local";
 import { GetAddress, getChainid } from "./web3";
+import { getAddress } from "ethers";
+import { IConsumable, IConsumableData, IItem } from "@/interface/ff.interface";
 
 const api = axios.create({
   baseURL: "https://api.worldofdefish.com",
@@ -72,6 +74,58 @@ export const getUsersStats = async () => {
     headers: {
       Authorization: GetAuthToken(),
     },
+  });
+};
+
+export const getGraphQLData = async () => {
+  const address = await GetCurrentAddress();
+  return await axios.post("https://api.defish.games/graphql", {
+    query: `query GetPageData($user_address1: [Address!]) {
+      items(pagination: {}, sort: {}, filter: { owner: $user_address1 }) {
+        name
+        id
+        rendered_image_url
+        slot_key
+        wod_multiplier
+        rarity
+        durability
+        is_teleported
+      }
+      fishings(
+        pagination: {}
+        sort: {}
+        filter: { owner: $user_address1, is_ended: false }
+      ) {
+        id
+        wod_multiplier
+        last_saved_wod_earned
+        zone {
+          id
+          random_wod_rate
+          fishing_pool {
+            agents_amount
+            wod_multiplier
+          }
+          fee
+        }
+        slot_items {
+          name
+          id
+          rendered_image_url
+          slot_key
+          wod_multiplier
+          rarity
+          durability
+          is_teleported
+        }
+      }
+    }    
+      `,
+    variables: {
+      user_address1: address,
+      user_address2: address,
+    },
+    operationName: "GetPageData",
   });
 };
 
@@ -359,50 +413,46 @@ export const GetAllConsumablePrices = async () => {
 export const BuyTools = async (
   amount: number,
   rarities: any,
-  items: any,
+  items: IItem[],
   consumableData: any
 ) => {
-  const calls = [];
+  let calls: any[] = [];
+  let itemInfo: any = {};
   let toolInfo: any = {};
-  for (let i = 0; i < consumableData.length; i++) {
-    toolInfo[consumableData[i].rarity] = {
-      id: consumableData[i].id,
-      amount: 0,
+  items.map((item) => {
+    if (itemInfo[item.rarity] === undefined) {
+      itemInfo[item.rarity] = 0;
+    }
+    itemInfo[item.rarity]++;
+  });
+  for (const i in itemInfo) {
+    toolInfo[i] = {
+      id: consumableData.filter((item: any) => item.rarity.toString() === i)[0]
+        .id,
+      amount: itemInfo[i] * amount,
     };
   }
-  const nonUsedRarites: any = Object.keys(rarities).filter((item: any) => {
-    return !rarities[item];
-  });
-  for (const i in items) {
-    try {
-      if (!nonUsedRarites.includes(items[i][0].rarity.toString())) {
-        let element = toolInfo[items[i][0].rarity];
-        element = { ...element, amount: items[i].length };
-        toolInfo[items[i][0].rarity] = element;
-      }
-    } catch (e) {}
-  }
-
   for (const i in toolInfo) {
-    console.log(toolInfo);
-    if (toolInfo[i].amount !== 0) {
-      calls.push(
-        axios.post(
-          "https://api.defish.games/graphql",
-          {
-            query: `mutation {repairmentCollectionUpdate(input: {consumable_vendor_id: ${parseInt(
-              toolInfo[i].id
-            )}, amount_to_add: ${toolInfo[i].amount * amount},},) {id}}`,
-          },
-          {
-            headers: {
-              Authorization: GetAuthToken(),
-            },
-          }
-        )
-      );
+    if (!rarities[i]) {
+      delete toolInfo[i];
     }
   }
-
+  for (const i in toolInfo) {
+    calls.push(
+      axios.post(
+        "https://api.defish.games/graphql",
+        {
+          query: `mutation {repairmentCollectionUpdate(input: {consumable_vendor_id: ${parseInt(
+            toolInfo[i].id
+          )}, amount_to_add: ${toolInfo[i].amount},},) {id}}`,
+        },
+        {
+          headers: {
+            Authorization: GetAuthToken(),
+          },
+        }
+      )
+    );
+  }
   await Promise.all(calls);
 };

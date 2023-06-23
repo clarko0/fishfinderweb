@@ -3,12 +3,14 @@ import {
   IActiveSessionData,
   IConsumable,
   IConsumableData,
+  IItem,
   ISet,
 } from "./ff.interface";
 
 export interface IFFData {
   page_loading: boolean;
   global: {
+    is_welcome_menu: boolean;
     repair_mode: 1 | 2 | 3;
     is_days: boolean;
     wod_price: number;
@@ -27,16 +29,7 @@ export interface IFFData {
     dashboard: {
       next_repair_counter: string;
       sessions_running: number;
-      repairs: {
-        amount: {
-          1: { amount: number; in_days: number };
-          2: { amount: number; in_days: number };
-          3: { amount: number; in_days: number };
-          4: { amount: number; in_days: number };
-          5: { amount: number; in_days: number };
-          6: { amount: number; in_days: number };
-        };
-      };
+
       estimated_earnings: {
         amount: number;
         price: number;
@@ -87,16 +80,66 @@ export interface IFFData {
             6: boolean;
           };
           offchain_wod: boolean;
+          tools: {
+            amount: number;
+            price: number;
+            usd: number;
+          };
         };
       };
       fishing: {
         open: boolean;
-        cards: React.FC[];
+        cards: any[];
       };
     };
   };
-  active_data: {
-    consumable_data: IConsumable[];
+
+  consumable_data: {
+    consumables: IConsumable[];
+    measurements: {
+      1: {
+        amount: number;
+        repairs: {
+          amount: number;
+          in_days: number;
+        };
+      };
+      2: {
+        amount: number;
+        repairs: {
+          amount: number;
+          in_days: number;
+        };
+      };
+      3: {
+        amount: number;
+        repairs: {
+          amount: number;
+          in_days: number;
+        };
+      };
+      4: {
+        amount: number;
+        repairs: {
+          amount: number;
+          in_days: number;
+        };
+      };
+      5: {
+        amount: number;
+        repairs: {
+          amount: number;
+          in_days: number;
+        };
+      };
+      6: {
+        amount: number;
+        repairs: {
+          amount: number;
+          in_days: number;
+        };
+      };
+    };
   };
   data: {
     consumable_data: {
@@ -104,7 +147,9 @@ export interface IFFData {
       2: IConsumable[];
       3: IConsumable[];
     };
-    items: IItems[];
+    consumable_prices_ids: any;
+    items: IItem[];
+    items_in_sets: IItem[];
     sets: ISet[];
     active_session_data: IActiveSessionData[];
   };

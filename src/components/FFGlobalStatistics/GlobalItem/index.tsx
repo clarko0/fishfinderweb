@@ -25,7 +25,9 @@ const GlobalItem = ({ content, value, image }: any) => {
         }}
       >
         {image}
-        <div style={{ fontWeight: "600", fontSize: "20px" }}>{value}</div>
+        <div style={{ fontWeight: "600", fontSize: "20px" }}>
+          {value >= 1000 ? intToString(value) : value}
+        </div>
       </div>
     </Tooltip>
   );

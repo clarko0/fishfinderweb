@@ -1,4 +1,3 @@
-import { genRanHex } from "@/storage/constants/misc";
 import { useEffect, useState } from "react";
 
 const TextInput = ({ id, id2, id3, type, placeholder, ...props }: any) => {

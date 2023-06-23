@@ -12,7 +12,6 @@ if (isDocked()) {
 }
 
 export const startAutoFishing = async (
-  playerLevel: number,
   keep_sets: boolean,
   keep_zones: boolean,
   skip_repair: boolean,
@@ -22,7 +21,6 @@ export const startAutoFishing = async (
   const test = await api.post("/ff/start-session", {
     address: await GetAddress(),
     auth: GetAuthToken(),
-    level: playerLevel,
     keep_zones: keep_zones,
     keep_sets: keep_sets,
     skip_repair: skip_repair,

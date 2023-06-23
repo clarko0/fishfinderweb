@@ -1,33 +1,29 @@
 const StartStopBtn = ({
-  size,
+  windowSize,
   styling,
-  isFishing,
-  status,
-  setIsEndFishingMenu,
-  startAutoFishing,
-  playerLevel,
-  setIsFishingSettings,
-  RefreshPing,
+  updatePageData,
+  fishingStatus,
 }: any) => {
+  const { width, height } = windowSize;
   return (
     <div
       style={{
         width: "400px",
-        transform: size.width > 600 ? "scale(1)" : "scale(0.8)",
+        transform: width > 600 ? "scale(1)" : "scale(0.8)",
         height: "80px",
         cursor: "pointer",
         userSelect: "none",
         position: "fixed",
         zIndex: "10",
-        left: size.width > 1650 ? "50%" : size.width > 1150 ? "845px" : "50%",
+        left: width > 1650 ? "50%" : width > 1150 ? "845px" : "50%",
         marginLeft: "-200px",
         top: "70%",
         marginTop:
-          size.width > 1650
+          width > 1650
             ? "0px"
-            : size.width > 600
+            : width > 600
             ? "120px"
-            : size.height > 800
+            : width > 800
             ? "50px"
             : "100px",
         fontWeight: "600",
@@ -40,15 +36,15 @@ const StartStopBtn = ({
         fontSize: "30px",
         boxShadow: styling.inverse_btn_glow,
       }}
-      onClick={async () => {
-        if (isFishing || status === "Pending") {
-          setIsEndFishingMenu(true);
+      onClick={() => {
+        if ([2, 1].includes(fishingStatus)) {
+          updatePageData("components.menu.end_fishing.open", true);
         } else {
-          setIsFishingSettings(true);
+          updatePageData("components.menu.fishing_settings.open", true);
         }
       }}
     >
-      {isFishing || status === "Pending" ? "End Fishing" : "Start Fishing"}
+      {[2, 1].includes(fishingStatus) ? "End Fishing" : "Start Fishing"}
     </div>
   );
 };

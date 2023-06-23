@@ -16,10 +16,10 @@ const api = axios.create({
 });
 
 export default async function handler(req: any, res: any) {
-  try {
-    const web3 = new Web3();
-    UTILS.MongoDb.connectToDatabase().then(async (result: any) => {
-      const { client, db } = result;
+  UTILS.MongoDb.connectToDatabase().then(async (result: any) => {
+    const { client, db } = result;
+    try {
+      const web3 = new Web3();
       if (req.method !== "POST") {
         res.status(405).send({ message: "Server Error" });
       }
@@ -29,7 +29,6 @@ export default async function handler(req: any, res: any) {
       const reqKeys: string[] = [
         "address",
         "auth",
-        "level",
         "keep_zones",
         "keep_sets",
         "skip_repair",
@@ -38,12 +37,10 @@ export default async function handler(req: any, res: any) {
       if (!compareArrays(bodyKeys, reqKeys)) {
         throw new Error("Invalid body");
       }
-      if (isNaN(parseInt(body.level))) {
-        throw new Error("Invalid level");
-      }
       if (!web3.utils.isAddress(body.address)) {
         throw new Error("Invalid address");
       }
+
       if (!VerifyAuth(body.auth, body.address)) {
         throw new Error("Auth token is not owned by address");
       }
@@ -59,18 +56,20 @@ export default async function handler(req: any, res: any) {
       if (!([1, 2, 3].indexOf(body.repair_level) !== -1)) {
         throw new Error("Invalid repair level");
       }
-      const pending = await db
-        .collection("ffpending")
-        .find({ projection: { address: body.address } })
-        .toArray();
-      const active = await db
-        .collection("ffpending")
-        .find({ projection: { address: body.address } })
-        .toArray();
-      if (pending.length >= 1 || active.length >= 1) {
-        throw new Error("Already have an active session");
+
+      const PENDING_COLL = await db.collection("ffpending");
+      const USER_COLL = await db.collection("ffusers");
+      const LOGS_COLL = await db.collection("fflogs");
+      const RUNNING_COLL = await db.collection("ffrunning");
+
+      const pending = await PENDING_COLL.findOne({ address: body.address });
+
+      const active = await RUNNING_COLL.findOne({ address: body.address });
+      if (active) {
+        throw new Error("User is already fishing");
       }
-      await db.collection("ffusers").updateOne(
+
+      await USER_COLL.updateOne(
         { address: body.address },
         {
           $set: {
@@ -81,12 +80,27 @@ export default async function handler(req: any, res: any) {
           },
         }
       );
-      await db.collection("ffpending").insertOne({
-        address: body.address,
-        auth: body.auth,
-        char_level: body.level,
-        session_id: genRanHex(32),
-      });
+
+      if (pending) {
+        await PENDING_COLL.updateOne(
+          {
+            address: body.address,
+          },
+          {
+            $set: {
+              auth: body.auth,
+              session_id: genRanHex(32),
+            },
+          }
+        );
+      } else {
+        await PENDING_COLL.insertOne({
+          address: body.address,
+          auth: body.auth,
+          session_id: genRanHex(32),
+        });
+      }
+
       const session_ids = await (
         await api.get(`/zones/active/offchain/select/all`, {
           headers: {
@@ -106,7 +120,7 @@ export default async function handler(req: any, res: any) {
         );
         results.push(response.data);
       }
-      const log = await db.collection("fflogs").insertOne({
+      await LOGS_COLL.insertOne({
         address: body.address,
         auth: body.auth,
         char_level: body.level,
@@ -121,8 +135,9 @@ export default async function handler(req: any, res: any) {
       });
       await client.close();
       res.status(200).json({});
-    });
-  } catch (e: any) {
-    res.status(500).send({ message: e.message });
-  }
+    } catch (e: any) {
+      console.log(e.message);
+      res.status(500).json({ message: e.message });
+    }
+  });
 }
