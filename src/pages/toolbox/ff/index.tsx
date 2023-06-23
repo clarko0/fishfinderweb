@@ -184,12 +184,13 @@ const FishermanFriend = () => {
   });
 
   const changeActiveToolData = () => {
+    console.log("Changing active tooldata");
     const repairMode = pageData.global.repair_mode;
     const consumableData = pageData.data.consumable_data[repairMode];
     updatePageData("consumable_data.consumables", consumableData);
 
     const newMeasurements: any = {};
-
+    console.log("Tooldata in Change ACtive Tool Data : ", consumableData);
     consumableData.forEach((tool) => {
       const { quantity, rarity } = tool;
       const div = repairMode === 1 ? 1 : repairMode === 2 ? 2 : 3;
@@ -198,6 +199,14 @@ const FishermanFriend = () => {
         pageData.data.items_in_sets.filter(
           (item: IItem) => item.rarity === rarity
         ).length;
+      console.log("Quantity : ", quantity);
+      console.log(
+        pageData.data.items_in_sets.filter(
+          (item: IItem) => item.rarity === rarity
+        ).length,
+        ": Number of items"
+      );
+      console.log("Amount for tool : ", tool, " : ", amount);
       newMeasurements[rarity] = {
         amount: quantity,
         repairs: {
@@ -209,6 +218,7 @@ const FishermanFriend = () => {
 
     [1, 2, 3, 4, 5, 6].forEach((item: number) => {
       if (!newMeasurements[item.toString()]) {
+        console.log("made null : ", item);
         newMeasurements[item.toString()] = {
           amount: 0,
           repairs: {

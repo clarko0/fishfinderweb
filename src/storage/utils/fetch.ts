@@ -17,6 +17,7 @@ export const GetUserdata = async () => {
 };
 
 export const GetTools = async () => {
+  console.log("Tools Fetched");
   return await api.get(`/consumables/repairments/user/${GetCurrentAddress()}`, {
     headers: {
       Authorization: GetAuthToken(),

@@ -196,6 +196,7 @@ export const ffStore = async (prevData: IFFData): Promise<IFFData> => {
     },
     consumable: async () => {
       const data = (await GetTools()).data;
+      console.log("Tool Data : ", data);
       data.map((item: any) => {
         const newItem: IConsumable = {
           quantity: item.quantity,
@@ -216,6 +217,7 @@ export const ffStore = async (prevData: IFFData): Promise<IFFData> => {
           newData.data.consumable_data[3].push(newItem);
         }
       });
+      console.log("New consumable data : ", newData.data.consumable_data);
     },
     toolPrices: async () => {
       const data = await GetAllConsumablePrices();
